@@ -127,6 +127,7 @@ function fragmentSource() {
 
         struct Scene {
             float t;
+            vec3 nN;
             vec3 pc;
             float edge;
             float k;            
@@ -189,7 +190,7 @@ function fragmentSource() {
                 sc = mix(fsc, sc, k);
             }
 
-            return  Scene(nearest.tN, sc, edge, k);
+            return  Scene(nearest.tN, nearest.nN, sc, edge, k);
         }
 
         float shadow(vec3 rp) {
@@ -270,7 +271,23 @@ function fragmentSource() {
             //paint boxes
             Scene boxes = drawBoxes(ro, rd, pc);
             if (boxes.t < mint) {
+
                 pc = boxes.pc;
+
+                //floor reflections
+                vec3 rrd = reflect(rd, boxes.nN);
+                vec3 rro = ro + rd * (boxes.t - EPS);
+                float rft = planeIntersection(rro, rrd, fn, fo);
+                if (rft > 0.0 && rft < FAR) {
+                    vec3 frp = rro + rrd * rft;
+                    vec3 rld = normalize(lp - frp);
+                    float rlt = length(lp - frp);
+                    float rdiff = max(dot(fn, rld), 0.05); //diffuse
+                    float ratten = 1. / (1.0 + rlt * rlt * .03);
+                    vec3 rsc = vec3(0.4, 1.0, 0.4) * floorTex(frp); //tile colour
+                    rsc *= rdiff * ratten;
+                    pc += rsc * exp(rft * -rft * 2.5) * 0.3;
+                }
             }
 
             gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);
