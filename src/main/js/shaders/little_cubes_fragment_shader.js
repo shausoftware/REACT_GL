@@ -125,32 +125,40 @@ function fragmentSource() {
             return 0.2 + noise((rp + 0.3) * 3.0) * 0.1;
         }
 
-        vec4 drawBoxes(vec3 ro, vec3 rd, vec3 pc) {
+        struct Scene {
+            float t;
+            vec3 pc;
+            float edge;
+            float k;            
+        };
+
+        Scene drawBoxes(vec3 ro, vec3 rd, vec3 pc) {
             
             vec3 sc = vec3(0.0);
+            float edge = 0.0;
+            float k = 0.0;
 
             Box nearest = Box(FAR, FAR, vec3(0.0), vec3(0.0), 0.0, 0.0); //nearest box
             float index = 0.0; //index of nearest box
-            float wg = 0.0; //global wireframe
 
             //find nearest cube
             for (int i = 0; i < 8; i++) {
-                float k = float(i);
-                Box box = translateBox(ro, rd, k);
+                float fi = float(i);
+                Box box = translateBox(ro, rd, fi);
                 if (box.tN > 0.0) {
                     //hit box
-                    if (box.wN > 0.0) wg = 1.0;
-                    if (box.wF > 0.0) wg = 1.0;
+                    if (box.wN > 0.0) edge = 1.0;
+                    if (box.wF > 0.0) edge = 1.0;
                     if (box.tN < nearest.tN) {
                         //nearest box
                         nearest = box;
-                        index = k;
+                        index = fi;
                     }
                 }
             }
 
             //colour wireframe
-            if (wg > 0.0) {
+            if (edge > 0.0) {
                 sc = vec3(0.0, 1.0, 0.0);
             } else {
                 sc = pc;
@@ -159,16 +167,17 @@ function fragmentSource() {
             if (nearest.tN < FAR) {
                 
                 //colour surface of nearest cube surface
-                float k = clamp(index * 0.06, 0.0, 1.0);
+                k = clamp(index * 0.06, 0.0, 1.0);
 
                 //front face
                 vec3 rp = ro + rd * nearest.tN;
                 vec3 ld = normalize(lp - rp);
                 float lt = length(lp - rp);
-                float diff = max(dot(nearest.nN, ld), 0.01);
+                float diff = max(dot(nearest.nN, ld), 0.05);
                 float spec = pow(max(dot(reflect(-ld, nearest.nN), -rd), 0.0), 16.0);
                 float atten = 1. / (1.0 + lt * lt * .05); //light attenuation
                 vec3 fsc = vec3(0.0, 1.0, 0.0) * diff * atten;
+                fsc += vec3(0.05, 0.0, 0.4) * nearest.nN.y * -0.04; //uplight
                 fsc += vec3(1.0) * spec;
                 
                 //back face
@@ -180,10 +189,9 @@ function fragmentSource() {
                 sc = mix(fsc, sc, k);
             }
 
-            return vec4(sc, nearest.tN);
+            return  Scene(nearest.tN, sc, edge, k);
         }
 
-        //TODO: needs some work
         float shadow(vec3 rp) {
 
             float sh = 1.0; //not in shadow
@@ -191,13 +199,14 @@ function fragmentSource() {
             vec3 ld = normalize(lp - rp); //light direction
             float lt = length(lp - rp); //distance to light
 
-            vec4 boxes = drawBoxes(rp, ld, vec3(0.0)); //distance to boxes
-            if (boxes.w > 0.0 && boxes.w < lt) {
+            Scene boxes = drawBoxes(rp, ld, vec3(0.0)); //distance to boxes
+            if (boxes.t > 0.0 && boxes.t < lt) {
                 //in shadow
-                sh = (1.0 - clamp(length(boxes.xyz) * 2., 0.2, 0.8)) * boxes.w / lt;
+                sh = 0.14 + (boxes.k * (1.0 - boxes.edge) * 0.86);
+                sh *= boxes.t;
             }
 
-            return sh;
+            return clamp(sh, 0.1, 1.0);
         }
                         
         //standard right hand camera setup
@@ -248,9 +257,9 @@ function fragmentSource() {
                 vec3 sc = vec3(0.4, 1.0, 0.4) * floorTex(rp); //tile colour
 
                 //reflections 
-                vec4 boxes = drawBoxes(rp, rrd, vec3(0.0));
-                if (boxes.w > 0.0 && boxes.w < FAR) {
-                    sc += boxes.xyz * exp(boxes.w * -boxes.w * 0.005);
+                Scene boxes = drawBoxes(rp, rrd, vec3(0.0));
+                if (boxes.t > 0.0 && boxes.t < FAR) {
+                    sc += boxes.pc * exp(boxes.t * -boxes.t * 0.0005);
                 }
 
                 sc += vec3(1.0) * spec; //specular
@@ -259,9 +268,9 @@ function fragmentSource() {
             }
 
             //paint boxes
-            vec4 boxes = drawBoxes(ro, rd, pc);
-            if (boxes.w < mint) {
-                pc = drawBoxes(ro, rd, pc).xyz;
+            Scene boxes = drawBoxes(ro, rd, pc);
+            if (boxes.t < mint) {
+                pc = boxes.pc;
             }
 
             gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);
