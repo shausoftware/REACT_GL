@@ -27,18 +27,19 @@ export default class WebGLContentItem extends React.Component {
         var listPage = 'CONTENT_LIST_1';
         var contentItem = <LittleCubes />;
         
-        if (this.state.contentItemName === 'NeonTruchet') {
-            contentItem = <NeonTruchet />;
-        } else if (this.state.contentItemName === 'VoxelBridge') {
-            contentItem = <VoxelBridge />;
-        } else if (this.state.contentItemName === 'Gasket') {
-            contentItem = <Gasket />;
-            var listPage = 'CONTENT_LIST_2';
+        if (this.state.contentItemName === 'LightTunnel') {
+            contentItem = <LightTunnel />;
         } else if (this.state.contentItemName === 'DiscoWall') {
             contentItem = <DiscoWall />;
+        } else if (this.state.contentItemName === 'Gasket') {
+            contentItem = <VoxelBridge />;
+            var listPage = 'CONTENT_LIST_2';
+        } else if (this.state.contentItemName === 'DiscoWall') {
+            contentItem = <NeonTruchet />;
             var listPage = 'CONTENT_LIST_2';
         } else if (this.state.contentItemName === 'LightTunnel') {
-            contentItem = <LightTunnel />;
+            contentItem = <Gasket />;
+            var listPage = 'CONTENT_LIST_2';
         }
 
         return (

@@ -6,11 +6,14 @@ require('bootstrap-loader');
 
 import ShauNavBar from './shaunavbar';
 import Home from './home';
+import TestPage from './testpage';
 import Raymarching from './raymarching/raymarching';
 import Particles from './particles/particles';
 import ShauForm from './shauform';
 import ShauLinks from './shaulinks';
 import ShauCss from './shaucss';
+
+const TEST_MODE = false;
 
 export default class App extends React.Component {
 	
@@ -34,7 +37,10 @@ export default class App extends React.Component {
 
 		var content = <Home />;
 		var rgb = [255, 0, 0]; //red
-
+		
+		if (TEST_MODE) {
+            content = <TestPage />
+		} 
 		if ('PAGE_RAYMARCHING' === this.state.currentPage) {
 			content = <Raymarching />;
 			rgb = [0, 255, 0]; //yellow
@@ -51,7 +57,7 @@ export default class App extends React.Component {
 			content = <ShauLinks />;
 			rgb = [255, 255, 255]; //white
 		}
-		ShauCss.pageCss(rgb);
+		ShauCss.pageCss(rgb);	
 
 		return(
 		    <div> 

@@ -20,24 +20,7 @@ export default class WebGLContentList1 extends React.Component {
         
         return(
             <div className="row">
-                
-                {/*
-                <div className="col-sm-6 col-md-4">
-                    <div className="thumbnail">
-                        <img src="/images/cat2.JPG" alt="TestShader" />
-                        <div className="caption">
-                            <h3>Test Shader</h3>
-                            <p>
-                                Test Shader.
-                            </p>
-                            <p>
-                                <a href="#" name="TestShader" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                */}
-                
+                                
                 <div className="col-sm-6 col-md-4">
                     <div className="thumbnail">
                         <img src="/images/firstattempt.png" alt="Initial Attempt" />

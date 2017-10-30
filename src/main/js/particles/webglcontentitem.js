@@ -2,7 +2,6 @@
 
 const React = require('react');
 
-import TestShader from './testshader';
 import InitialAttempt from './initialattempt';
 
 export default class WebGLContentItem extends React.Component {
@@ -23,10 +22,6 @@ export default class WebGLContentItem extends React.Component {
         var contentItem = <InitialAttempt />;
         var listPage = 'CONTENT_LIST_1';
         
-        if (this.state.contentItemName === 'TestShader') {
-            contentItem = <TestShader />;
-        }
-
         return (
             <div>
                 <p className="text-right">

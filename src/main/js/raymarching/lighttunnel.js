@@ -2,7 +2,6 @@
 
 const React = require('react');
 import ShauGL from '../shaugl';
-import ShauBufferGL from '../shaubuffergl';
 import VertexShader from '../shaders/vertex_shader';
 import LightTunnelFragmentShader from '../shaders/light_tunnel_fragment_shader';
 import LightTunnelBufferShader from '../shaders/light_tunnel_buffer_shader';
@@ -68,7 +67,7 @@ export default class LightTunnel extends React.Component {
             
             //render to canvas
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauBufferGL.drawSceneWithBufferTexture(gl, programInfo, buffers, renderBuffer.texture, now, clearColour);
+            ShauGL.drawSceneWithBufferTexture(gl, programInfo, buffers, renderBuffer.texture, now, clearColour);
             
             animId = requestAnimationFrame(renderFrame);
         }
