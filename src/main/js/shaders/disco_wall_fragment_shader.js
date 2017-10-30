@@ -14,9 +14,11 @@ function fragmentSource() {
         varying float v_time;
 
         #define EPS 0.005
-        #define FAR 50.0 
+        #define FAR 30.0 
         #define PI 3.14159265359
         #define T v_time
+        #define ROWS 3
+        #define COLS 7
 
         struct Scene {
             vec3 rp;
@@ -31,8 +33,7 @@ function fragmentSource() {
             float tN;
             float tF;
             vec3 nN;
-            vec3 nF;
-        };
+        };        
 
         vec3 lp = vec3(4.0, 5.0, -2.0); //light position
         vec3 boxes[24];
@@ -45,18 +46,18 @@ function fragmentSource() {
         
         void setup() {
 
-            sphere1 = vec4(1.0, -2.2, 0.0, 0.3);
-            sphere2 = vec4(-1.0, -2.2, 0.0, 0.3);            
+            sphere1 = vec4(0.7, -2.3, 0.0, 0.2);
+            sphere2 = vec4(-0.7, -2.3, 0.0, 0.2);            
             sphere1.xz *= rot(T); 
             sphere2.xz *= rot(T); 
             sphere1.xyz += vec3(0.0, 0.0, -3.0);
             sphere2.xyz += vec3(0.0, 0.0, -3.0);
 
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 8; x++) {
-                    float index = float(y * 8 + x);
-                    vec3 box = vec3(float(4 - x), float(y), sin(T + index) * 0.2);
-                    boxes[y * 8 + x] = box;
+            for (int y = 0; y < ROWS; y++) {
+                for (int x = 0; x < COLS; x++) {
+                    float index = float(y * COLS + x);
+                    vec3 box = vec3(3.5 - float(x), float(y), sin(T + index) * 0.2);
+                    boxes[y * COLS + x] = box;
                 }
             }
         }
@@ -65,7 +66,7 @@ function fragmentSource() {
         // http://www.iquilezles.org/www/articles/boxfunctions/boxfunctions.htm
         Hit boxIntersection(vec3 ro, vec3 rd, vec3 boxSize) {
             
-            Hit box = Hit(0.0, 0.0, vec3(0.0), vec3(0.0)); //miss
+            Hit box = Hit(0.0, 0.0, vec3(0.0)); //miss
 
             vec3 m = 1.0 / rd;
             vec3 n = m * ro;
@@ -80,9 +81,8 @@ function fragmentSource() {
             if (tN > tF || tF < 0.0) return box;
 
             vec3 nN = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz); //near face normal
-            vec3 nF = -sign(rd) * step(t2.xyz, t2.yzx) * step(t2.xyz, t2.zxy); //far face normal
             
-            return Hit(tN, tF, nN, nF);
+            return Hit(tN, tF, nN);
         }
 
         // Slightly modified version of IQs sphere functions
@@ -93,13 +93,12 @@ function fragmentSource() {
             float b = dot(oc, rd);
             float c = dot(oc, oc) - sph.w * sph.w;
             float h = b * b - c;
-            if (h < 0.0) return Hit(0.0, 0.0, vec3(0.0), vec3(0.0)); //miss;
+            if (h < 0.0) return Hit(0.0, 0.0, vec3(0.0)); //miss;
             h = sqrt(h);
             float tN = -b - h;
             float tF = -b + h;
             vec3 nN = normalize((ro + rd * tN) - sph.xyz);
-            vec3 nF = -normalize((ro + rd * tF) - sph.xyz);
-            return Hit(tN, tF, nN, nF);
+            return Hit(tN, tF, nN);
         }
 
         float sphSoftShadow(vec3 ro, vec3 rd, vec4 sph, float k) {
@@ -117,19 +116,19 @@ function fragmentSource() {
             return dot(o - ro, n) / dot(rd, n);
         }
 
-        Hit drawBoxes(vec3 ro, vec3 rd) {
+        Hit drawBoxes(vec3 ro, vec3 rd, inout vec3 bc) {
 
             float tN = FAR;
             float tF = FAR;
             vec3 n = vec3(0.0);
-            vec3 bc = vec3(-1.0);
+            bc = vec3(-1.0);
 
-            float r1 = rand(vec2(T)) * 24.0;
+            float r1 = rand(vec2(T)) * float(ROWS * COLS);
 
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 8; x++) {
-                    float index = float(y * 8 + x);
-                    vec3 box = boxes[y * 8 + x];
+            for (int y = 0; y < ROWS; y++) {
+                for (int x = 0; x < COLS; x++) {
+                    float index = float(y * COLS + x);
+                    vec3 box = boxes[y * COLS + x];
                     Hit bh = boxIntersection(ro + box, rd, vec3(0.48));
                     if (bh.tN > 0.0 && bh.tN < tN) {
                         tN = bh.tN;
@@ -137,12 +136,14 @@ function fragmentSource() {
                         n = bh.nN;
                         if (r1 > index && r1 < index + 1.0) {
                             bc = box;
+                        } else {
+                            bc = vec3(-1.0);
                         }
                     }
                 }
             }
 
-            return Hit(tN, tF, n, bc);
+            return Hit(tN, tF, n);
         }
 
         vec4 drawSpheres(vec3 ro, vec3 rd) {
@@ -175,9 +176,9 @@ function fragmentSource() {
 
             float t = FAR;
 
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 8; x++) {
-                    vec3 box = boxes[y * 8 + x];
+            for (int y = 0; y < ROWS; y++) {
+                for (int x = 0; x < COLS; x++) {
+                    vec3 box = boxes[y * COLS + x];
                     float ns = sdBox(rp + box, vec3(0.48));
                     if (ns < t) t = ns;
                 }
@@ -191,13 +192,13 @@ function fragmentSource() {
             vec3 pc = vec3(0.0);
             float t = 0.0;
 
-            for (int i = 0; i < 40; i++) {
+            for (int i = 0; i < 20; i++) {
                 vec3 rp = ro + rd * t;
                 float ns = map(rp);
                 if (ns < EPS || t > maxt) break;
                 float lt = length(rp + bc);
 
-                pc += vec3(0.0, 1.0, 0.0) * 1.0 / (1.0 + lt * lt * 16.0) * 0.05;
+                pc += vec3(0.0, 1.0, 0.0) * exp(lt * -lt * 4.0) * 0.05;
 
                 t += ns;
             }
@@ -210,7 +211,7 @@ function fragmentSource() {
             vec3 pc = vec3(0.0);
             float t = 0.0;
 
-            for (int i = 0; i < 50; i++) {
+            for (int i = 0; i < 30; i++) {
                 vec3 rp = ro + rd * t;
                 if (t > maxt) break;
                 float lt = length(rp + bc);
@@ -228,7 +229,7 @@ function fragmentSource() {
             vec2 uv = (gl_FragCoord.xy - v_resolution.xy * 0.5) / v_resolution.y;
 
             vec3 lookAt = vec3(0.0, -2.0, 0.0);
-            ro = lookAt + vec3(-3.0, 2.0, -8.0);
+            ro = lookAt + vec3(sin(T * 0.2) * 3.0, 1.0, -6.0);
 
             float FOV = PI / 3.0;
             vec3 forward = normalize(lookAt - ro);
@@ -276,7 +277,8 @@ function fragmentSource() {
                 pc *= sh1 * sh2;
             }
 
-            Hit box = drawBoxes(ro, rd);
+            vec3 gbc = vec3(-1.0);
+            Hit box = drawBoxes(ro, rd, gbc);
             if (box.tN > 0.0 && box.tN < mint) {
                 
                 //boxes
@@ -294,10 +296,10 @@ function fragmentSource() {
                 pc = vec3(0.0, 0.1, 0.0) * diff * atten;
                 pc += vec3(1.0) * spec;
 
-                if (box.nF != vec3(-1.0)) {
+                if (gbc != vec3(-1.0)) {
                     //lit  cube
-                    pc += vMarch(rp, rd, box.nF, box.tF - box.tN) * 1.2;
-                    bc = box.nF;
+                    pc += vMarch(rp, rd, gbc, box.tF - box.tN) * 1.2;
+                    bc = gbc;
                 }
             }
 
@@ -374,10 +376,10 @@ function fragmentSource() {
                 pc *= sh3;                
             }
 
-            float r1 = rand(vec2(T)) * 24.0;
-            float y = floor(r1 / 8.0);            
-            float x = floor(r1) - y * 8.0;
-            vec3 box = vec3(4.0 - x, y, sin(T + floor(r1)) * 0.2);
+            float r1 = rand(vec2(T)) * float(ROWS * COLS);
+            float y = floor(r1 / float(COLS));            
+            float x = floor(r1) - y * float(COLS);
+            vec3 box = vec3(3.5 - x, y, sin(T + floor(r1)) * 0.2);
             pc += march(ro, rd, box, scene.t);
             
             gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);

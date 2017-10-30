@@ -31,13 +31,13 @@ export default class WebGLContentItem extends React.Component {
             contentItem = <LightTunnel />;
         } else if (this.state.contentItemName === 'DiscoWall') {
             contentItem = <DiscoWall />;
-        } else if (this.state.contentItemName === 'Gasket') {
+        } else if (this.state.contentItemName === 'VoxelBridge') {
             contentItem = <VoxelBridge />;
             var listPage = 'CONTENT_LIST_2';
-        } else if (this.state.contentItemName === 'DiscoWall') {
+        } else if (this.state.contentItemName === 'NeonTruchet') {
             contentItem = <NeonTruchet />;
             var listPage = 'CONTENT_LIST_2';
-        } else if (this.state.contentItemName === 'LightTunnel') {
+        } else if (this.state.contentItemName === 'Gasket') {
             contentItem = <Gasket />;
             var listPage = 'CONTENT_LIST_2';
         }

@@ -4,6 +4,7 @@ const React = require('react');
 
 const cat2Src = require('../static/images/cat2.jpg');
 const littleCubesSrc = require('../static/images/littlecubes.png');
+const discoWallSrc = require('../static/images/discowall.png');
 
 export default class WebGLContentList1 extends React.Component {
 
@@ -58,7 +59,7 @@ export default class WebGLContentList1 extends React.Component {
 
                     <div className="col-sm-6 col-md-4">
                         <div className="thumbnail">
-                            <img src={cat2Src} alt="Disco Wall" />
+                            <img src={discoWallSrc} alt="Disco Wall" />
                             <div className="caption">
                                 <h3>Disco Wall</h3>
                                 <p>This scene is rendered using a combination of raytracing and raymarched volumetric lighting. 
