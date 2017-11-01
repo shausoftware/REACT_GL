@@ -174,7 +174,7 @@ function fragmentSource() {
             float ao = AO(rp, n);
             
             //diffuse
-            pc = 0.2 * vec3(1.0, 0.8, 1.0) * cdiff * catten + 
+            pc = 0.2 * vec3(0.3, 0.24, 0.3) * cdiff * catten + 
                  0.8 * vec3(0.0, 1.0, 0.0) * sdiff * satten;
             pc *= 0.5;
 

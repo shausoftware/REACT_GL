@@ -33,8 +33,8 @@ function fragmentSource() {
         vec3 map(vec3 rp) {
 
             rp.xy -= path(rp.z).xy;
-            rp.xy *= rot(-T);            
-            float tun = 1.5 - length(rp.xy);
+            rp.xy *= rot(T);            
+            float tun = 1.3 - length(rp.xy);
             
             //polar coordinates
             float a = atan(rp.y, rp.x) / 6.2831853;
@@ -114,17 +114,11 @@ function fragmentSource() {
                 vec3 ld = normalize(lp - rp);
                 float diff = max(dot(ld, n), 0.05);
 
-                vec2 tileid = vec2(t.y, floor((t.z + 0.5) * 18.0));
-                
-                vec2 mx1 = mod(tileid, 4.0) - 2.0;
-                if (mx1.x * mx1.y >= 0.0) {
-                    if (rand(tileid) > 0.5) {
-                        if (mod(t.z + 0.5, 0.01) > 0.009) {
-                            pc = vec3(0.4, 0.0, 0.0) * diff;
-                            float fogAmount = 1.0 - exp(-t.x * 0.2);
-                            pc = mix(pc, vec3(0.0), fogAmount);
-                            mint = t.x;
-                        }
+                float mz = mod(rp.z - sin(T * 0.5) * 20.0, 40.0);
+                if (mz > 39.0 && mz < 39.4 || mz > 39.6) {
+                    if (mod(t.z, 0.05) > 0.025) {
+                        pc = vec3(0.0, 1.0, 0.0);
+                        mint = t.x;
                     }
                 }
             }

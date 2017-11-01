@@ -14,7 +14,8 @@ function fragmentSource() {
         varying float v_time;
 
         uniform sampler2D u_texture;        
-
+        uniform sampler2D u_texture2;        
+        
         #define EPS 0.005
         #define FAR 100.0 
         #define PI 3.14159265359

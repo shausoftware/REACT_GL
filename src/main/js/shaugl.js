@@ -150,6 +150,11 @@ function drawScene(gl, programInfo, buffers, runningTime, clearColour) {
     var offset = 0;
     var count = 6;
     gl.drawArrays(primitiveType, offset, count);
+
+    //clean up
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
+    gl.useProgram(null);
 }
 
 function drawSceneWithBufferTexture(gl, programInfo, buffers, texture, runningTime, clearColour) {
@@ -165,7 +170,7 @@ function drawSceneWithBufferTexture(gl, programInfo, buffers, texture, runningTi
     gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform1i(programInfo.uniformLocations.textureUniformLocation, 0);
+    gl.uniform1i(programInfo.uniformLocations.textureUniformLocation, 0); 
 
     gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
     gl.uniform1f(programInfo.uniformLocations.timeUniformLocation, runningTime);
@@ -174,6 +179,11 @@ function drawSceneWithBufferTexture(gl, programInfo, buffers, texture, runningTi
     var offset = 0;
     var count = 6;
     gl.drawArrays(primitiveType, offset, count);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
+    gl.useProgram(null);
 }
 
 module.exports = {

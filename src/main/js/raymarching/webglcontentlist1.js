@@ -2,7 +2,7 @@
 
 const React = require('react');
 
-const cat2Src = require('../static/images/cat2.jpg');
+const lightTunnelSrc = require('../static/images/lighttunnel.png');
 const littleCubesSrc = require('../static/images/littlecubes.png');
 const discoWallSrc = require('../static/images/discowall.png');
 
@@ -45,7 +45,7 @@ export default class WebGLContentList1 extends React.Component {
 
                     <div className="col-sm-6 col-md-4">
                         <div className="thumbnail">
-                            <img src={cat2Src} alt="Light Tunnel" />
+                            <img src={lightTunnelSrc} alt="Light Tunnel" />
                             <div className="caption">
                                 <h3>Light Tunnel</h3>
                                 <p>The classic tunnel inspired by Beeple Crap. 
