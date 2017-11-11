@@ -3,6 +3,8 @@
 const React = require('react');
 
 import InitialAttempt from './initialattempt';
+import MozillaCube from './mozillacube';
+import Teapot from './teapot';
 
 export default class WebGLContentItem extends React.Component {
 
@@ -21,6 +23,12 @@ export default class WebGLContentItem extends React.Component {
 
         var contentItem = <InitialAttempt />;
         var listPage = 'CONTENT_LIST_1';
+        if ('MozillaCube' === this.state.contentItemName) {
+            contentItem = <MozillaCube />;
+        }
+        if ('Teapot' === this.state.contentItemName) {
+            contentItem = <Teapot />;
+        }
         
         return (
             <div>

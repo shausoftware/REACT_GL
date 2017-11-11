@@ -45,7 +45,7 @@ export default class WebGLContentList2 extends React.Component {
                             <img src={neonTruchetSrc} alt="Neon Truchet" />
                             <div className="caption">
                                 <h3>Neon Truchet</h3>
-                                <p>A 3D Truchet tiling with directional flow.
+                                <p>WIP. A 3D Truchet tiling with directional flow.
                                 </p>
                                 <p>
                                     <a href="#" name="NeonTruchet" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 
@@ -60,7 +60,7 @@ export default class WebGLContentList2 extends React.Component {
                             <div className="caption">
                                 <h3>Apollonian Gasket</h3>
                                 <p>A scene I created using by raymarching an Apollonian Gasket fractal. It's quite strenuous 
-                                    on the GPU so it may be slow on some older machines. 
+                                   on the GPU so it may be slow on some older machines. 
                                 </p>
                                 <p>
                                     <a href="#" name="Gasket" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 

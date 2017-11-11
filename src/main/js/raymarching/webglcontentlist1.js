@@ -48,7 +48,7 @@ export default class WebGLContentList1 extends React.Component {
                             <img src={lightTunnelSrc} alt="Light Tunnel" />
                             <div className="caption">
                                 <h3>Light Tunnel</h3>
-                                <p>The classic tunnel inspired by Beeple Crap. 
+                                <p>WIP. The classic tunnel inspired by Beeple Crap. 
                                 </p>
                                 <p>
                                     <a href="#" name="LightTunnel" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 
@@ -62,7 +62,7 @@ export default class WebGLContentList1 extends React.Component {
                             <img src={discoWallSrc} alt="Disco Wall" />
                             <div className="caption">
                                 <h3>Disco Wall</h3>
-                                <p>This scene is rendered using a combination of raytracing and raymarched volumetric lighting. 
+                                <p>WIP. This scene is rendered using a combination of raytracing and raymarched volumetric lighting. 
                                 </p>
                                 <p>
                                     <a href="#" name="DiscoWall" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 

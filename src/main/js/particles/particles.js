@@ -34,11 +34,12 @@ export default class Particles extends React.Component {
 
         return (
             <div className='panel panel-default'>
-            <div className='panel-heading'>Particle Systems</div>
+            <div className='panel-heading'>Experiments and learning</div>
                 <div className='panel-body'>
                     <p className='text-center'>
-                        I love some of the things you can do by modelling with particle systems and I've 
-                        wanted to build one for a long time. 
+                        WebGL experiments and Learning materials. I thought it might be nice to document
+                        my learning curve with WebGL. There seems to be lot's of good examples of the basics
+                        but materials on more advanced subjects seem to be a little thin on the ground.  
                     </p>
 
                     <div className='text-center'>

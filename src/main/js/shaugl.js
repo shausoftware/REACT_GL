@@ -50,6 +50,7 @@ function checkExtensions(gl) {
     
     var ext1 = undefined;
     var ext2 = undefined;
+    var ext3 = undefined;
 
     try {ext1 = gl.getExtension('OES_texture_float');} catch(e) {}
     if (!ext1) {
@@ -60,6 +61,12 @@ function checkExtensions(gl) {
     try {ext2 = gl.getExtension('WEBGL_draw_buffers');} catch(e) {}
     if (!ext2) {
         console.error("WEBGL_draw_buffers extension not supported");
+        return undefined;
+    }
+
+    try {ext3 = gl.getExtension('OES_standard_derivatives');} catch(e) {}
+    if (!ext3) {
+        console.error("OES_standard_derivatives extension not supported");
         return undefined;
     }
 

@@ -34,7 +34,7 @@ module.exports = {
                 }
             },
             {
-                test: /\.(jpe?g|png|gif|unity3d)$/i,   //to support eg. background-image property 
+                test: /\.(jpe?g|png|gif|unity3d|obj)$/i,   //to support eg. background-image property 
                 loader: 'file-loader?name=images/[name].[ext]',
             },
             {

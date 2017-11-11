@@ -1,16 +1,27 @@
 'use strict';
 
 const React = require('react');
+var glm = require('gl-matrix');
+
+const woodSrc = require('./static/images/wood.png');
+const teapotObjSrc = require('./static/teapot.obj');
+const bugattiObjSrc = require('./static/bugatti.obj');
+const aventObjSrc = require('./static/avent.obj');
+
 import ShauGL from './shaugl';
-import ShauTunnelGL from './shautunnelgl';
+import ShauImageGL from './shauimagegl';
 
-import VertexShader from './shaders/vertex_shader';
+import TeapotGL from './teapotgl';
+import TeapotShadowVertexShader from './shaders/teapot_shadow_vertex_shader';
+import TeapotShadowFragmentShader from './shaders/teapot_shadow_fragment_shader';
+import TeapotVertexShader from './shaders/teapot_vertex_shader';
+import TeapotFragmentShader from './shaders/teapot_fragment_shader';
+import TeapotSSAOVertexShader from './shaders/teapot_ssao_vertex_shader';
+import TeapotSSAOFragmentShader from './shaders/teapot_ssao_fragment_shader';
 
-import NeonTruchetFragmentShader from './shaders/neon_truchet_fragment_shader';
-
-import LightTunnelFragmentShader from './shaders/light_tunnel_fragment_shader';
-import LightTunnelBufferShader from './shaders/light_tunnel_buffer_shader';
-import LightTunnelBuffer2Shader from './shaders/light_tunnel_buffer2_shader';
+import CubeGL from './cubegl';
+import CubeVertexShader from './shaders/cube_vertex_shader';
+import CubeFragmentShader from './shaders/cube_fragment_shader';
 
 var animId = undefined;
 
@@ -29,83 +40,139 @@ export default class TestPage extends React.Component {
             return;
         }
 
-        const vsSource = VertexShader.vertexSource();
-        const fsSource = LightTunnelFragmentShader.fragmentSource();
-        const fsBufferSource = LightTunnelBufferShader.fragmentSource();
-        const fsBuffer2Source = LightTunnelBuffer2Shader.fragmentSource();
+        ShauGL.checkExtensions(gl);
+
+        var shadowDepthTextureSize = 2048;
+        var lightPosition = [-2.0, 10.0, 1.0];
+        var camera = {
+            position: [0.0, 5.0, 10.0],
+            target: [0.0, 0.0, 0.0],
+            near: 0.01,
+            far: 400.0,
+            fov: 45.0,
+            aspectRatio: gl.canvas.width / gl.canvas.height
+        };
+
+        var lightProjectionMatrix = glm.mat4.create();
+        glm.mat4.ortho(lightProjectionMatrix,                   
+                       -40.0,
+                        40.0,
+                       -40.0,
+                        40.0,
+                       -40.0, 
+                        80.0);
         
-        const shaderProgram = ShauGL.initShaderProgram(gl, vsSource, fsSource);
-        const bufferProgram = ShauGL.initShaderProgram(gl, vsSource, fsBufferSource);
-        const buffer2Program = ShauGL.initShaderProgram(gl, vsSource, fsBuffer2Source);
+        var cameraProjectionMatrix = glm.mat4.create();
+        glm.mat4.perspective(cameraProjectionMatrix,
+                             camera.fov,
+                             camera.aspectRatio,
+                             camera.near,
+                             camera.far);
         
-        const programInfo = {
-            program: shaderProgram,
+        //teapot program
+        const teapotVsSource = TeapotVertexShader.vertexSource();
+        const teapotFsSource = TeapotFragmentShader.fragmentSource();
+        const teapotShaderProgram = ShauGL.initShaderProgram(gl, teapotVsSource, teapotFsSource);
+        const teapotProgramInfo = {
+            program: teapotShaderProgram,
             attribLocations: {
-                positionAttributePosition: gl.getAttribLocation(shaderProgram, 'a_position')
+                positionAttributeLocation: gl.getAttribLocation(teapotShaderProgram, 'a_position'),
+                normalAttributeLocation: gl.getAttribLocation(teapotShaderProgram, 'a_normal')
             },
             uniformLocations: {
-                textureUniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture'),
-                textureUniformLocation2: gl.getUniformLocation(shaderProgram, 'u_texture2'),
-                resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
-                timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
+                modelViewMatrixUniformLocation: gl.getUniformLocation(teapotShaderProgram, 'u_model_view_matrix'),
+                projectionMatrixUniformLocation: gl.getUniformLocation(teapotShaderProgram, 'u_projection_matrix'),
+                smModelViewMatrixUniformLocation: gl.getUniformLocation(teapotShaderProgram, 'u_sm_model_view_matrix'),
+                smProjectionMatrixUniformLocation: gl.getUniformLocation(teapotShaderProgram, 'u_sm_projection_matrix'),
+                normalsMatrixUniformLocation: gl.getUniformLocation(teapotShaderProgram, 'u_normals_matrix'),
+                depthColourTextureUniformLocation: gl.getUniformLocation(teapotShaderProgram, 'u_depth_colour_texture'),
+                colourUniformLocation: gl.getUniformLocation(teapotShaderProgram, 'u_colour'),
+                lightPositionUniformLocation: gl.getUniformLocation(teapotShaderProgram, 'u_light_position'),
+                ssaoTextureUniformLocation: gl.getUniformLocation(teapotShaderProgram, 'u_ssao_texture')
+            }
+        }
+
+        //shadow program
+        const shadowMapVsSource = TeapotShadowVertexShader.vertexSource();
+        const shadowMapFsSource = TeapotShadowFragmentShader.fragmentSource();
+        const shadowMapShaderProgram = ShauGL.initShaderProgram(gl, shadowMapVsSource, shadowMapFsSource);
+        const shadowMapProgramInfo = {
+            program: shadowMapShaderProgram,
+            attribLocations: {
+                positionAttributePosition: gl.getAttribLocation(shadowMapShaderProgram, 'a_position')
+            },
+            uniformLocations: {
+                modelViewMatrixUniformLocation: gl.getUniformLocation(shadowMapShaderProgram, 'u_model_view_matrix'),
+                projectionMatrixUniformLocation: gl.getUniformLocation(shadowMapShaderProgram, 'u_projection_matrix')
             }
         };
 
-        const bufferProgramInfo = {
-            program: bufferProgram,
+        //ssao program
+        const ssaoVsSource = TeapotSSAOVertexShader.vertexSource();
+        const ssaoFsSource = TeapotSSAOFragmentShader.fragmentSource();
+        const ssaoShaderProgram = ShauGL.initShaderProgram(gl, ssaoVsSource, ssaoFsSource);
+        const ssaoProgramInfo = {
+            program: ssaoShaderProgram,
             attribLocations: {
-                positionAttributePosition: gl.getAttribLocation(bufferProgram, 'a_position')
+                positionAttributePosition: gl.getAttribLocation(ssaoShaderProgram, 'a_position'),
+                normalAttributeLocation: gl.getAttribLocation(ssaoShaderProgram, 'a_normal')
             },
             uniformLocations: {
-                resolutionUniformLocation: gl.getUniformLocation(bufferProgram, 'u_resolution'),
-                timeUniformLocation: gl.getUniformLocation(bufferProgram, 'u_time')
+                modelViewMatrixUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_model_view_matrix'),
+                projectionMatrixUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_projection_matrix'),
+                normalsMatrixUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_normals_matrix'),
+                farUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_far')                
             }
         };
 
-        const buffer2ProgramInfo = {
-            program: buffer2Program,
-            attribLocations: {
-                positionAttributePosition: gl.getAttribLocation(buffer2Program, 'a_position')
-            },
-            uniformLocations: {
-                resolutionUniformLocation: gl.getUniformLocation(buffer2Program, 'u_resolution'),
-                timeUniformLocation: gl.getUniformLocation(buffer2Program, 'u_time')
-            }
-        };
-
-        const buffers = ShauGL.initBuffers(gl);
-        var renderBuffer = ShauGL.setupRenderFramebuffer(gl);        
-        var renderBuffer2 = ShauGL.setupRenderFramebuffer(gl);        
-        
-        var clearColour = {red: 0.0, green: 1.0, blue: 0.0};
+        var buffers = undefined;
+        var shadowMapFramebuffer = TeapotGL.initSmFramebuffer(gl, shadowDepthTextureSize, shadowDepthTextureSize);
+        var ssaoFramebuffer = TeapotGL.initSmFramebuffer(gl, gl.canvas.width, gl.canvas.height);
+        var viewCameraMatrices = TeapotGL.setupCamera(camera.position, camera.target, cameraProjectionMatrix);
+        var shadowMapCameraMatrices = TeapotGL.setupCamera(lightPosition, camera.target, lightProjectionMatrix);
+ 
+        var then = 0;
         function renderFrame(now) {
-            
-            now *= 0.001;
-            
-            //render to frame buffer 1
-            gl.bindFramebuffer(gl.FRAMEBUFFER, renderBuffer.framebuffer);
-            ShauGL.drawScene(gl, bufferProgramInfo, buffers, now, clearColour);
 
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            now *= 0.001; // convert to seconds
+            const deltaTime = now - then;
+            then = now;
+            
+            // Draw to our off screen drawing buffer for shadow map
+            gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMapFramebuffer.framebuffer);
+            TeapotGL.drawShadowMap(gl, 
+                                   shadowMapProgramInfo, 
+                                   buffers, 
+                                   shadowMapCameraMatrices,  
+                                   shadowDepthTextureSize);
+            //*/
+            
+            //ssao depth to off screen buffer
+            gl.bindFramebuffer(gl.FRAMEBUFFER, ssaoFramebuffer.framebuffer);
+            TeapotGL.drawSSAO(gl, ssaoProgramInfo, buffers, viewCameraMatrices, camera);
+            //*/
 
-            //render to frame buffer 2
-            gl.bindFramebuffer(gl.FRAMEBUFFER, renderBuffer2.framebuffer);
-            ShauGL.drawScene(gl, buffer2ProgramInfo, buffers, now, clearColour);
-            
-            //render to canvas
+            //draw scene
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauTunnelGL.drawTunnelSceneWithBufferTextures(gl, 
-                                                           programInfo, 
-                                                           buffers, 
-                                                           renderBuffer.texture, 
-                                                           renderBuffer2.texture, 
-                                                           now, 
-                                                           clearColour);
-            
+            TeapotGL.drawScene(gl, 
+                               teapotProgramInfo, 
+                               buffers, 
+                               viewCameraMatrices,
+                               shadowMapCameraMatrices,
+                               shadowMapFramebuffer.texture,
+                               ssaoFramebuffer.texture,
+                               lightPosition);
+            //*/
+
             animId = requestAnimationFrame(renderFrame);
         }
 
-        animId = requestAnimationFrame(renderFrame);        
+        var useMaterials = false;
+        TeapotGL.loadMesh(teapotObjSrc, useMaterials).then(mesh => {
+            console.log('MESH LOADED');
+            buffers = TeapotGL.initBuffers(gl, mesh);
+            animId = requestAnimationFrame(renderFrame);        
+        });
     }
 
     componentWillUnmount() {
