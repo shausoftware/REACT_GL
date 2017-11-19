@@ -51,9 +51,9 @@ export default class Raymarching extends React.Component {
                 <div className='panel-body'>
                     <p className='text-center'>
                         Thanks to the likes of IQ and the Shadertoy community I've been introduced the world of 
-                        Fragment shaders. This pages contains some of my creations using raymarching, raytracing,
+                        fragment shaders. This pages contains some of my creations using raymarching, raytracing,
                         and voxel rendering techniques. They all use a similar process where a simple quad is drawn 
-                        to the screen by the Vertex shader and the Fragment shader is left to handle everything else
+                        to the screen by the vertex shader and the Fragment shader is left to handle everything else
                          such as geometry, cameras and lighting.
                     </p>
 

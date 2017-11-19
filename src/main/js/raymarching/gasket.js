@@ -1,7 +1,7 @@
 'use strict';
 
 const React = require('react');
-import ShauGL from '../shaugl';
+import ShauRMGL from '../shaurmgl';
 import VertexShader from '../shaders/vertex_shader';
 import GasketFragmentShader from '../shaders/gasket_fragment_shader';
 
@@ -25,7 +25,7 @@ export default class Gasket extends React.Component {
         const vsSource = VertexShader.vertexSource();
         const fsSource = GasketFragmentShader.fragmentSource();
 
-        const shaderProgram = ShauGL.initShaderProgram(gl, vsSource, fsSource);
+        const shaderProgram = ShauRMGL.initShaderProgram(gl, vsSource, fsSource);
 
         const programInfo = {
             program: shaderProgram,
@@ -38,12 +38,12 @@ export default class Gasket extends React.Component {
             }
         };
 
-        const buffers = ShauGL.initBuffers(gl);
+        const buffers = ShauRMGL.initBuffers(gl);
         
         var clearColour = {red: 0.0, green: 1.0, blue: 0.0};
         function renderFrame(now) {
             now *= 0.001;
-            ShauGL.drawScene(gl, programInfo, buffers, now, clearColour);
+            ShauRMGL.drawRMScene(gl, programInfo, buffers, now, clearColour);
             animId = requestAnimationFrame(renderFrame);
         }
 

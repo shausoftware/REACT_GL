@@ -13,7 +13,7 @@ function fragmentSource() {
         varying vec2 v_resolution;
         varying float v_time;
 
-        uniform sampler2D u_texture;                
+        uniform sampler2D u_texture1;                
         uniform sampler2D u_texture2;                
         
         #define EPS 0.005
@@ -460,7 +460,7 @@ function fragmentSource() {
             
             pc += vec3(0.0, 1.0, 0.0) * scene.li;
 
-            vec4 sleeve = texture2D(u_texture, gl_FragCoord.xy / v_resolution);
+            vec4 sleeve = texture2D(u_texture1, gl_FragCoord.xy / v_resolution);
             if (sleeve.w * FAR < scene.t) {
                 pc = sleeve.xyz;
             }

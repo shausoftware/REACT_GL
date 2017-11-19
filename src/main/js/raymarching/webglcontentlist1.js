@@ -48,7 +48,7 @@ export default class WebGLContentList1 extends React.Component {
                             <img src={lightTunnelSrc} alt="Light Tunnel" />
                             <div className="caption">
                                 <h3>Light Tunnel</h3>
-                                <p>WIP. The classic tunnel inspired by Beeple Crap. 
+                                <p>WIP. The classic tunnel inspired by Beeple. 
                                 </p>
                                 <p>
                                     <a href="#" name="LightTunnel" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 

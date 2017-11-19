@@ -13,8 +13,7 @@ function fragmentSource() {
         varying vec2 v_resolution;
         varying float v_time;
 
-        uniform sampler2D u_texture;        
-        uniform sampler2D u_texture2;        
+        uniform sampler2D u_texture1;        
         
         #define EPS 0.005
         #define FAR 100.0 
@@ -183,7 +182,7 @@ function fragmentSource() {
             }
 
             //glow light
-            pc += texture2D(u_texture, gl_FragCoord.xy / v_resolution).xyz;
+            pc += texture2D(u_texture1, gl_FragCoord.xy / v_resolution).xyz;
             
             gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);
         }

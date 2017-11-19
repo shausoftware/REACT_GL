@@ -1,7 +1,7 @@
 'use strict';
 
 const React = require('react');
-import ShauGL from '../shaugl';
+import ShauRMGL from '../shaurmgl';
 import VertexShader from '../shaders/vertex_shader';
 import VoxelBridgeFragmentShader from '../shaders/voxel_bridge_fragment_shader';
 import VoxelBridgeBufferFragmentShader from '../shaders/voxel_bridge_buffer_fragment_shader';
@@ -27,8 +27,8 @@ export default class VoxelBridge extends React.Component {
         const fsSource = VoxelBridgeFragmentShader.fragmentSource();
         const fsBufferSource = VoxelBridgeBufferFragmentShader.fragmentSource();
 
-        const shaderProgram = ShauGL.initShaderProgram(gl, vsSource, fsSource);
-        const bufferProgram = ShauGL.initShaderProgram(gl, vsSource, fsBufferSource);
+        const shaderProgram = ShauRMGL.initShaderProgram(gl, vsSource, fsSource);
+        const bufferProgram = ShauRMGL.initShaderProgram(gl, vsSource, fsBufferSource);
 
         const programInfo = {
             program: shaderProgram,
@@ -36,7 +36,7 @@ export default class VoxelBridge extends React.Component {
                 positionAttributePosition: gl.getAttribLocation(shaderProgram, 'a_position')
             },
             uniformLocations: {
-                textureUniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture'),
+                texture1UniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture1'),
                 resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
                 timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
             }
@@ -48,15 +48,15 @@ export default class VoxelBridge extends React.Component {
                 positionAttributePosition: gl.getAttribLocation(bufferProgram, 'a_position')
             },
             uniformLocations: {
-                textureUniformLocation: gl.getUniformLocation(bufferProgram, 'u_texture'),
+                texture1UniformLocation: gl.getUniformLocation(bufferProgram, 'u_texture1'),
                 resolutionUniformLocation: gl.getUniformLocation(bufferProgram, 'u_resolution'),
                 timeUniformLocation: gl.getUniformLocation(bufferProgram, 'u_time')
             }
         };
         
-        const buffers = ShauGL.initBuffers(gl);
-        var renderBuffer = ShauGL.setupRenderFramebuffer(gl);
-        var bufferTexture2 = ShauGL.setupTexture(gl);
+        const buffers = ShauRMGL.initBuffers(gl);
+        var renderBuffer = ShauRMGL.setupRenderFramebuffer(gl);
+        var bufferTexture2 = ShauRMGL.setupTexture(gl);
 
         var clearColour = {red: 0.0, green: 1.0, blue: 0.0};
         function renderFrame(now) {
@@ -66,7 +66,15 @@ export default class VoxelBridge extends React.Component {
             //TODO: make buffer handling more efficient
             //render to frame buffer
             gl.bindFramebuffer(gl.FRAMEBUFFER, renderBuffer.framebuffer);
-            ShauGL.drawSceneWithBufferTexture(gl, bufferProgramInfo, buffers, bufferTexture2, now, clearColour);
+            ShauRMGL.drawRMSceneWithTextures(gl, 
+                                             bufferProgramInfo, 
+                                             buffers, 
+                                             bufferTexture2,
+                                             undefined,
+                                             undefined,
+                                             undefined, 
+                                             now, 
+                                             clearColour);
             
             //copy data into texture for feedback
             gl.bindTexture(gl.TEXTURE_2D, bufferTexture2);
@@ -76,7 +84,15 @@ export default class VoxelBridge extends React.Component {
 
             //render to canvas
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauGL.drawSceneWithBufferTexture(gl, programInfo, buffers, renderBuffer.texture, now, clearColour);
+            ShauRMGL.drawRMSceneWithTextures(gl, 
+                                             programInfo, 
+                                             buffers, 
+                                             renderBuffer.texture, 
+                                             undefined,
+                                             undefined,
+                                             undefined,
+                                             now, 
+                                             clearColour);
 
             animId = requestAnimationFrame(renderFrame);
         }

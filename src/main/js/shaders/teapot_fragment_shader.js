@@ -21,7 +21,6 @@ function fragmentSource() {
     varying vec4 v_shadow_position;
     varying vec3 v_colour;
     varying vec3 v_normal;
-    varying mat4 v_projection_matrix;
     
     const int kernelSize = 16;  
 	const float radius = 0.1;

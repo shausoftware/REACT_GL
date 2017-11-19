@@ -23,7 +23,6 @@ function vertexSource() {
     varying vec4 v_shadow_position;
     varying vec3 v_colour;
     varying vec3 v_normal;
-    varying mat4 v_projection_matrix;
     
     void main(void) {
 
@@ -36,7 +35,7 @@ function vertexSource() {
         float spec = pow(max(dot(v_normal, h), 0.0), 22.0);
       
         v_colour = u_colour * diff + vec3(1.0) * spec;        
-        v_projection_matrix = u_projection_matrix;
+
         gl_Position = u_projection_matrix * u_model_view_matrix * vec4(a_position, 1.0);
         v_shadow_position = texUnitConverter * u_sm_projection_matrix * u_sm_model_view_matrix * vec4(a_position, 1.0);
     }

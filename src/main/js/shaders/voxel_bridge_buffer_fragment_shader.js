@@ -13,7 +13,7 @@ function fragmentSource() {
         varying vec2 v_resolution;
         varying float v_time;
 
-        uniform sampler2D u_texture;        
+        uniform sampler2D u_texture1;        
         
         #define EPS 0.005
         #define FAR 100.0 
@@ -83,7 +83,7 @@ function fragmentSource() {
 
         void main() {
 
-            vec3 pc = vec3(0.0); //texture2D(u_texture, gl_FragCoord.xy / v_resolution) * 0.6;
+            vec3 pc = vec3(0.0); 
 
             vec3 ro, rd;
             setupCamera(ro, rd);
@@ -100,7 +100,7 @@ function fragmentSource() {
                 }
             }
 
-            vec3 aa = texture2D(u_texture, gl_FragCoord.xy / v_resolution).xyz;
+            vec3 aa = texture2D(u_texture1, gl_FragCoord.xy / v_resolution).xyz;
             aa -= 0.01;
             pc += aa;
 

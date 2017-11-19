@@ -8,7 +8,7 @@ import ShauNavBar from './shaunavbar';
 import Home from './home';
 import TestPage from './testpage';
 import Raymarching from './raymarching/raymarching';
-import Particles from './particles/particles';
+import Experiments from './experiments/experiments';
 import ShauForm from './shauform';
 import ShauLinks from './shaulinks';
 import ShauCss from './shaucss';
@@ -45,8 +45,8 @@ export default class App extends React.Component {
 			content = <Raymarching />;
 			rgb = [0, 255, 0]; //yellow
 		}
-		if ('PAGE_PARTICLES' === this.state.currentPage) {
-			content = <Particles />;
+		if ('PAGE_EXPERIMENTS' === this.state.currentPage) {
+			content = <Experiments />;
 			rgb = [0, 0, 255]; //blue
 		}
 		if ('PAGE_SHAUFORM' === this.state.currentPage) {

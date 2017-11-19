@@ -6,7 +6,7 @@ const cat3 = require('./static/images/cat3.jpg');
 const cat4 = require('./static/images/cat4.jpg');
 
 const React = require('react');
-import ShauGL from './shaugl';
+import ShauRMGL from './shaurmgl';
 import ShauImageGL from './shauimagegl';
 import HomeVertexShader from './shaders/home_vertex_shader';
 import HomeFragmentShader from './shaders/home_fragment_shader';
@@ -33,7 +33,7 @@ export default class Home extends React.Component {
         const vsSource = HomeVertexShader.vertexSource();
         const fsSource = HomeFragmentShader.fragmentSource();
 
-        const shaderProgram = ShauGL.initShaderProgram(gl, vsSource, fsSource);
+        const shaderProgram = ShauRMGL.initShaderProgram(gl, vsSource, fsSource);
 
         const programInfo = {
             program: shaderProgram,
@@ -48,7 +48,7 @@ export default class Home extends React.Component {
             }
         };
 
-        var buffers = ShauGL.initBuffers(gl);
+        var buffers = ShauRMGL.initBuffers(gl);
 
         var textureInfos = [
             ShauImageGL.loadImageAndCreateTextureInfo(gl, cat1),
@@ -100,9 +100,10 @@ export default class Home extends React.Component {
                 <div className='panel-body'>
                     <p className='text-center'>
                         Hi there. This is the third 
-                        incarnation of SHAUSTUFF. This site is built using all the 
+                        incarnation of my website SHAUSTUFF. This site is built using all the 
                         latest web development goodies including React and Bootstrap 
-                        but it's mainly me playing with WebGL and graphics.                       All of the code to this site is available from my github repository 
+                        but it's mainly me building a framework to experiment with WebGL and graphics.                        
+                        All of the code to this site is available from my github repository 
                         should you be interested in such things (see links). Now on to business... 
                         some pictures of cats (this time rendered using WebGL).    
                     </p>    
