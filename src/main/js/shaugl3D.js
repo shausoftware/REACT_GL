@@ -4,6 +4,8 @@ import ShadowVertexShader from './shaders/shadow_vertex_shader';
 import ShadowFragmentShader from './shaders/shadow_fragment_shader';
 import SSAOVertexShader from './shaders/ssao_vertex_shader';
 import SSAOFragmentShader from './shaders/ssao_fragment_shader';
+import PostProcessVertexShader from './shaders/post_process_vertex_shader';
+import PostProcessFragmentShader from './shaders/post_process_fragment_shader';
 
 const glm = require('gl-matrix');
 
@@ -115,6 +117,23 @@ function initSSAOProgram(gl) {
     return ssaoProgramInfo;  
 }
 
+function initPostProcessProgram(gl) {
+    const ppVsSource = PostProcessVertexShader.vertexSource();
+    const ppFsSource = PostProcessFragmentShader.fragmentSource();
+    const ppShaderProgram = initShaderProgram(gl, ppVsSource, ppFsSource);
+    const ppProgramInfo = {
+        program: ppShaderProgram,
+        attribLocations: {
+            positionAttributeLocation: gl.getAttribLocation(ppShaderProgram, 'a_position')
+        },
+        uniformLocations: {
+            imageTextureUniformLocation: gl.getUniformLocation(ppShaderProgram, 'u_image_texture'),
+            ssaoTextureUniformLocation: gl.getUniformLocation(ppShaderProgram, 'u_ssao_texture')            
+        }
+    };
+    return ppProgramInfo;
+}
+
 function isPowerOf2(value) {
     return (value & (value - 1)) == 0;
 }
@@ -194,14 +213,29 @@ function loadImageAndInitTextureInfo(gl, url) {
 function initFramebuffer(gl, width, height) {
     
     var texture = this.initTexture(gl, width, height);
-
+    
     var fbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+    fbo.width = gl.canvas.width;
+    fbo.height = gl.canvas.height;
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null); //clean up
+    //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, fbo.width, fbo.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+    var renderbuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
     
-    return {framebuffer: fbo, texture: texture};
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    return {
+        framebuffer: fbo,
+        texture: texture
+    };
 }
 
 function initDepthFramebuffer(gl, width, height) {
@@ -369,6 +403,18 @@ function initBuffers(gl, model) {
     var modelBuffers = [];
     var glassBuffers = [];
 
+    const screenQuad = [
+        -1.0, -1.0,
+        -1.0,  1.0,
+         1.0,  1.0,
+         1.0,  1.0,
+         1.0, -1.0,
+        -1.0, -1.0
+    ];
+    const screenQuadBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, screenQuadBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(screenQuad), gl.STATIC_DRAW);
+
     for (var i = 0; i < model.length; i++) {
 
         var colour = [0.0, 0.0, 0.0];
@@ -436,7 +482,7 @@ function initBuffers(gl, model) {
                 specular = 0.1;
                 transparency = 0.0;
                 reflect = 0.0;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;
@@ -446,7 +492,7 @@ function initBuffers(gl, model) {
                 specular = 0.1;
                 transparency = 0.0;
                 reflect = 0.0;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;
@@ -456,7 +502,7 @@ function initBuffers(gl, model) {
                 specular = 1.0;
                 transparency = 0.0;
                 reflect = 0.2;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;
@@ -466,7 +512,7 @@ function initBuffers(gl, model) {
                 specular = 1.0;
                 transparency = 0.0;
                 reflect = 0.2;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;
@@ -476,7 +522,7 @@ function initBuffers(gl, model) {
                 specular = 1.0;
                 transparency = 0.0;
                 reflect = 0.0;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;
@@ -485,7 +531,7 @@ function initBuffers(gl, model) {
                 specular = 0.0;
                 transparency = 0.0;
                 reflect = 0.0;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;
@@ -688,10 +734,10 @@ function initBuffers(gl, model) {
                 shadow = 0.0;
                 fresnel = 0.0;
                 tex = 0.0;
-                break;  
+                break;
             default:
                 colour = [1.0, 1.0, 1.0];
-                specular = 1.0;
+                specular = 0.0;
                 transparency = 0.0;
                 reflect = 0.0;
                 shadow = 0.0;
@@ -722,29 +768,30 @@ function initBuffers(gl, model) {
         }                  
     }
 
-    var floorData = [-100.0, 0.0,  100.0,   0.0, 1.0, 0.0,
-                      100.0, 0.0,  100.0,   0.0, 1.0, 0.0,
-                      100.0, 0.0, -100.0,   0.0, 1.0, 0.0,
-                     -100.0, 0.0,  100.0,   0.0, 1.0, 0.0,
-                      100.0, 0.0, -100.0,   0.0, 1.0, 0.0,
-                     -100.0, 0.0, -100.0,   0.0, 1.0, 0.0];
+    var floorData = [-100.0, -0.1,  100.0,   0.0, 1.0, 0.0,
+                      100.0, -0.1,  100.0,   0.0, 1.0, 0.0,
+                      100.0, -0.1, -100.0,   0.0, 1.0, 0.0,
+                     -100.0, -0.1,  100.0,   0.0, 1.0, 0.0,
+                      100.0, -0.1, -100.0,   0.0, 1.0, 0.0,
+                     -100.0, -0.1, -100.0,   0.0, 1.0, 0.0];
     const floorInterleavedBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, floorInterleavedBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(floorData), gl.STATIC_DRAW);
     var floorBuffer =  {groupId: 'floor',
                         interleavedBuffer: floorInterleavedBuffer,
                         indexCount: 6,
-                        colour: [0.05, 0.0, 0.4],
-                        specular: 0.6,
+                        colour: [0.02, 0.0, 0.3],
+                        specular: 0.0,
                         transparency: 0.0,
                         reflect: 0.0,
                         shadow: 1.0,
                         fresnel: 0.0,
-                        tex: 1.0};    
+                        tex: 0.0};    
 
     return {modelBuffers: modelBuffers,
             glassBuffers: glassBuffers,
-            floorBuffer: floorBuffer};
+            floorBuffer: floorBuffer,
+            screenQuadBuffer: screenQuadBuffer};
 }
 
 function setupCamera(cameraPosition, target, projectionMatrix) {
@@ -1036,7 +1083,39 @@ function drawScene(gl,
     //texture id
     gl.uniform1f(programInfo.uniformLocations.texUniformLocation, buffers.floorBuffer.tex);
         
-    gl.drawArrays(gl.TRIANGLES, 0, buffers.floorBuffer.indexCount);                       
+    gl.drawArrays(gl.TRIANGLES, 0, buffers.floorBuffer.indexCount); 
+
+}
+
+function postProcess(gl, 
+                     programInfo, 
+                     buffers,
+                     imageTexture,
+                     ssaoTexture) {
+
+    gl.useProgram(programInfo.program);
+    
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(gl.DEPTH_TEST); // Enable depth testing
+    gl.depthFunc(gl.LESS); // Near things obscure far things            
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.screenQuadBuffer);
+    gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+    
+    //image texture
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, imageTexture);
+    gl.uniform1i(programInfo.uniformLocations.imageTextureUniformLocation, 0);
+
+    //ssao texture
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, ssaoTexture);
+    gl.uniform1i(programInfo.uniformLocations.ssaoTextureUniformLocation, 1);
+    
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
 module.exports = {
@@ -1046,6 +1125,7 @@ module.exports = {
     checkExtensions: checkExtensions,
     initShadowProgram: initShadowProgram,
     initSSAOProgram: initSSAOProgram,
+    initPostProcessProgram: initPostProcessProgram,
     initTexture: initTexture,
     loadImageAndInitTextureInfo: loadImageAndInitTextureInfo,
     initFramebuffer: initFramebuffer,
@@ -1055,5 +1135,6 @@ module.exports = {
     setupCamera: setupCamera,
     drawShadowMap: drawShadowMap,
     drawSSAODepthMap: drawSSAODepthMap,
-    drawScene: drawScene
+    drawScene: drawScene,
+    postProcess: postProcess
 };

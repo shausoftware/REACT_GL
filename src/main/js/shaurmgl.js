@@ -178,7 +178,6 @@ function drawRMSceneWithTextures(gl,
     gl.useProgram(programInfo.program);
     gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.screenInset);
-    
     gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
 
     if (texture1 != undefined) {
@@ -189,17 +188,17 @@ function drawRMSceneWithTextures(gl,
     if (texture2 != undefined) {
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, texture2);
-        gl.uniform1i(programInfo.uniformLocations.texture2UniformLocation, 0); 
+        gl.uniform1i(programInfo.uniformLocations.texture2UniformLocation, 1); 
     }
     if (texture3 != undefined) {
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, texture3);
-        gl.uniform1i(programInfo.uniformLocations.texture3UniformLocation, 0); 
+        gl.uniform1i(programInfo.uniformLocations.texture3UniformLocation, 2); 
     }
     if (texture4 != undefined) {
         gl.activeTexture(gl.TEXTURE3);
         gl.bindTexture(gl.TEXTURE_2D, texture4);
-        gl.uniform1i(programInfo.uniformLocations.texture4UniformLocation, 0); 
+        gl.uniform1i(programInfo.uniformLocations.texture4UniformLocation, 3); 
     }
 
     gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, gl.canvas.width, gl.canvas.height);

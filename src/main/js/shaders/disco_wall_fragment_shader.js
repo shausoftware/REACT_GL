@@ -16,7 +16,7 @@ function fragmentSource() {
         #define EPS 0.005
         #define FAR 30.0 
         #define PI 3.14159265359
-        #define T v_time
+        #define T v_time * 0.5
         #define ROWS 3
         #define COLS 7
 
@@ -353,7 +353,10 @@ function fragmentSource() {
     
                     //floor
                     atten = 1.0 / (1.0 + reflScene.t * reflScene.t * 4.0); //reflect attenuation
-                    
+                    if (reflScene.id == 3.0) {
+                        atten = 1.0 / (1.0 + reflScene.t * reflScene.t * 32.0); //reflect attenuation
+                    }
+
                     //shadows from boxes
                     Scene shadScene = drawScene(ro + rd * (scene.t - EPS), ld);
                     if (shadScene.t < lt) {

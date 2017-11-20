@@ -86,10 +86,10 @@ export default class WebGLContentList1 extends React.Component {
                             <p>
                                 WIP. Loading and rendering an OBJ model by Kimzauto. The model 
                                 was pre-processed a bit to split objects by their assigned materials. Rendering implements SSAO,
-                                reflections, transparency and shadow mapping (which needs a bit of work). Unfortunately the model is quite big 
+                                reflections, transparency, depth of field and shadow mapping. Unfortunately the model is quite big 
                                 (nearly a million faces) so it takes 20-30 seconds to load at the moment.
-                                Thus the next step is to optimize the model and download time and create a 
-                                nice loading screen.  
+                                Thus one of the next steps is to optimize the model and download time and create a 
+                                nice loading screen. I also want to look at some post processing. 
                             </p>
                             <p>
                                 <a href="#" name="Bugatti" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 

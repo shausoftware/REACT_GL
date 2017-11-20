@@ -164,7 +164,7 @@ function fragmentSource() {
             pc *= noise(pos * 20.0);
         }
         */
-        pc += vec3(0.02, 0.0, 0.2) * 0.4 * clamp(-v_normal.y, 0.0, 1.0); //uplight
+        pc += vec3(0.02, 0.0, 0.2) * 0.6 * clamp(-v_normal.y, 0.0, 1.0); //uplight
         pc += vec3(0.8, 0.8, 1.0) * 0.03 * clamp(v_normal.y, 0.0, 1.0); //downlight
         pc *= atten;
         pc += vec3(0.8, 0.8, 1.0) * spec * u_specular;

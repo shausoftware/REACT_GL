@@ -28,7 +28,7 @@ export default class Bugatti extends React.Component {
         }
 
         ShauGL.checkExtensions(gl);
-
+        
         var shadowDepthTextureSize = 4096;
         var lightPosition = [-3.0, 8.0, 2.0];
         
@@ -55,6 +55,7 @@ export default class Bugatti extends React.Component {
                 reflectUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_reflect'),
                 shadowUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_shadow'),
                 fresnelUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_fresnel'),
+                texUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_tex'),
                 lightPositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_light_position'),
                 eyePositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_eye_position'),
                 ssaoTextureUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_ssao_texture')
@@ -63,11 +64,13 @@ export default class Bugatti extends React.Component {
 
         const shadowMapProgramInfo = ShauGL.initShadowProgram(gl);
         const ssaoProgramInfo = ShauGL.initSSAOProgram(gl);
+        const postProcessProgramInfo = ShauGL.initPostProcessProgram(gl);
 
         var buffers = undefined;
         var shadowMapFramebuffer = ShauGL.initDepthFramebuffer(gl, shadowDepthTextureSize, shadowDepthTextureSize);
         var ssaoFramebuffer = ShauGL.initDepthFramebuffer(gl, gl.canvas.width, gl.canvas.height);
-    
+        var imageFrameBuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height);
+
         var then = 0;
         function renderFrame(now) {
 
@@ -89,12 +92,12 @@ export default class Bugatti extends React.Component {
             };    
             var lightProjectionMatrix = glm.mat4.create();
             glm.mat4.ortho(lightProjectionMatrix,                   
-                            -40.0,
-                            40.0,
-                            -40.0,
-                            40.0,
-                            -40.0, 
-                            80.0);
+                            -10.0,
+                            10.0,
+                            -10.0,
+                            10.0,
+                            -10.0, 
+                            20.0);
             var cameraProjectionMatrix = glm.mat4.create();
             glm.mat4.perspective(cameraProjectionMatrix,
                                     camera.fov,
@@ -114,6 +117,7 @@ export default class Bugatti extends React.Component {
                                     shadowDepthTextureSize);
             //*/
             
+        
             //ssao depth to off screen buffer
             gl.bindFramebuffer(gl.FRAMEBUFFER, ssaoFramebuffer.framebuffer);
             //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -125,7 +129,8 @@ export default class Bugatti extends React.Component {
             //*/
 
             //draw scene
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, imageFrameBuffer.framebuffer);
+            //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             ShauGL.drawScene(gl, 
                                 bugattiProgramInfo, 
                                 buffers, 
@@ -137,14 +142,22 @@ export default class Bugatti extends React.Component {
                                 camera);
             //*/
 
+            
+            //post processing
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            ShauGL.postProcess(gl,
+                                postProcessProgramInfo,
+                                buffers,
+                                imageFrameBuffer.texture,
+                                ssaoFramebuffer.texture);
+            //*/                   
+
             animId = requestAnimationFrame(renderFrame);
         }
         //*/
 
         ShauGL.loadMesh(bugattiObjSrc).then(mesh => {
-            console.log('MESH LOADED');
             buffers = ShauGL.initBuffers(gl, mesh);
-            console.log('BUFFERS INITIALISED');
             animId = requestAnimationFrame(renderFrame);
         });
     }
