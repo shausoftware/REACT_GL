@@ -560,7 +560,7 @@ function initBuffers(gl, model) {
                 specular = 1.0;
                 transparency = 0.0;
                 reflect = 0.2;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.6;
                 tex = 0.0;
                 break;
@@ -580,7 +580,7 @@ function initBuffers(gl, model) {
                 specular = 0.5;
                 transparency = 0.0;
                 reflect = 0.0;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;
@@ -721,7 +721,7 @@ function initBuffers(gl, model) {
                 specular = 1.0;
                 transparency = 0.0;
                 reflect = 0.0;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;  

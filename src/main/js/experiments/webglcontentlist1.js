@@ -42,6 +42,26 @@ export default class WebGLContentList1 extends React.Component {
                     </div>
                 </div>
                 */}
+
+                <div className="col-sm-6 col-md-4">
+                    <div className="thumbnail">
+                        <img src={bugattiSrc} alt="Bugatti" />
+                        <div className="caption">
+                            <h3>Bugatti Chiron</h3>
+                            <p>
+                                WIP. Loading and rendering an OBJ model by Kimzauto. The model 
+                                was pre-processed a bit to split objects by their assigned materials. Rendering implements SSAO,
+                                reflections, transparency, depth of field and shadow mapping. Unfortunately the model is quite big 
+                                (nearly a million faces) so it takes 20-30 seconds to load at the moment.
+                                Thus one of the next steps is to optimize the model and download time and create a 
+                                nice loading screen. I also want to look at some post processing. 
+                            </p>
+                            <p>
+                                <a href="#" name="Bugatti" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 
                 <div className="col-sm-6 col-md-4">
                     <div className="thumbnail">
@@ -73,26 +93,6 @@ export default class WebGLContentList1 extends React.Component {
                             </p>
                             <p>
                                 <a href="#" name="InitialAttempt" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="col-sm-6 col-md-4">
-                    <div className="thumbnail">
-                        <img src={bugattiSrc} alt="Bugatti" />
-                        <div className="caption">
-                            <h3>Bugatti Chiron</h3>
-                            <p>
-                                WIP. Loading and rendering an OBJ model by Kimzauto. The model 
-                                was pre-processed a bit to split objects by their assigned materials. Rendering implements SSAO,
-                                reflections, transparency, depth of field and shadow mapping. Unfortunately the model is quite big 
-                                (nearly a million faces) so it takes 20-30 seconds to load at the moment.
-                                Thus one of the next steps is to optimize the model and download time and create a 
-                                nice loading screen. I also want to look at some post processing. 
-                            </p>
-                            <p>
-                                <a href="#" name="Bugatti" onClick={this.handleViewContentItem} className="btn btn-primary" role="button">View</a> 
                             </p>
                         </div>
                     </div>

@@ -19236,7 +19236,7 @@ function initBuffers(gl, model) {
                 specular = 1.0;
                 transparency = 0.0;
                 reflect = 0.2;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.6;
                 tex = 0.0;
                 break;
@@ -19256,7 +19256,7 @@ function initBuffers(gl, model) {
                 specular = 0.5;
                 transparency = 0.0;
                 reflect = 0.0;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;
@@ -19397,7 +19397,7 @@ function initBuffers(gl, model) {
                 specular = 1.0;
                 transparency = 0.0;
                 reflect = 0.0;
-                shadow = 0.0;
+                shadow = 1.0;
                 fresnel = 0.0;
                 tex = 0.0;
                 break;
@@ -26755,6 +26755,38 @@ var WebGLContentList1 = function (_React$Component) {
                     React.createElement(
                         'div',
                         { className: 'thumbnail' },
+                        React.createElement('img', { src: bugattiSrc, alt: 'Bugatti' }),
+                        React.createElement(
+                            'div',
+                            { className: 'caption' },
+                            React.createElement(
+                                'h3',
+                                null,
+                                'Bugatti Chiron'
+                            ),
+                            React.createElement(
+                                'p',
+                                null,
+                                'WIP. Loading and rendering an OBJ model by Kimzauto. The model was pre-processed a bit to split objects by their assigned materials. Rendering implements SSAO, reflections, transparency, depth of field and shadow mapping. Unfortunately the model is quite big (nearly a million faces) so it takes 20-30 seconds to load at the moment. Thus one of the next steps is to optimize the model and download time and create a nice loading screen. I also want to look at some post processing.'
+                            ),
+                            React.createElement(
+                                'p',
+                                null,
+                                React.createElement(
+                                    'a',
+                                    { href: '#', name: 'Bugatti', onClick: this.handleViewContentItem, className: 'btn btn-primary', role: 'button' },
+                                    'View'
+                                )
+                            )
+                        )
+                    )
+                ),
+                React.createElement(
+                    'div',
+                    { className: 'col-sm-6 col-md-4' },
+                    React.createElement(
+                        'div',
+                        { className: 'thumbnail' },
                         React.createElement('img', { src: teapotSrc, alt: 'Teapot' }),
                         React.createElement(
                             'div',
@@ -26807,38 +26839,6 @@ var WebGLContentList1 = function (_React$Component) {
                                 React.createElement(
                                     'a',
                                     { href: '#', name: 'InitialAttempt', onClick: this.handleViewContentItem, className: 'btn btn-primary', role: 'button' },
-                                    'View'
-                                )
-                            )
-                        )
-                    )
-                ),
-                React.createElement(
-                    'div',
-                    { className: 'col-sm-6 col-md-4' },
-                    React.createElement(
-                        'div',
-                        { className: 'thumbnail' },
-                        React.createElement('img', { src: bugattiSrc, alt: 'Bugatti' }),
-                        React.createElement(
-                            'div',
-                            { className: 'caption' },
-                            React.createElement(
-                                'h3',
-                                null,
-                                'Bugatti Chiron'
-                            ),
-                            React.createElement(
-                                'p',
-                                null,
-                                'WIP. Loading and rendering an OBJ model by Kimzauto. The model was pre-processed a bit to split objects by their assigned materials. Rendering implements SSAO, reflections, transparency and shadow mapping (which needs a bit of work). Unfortunately the model is quite big (nearly a million faces) so it takes 20-30 seconds to load at the moment. Thus one of the next steps is to optimize the model and download time and create a nice loading screen. I also want to look at some post processing.'
-                            ),
-                            React.createElement(
-                                'p',
-                                null,
-                                React.createElement(
-                                    'a',
-                                    { href: '#', name: 'Bugatti', onClick: this.handleViewContentItem, className: 'btn btn-primary', role: 'button' },
                                     'View'
                                 )
                             )
