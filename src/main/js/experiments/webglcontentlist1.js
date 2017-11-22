@@ -4,6 +4,7 @@ const React = require('react');
 
 const teapotSrc = require('../static/images/teapot.png');
 const bugattiSrc = require('../static/images/bugatti2.png');
+const ironManSrc = require('../static/images/ironman.png');
 const cat2Src = require('../static/images/cat2.jpg');
 
 export default class WebGLContentList1 extends React.Component {
@@ -25,7 +26,7 @@ export default class WebGLContentList1 extends React.Component {
                 
                 <div className="col-sm-6 col-md-4">
                     <div className="thumbnail">
-                        <img src={cat2Src} alt="Iron Man" />
+                        <img src={ironManSrc} alt="Iron Man" />
                         <div className="caption">
                             <h3>Iron Man</h3>
                             <p>
