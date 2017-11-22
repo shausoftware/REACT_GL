@@ -5,6 +5,19 @@ var glm = require('gl-matrix');
 
 function initBuffers(gl, model) {
 
+    const inset = [
+        -0.98, -0.98,
+        -0.98,  0.98,
+         0.98,  0.98,
+         0.98,  0.98,
+         0.98, -0.98,
+        -0.98, -0.98
+    ];
+
+    const insetBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, insetBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(inset), gl.STATIC_DRAW);
+
     var floorVertices = [
         -300.0, -1.0, 300.0,
         300.0,  -1.0, 300.0,
@@ -56,7 +69,8 @@ function initBuffers(gl, model) {
         modelVerticesBuffer: modelVerticesBuffer,
         modelNormalsBuffer: modelNormalsBuffer,
         modelIndicesBuffer: modelIndicesBuffer,
-        modelIndexCount: model.indices.length
+        modelIndexCount: model.indices.length,
+        screenInsetBuffer: insetBuffer
     }
 }
 
@@ -290,7 +304,7 @@ function drawScene(gl, programInfo, buffers, viewCameraMatrices, shadowMapCamera
     gl.useProgram(programInfo.program);
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clearColor(0.0, 0.0, 1.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LESS); // Near things obscure far things            
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -365,6 +379,30 @@ function drawScene(gl, programInfo, buffers, viewCameraMatrices, shadowMapCamera
     //*/
 }
 
+function vignette(gl, programInfo, buffers, imageTexture) {
+
+    gl.useProgram(programInfo.program);
+    
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0.0, 0.0, 1.0, 1.0);
+    gl.enable(gl.DEPTH_TEST); // Enable depth testing
+    gl.depthFunc(gl.LESS); // Near things obscure far things            
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.screenInsetBuffer);
+    gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+    
+    gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+    
+    //image texture
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, imageTexture);
+    gl.uniform1i(programInfo.uniformLocations.vignetteTextureUniformLocation, 0);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+
 module.exports = {
     initBuffers: initBuffers,
     initSmFramebuffer: initSmFramebuffer,
@@ -372,5 +410,6 @@ module.exports = {
     setupCamera: setupCamera,
     drawSSAO: drawSSAO,
     drawShadowMap: drawShadowMap,
-    drawScene: drawScene
+    drawScene: drawScene,
+    vignette: vignette
 };

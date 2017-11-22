@@ -47,7 +47,7 @@ export default class Experiments extends React.Component {
 
         return (
             <div className='panel panel-default'>
-            <div className='panel-heading'>Experiments and learning</div>
+            <div className='panel-heading'>Experiments</div>
                 <div className='panel-body'>
                     <p className='text-center'>
                         General WebGL experiments.  

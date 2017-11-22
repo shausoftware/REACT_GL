@@ -14,10 +14,24 @@ function initBuffers(gl) {
     gl.bindBuffer(gl.ARRAY_BUFFER, screenQuadBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(screenQuad), gl.STATIC_DRAW);
 
+    const inset = [
+        -0.98, -0.98,
+        -0.98,  0.98,
+         0.98,  0.98,
+         0.98,  0.98,
+         0.98, -0.98,
+        -0.98, -0.98
+    ];
+
+    const insetBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, insetBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(inset), gl.STATIC_DRAW);
+
     return {modelBuffers: undefined,
             glassBuffers: undefined,
             floorBuffer: undefined,
-            screenQuadBuffer: screenQuadBuffer};
+            screenQuadBuffer: screenQuadBuffer,
+            screenInsetBuffer: insetBuffer};
 }
 
 function initModelBuffers(buffers, gl, model) {
@@ -354,13 +368,13 @@ function postProcess(gl,
     gl.useProgram(programInfo.program);
     
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.0, 0.0, 1.0, 1.0);
     gl.enable(gl.DEPTH_TEST); // Enable depth testing
     gl.depthFunc(gl.LESS); // Near things obscure far things            
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.screenQuadBuffer);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.screenInsetBuffer);
     gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
     
     //dof

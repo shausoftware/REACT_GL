@@ -93,7 +93,7 @@ export default class IronMan extends React.Component {
                 ShauGL.renderLoadScreen(gl, loadScreenProgramInfo, buffers, now);
             } else {
 
-                var cameraPosition = glm.vec3.fromValues(4.0, 10.0, 5.0);
+                var cameraPosition = glm.vec3.fromValues(5.0, 10.0, 6.0);
                 var target = glm.vec3.fromValues(0.0, 6.0, 0.5);
                 glm.vec3.rotateY(cameraPosition, cameraPosition, target, now * 0.2);
     

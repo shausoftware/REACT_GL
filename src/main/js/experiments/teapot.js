@@ -10,6 +10,8 @@ import ShauGL from '../shaugl3D';
 import TeapotGL from './teapotgl';
 import TeapotVertexShader from '../shaders/teapot_vertex_shader';
 import TeapotFragmentShader from '../shaders/teapot_fragment_shader';
+import VertexShader from '../shaders/vertex_shader';
+import VignetteFragmentShader from '../shaders/vignette_fragment_shader';
 
 var animId = undefined;
 
@@ -80,6 +82,21 @@ export default class Teapot extends React.Component {
             }
         }
 
+        //vignette
+        const vVsSource = VertexShader.vertexSource();
+        const vFsSource = VignetteFragmentShader.fragmentSource();
+        const vShaderProgram = ShauGL.initShaderProgram(gl, vVsSource, vFsSource);
+        const vProgramInfo = {
+            program: vShaderProgram,
+            attribLocations: {
+                positionAttributeLocation: gl.getAttribLocation(vShaderProgram, 'a_position')
+            },
+            uniformLocations: {
+                vignetteTextureUniformLocation: gl.getUniformLocation(vShaderProgram, 'u_vignette_texture'),
+                resolutionUniformLocation: gl.getUniformLocation(vShaderProgram, 'u_resolution')
+            }
+        };
+
         //shadow program
         const shadowMapProgramInfo = ShauGL.initShadowProgram(gl);
 
@@ -89,6 +106,7 @@ export default class Teapot extends React.Component {
         var buffers = undefined;
         var shadowMapFramebuffer = ShauGL.initDepthFramebuffer(gl, shadowDepthTextureSize, shadowDepthTextureSize);
         var ssaoFramebuffer = ShauGL.initDepthFramebuffer(gl, gl.canvas.width, gl.canvas.height);
+        var renderFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height);
         var viewCameraMatrices = ShauGL.setupCamera(camera.position, camera.target, cameraProjectionMatrix);
         var shadowMapCameraMatrices = ShauGL.setupCamera(lightPosition, camera.target, lightProjectionMatrix);
     
@@ -114,7 +132,8 @@ export default class Teapot extends React.Component {
             //*/
 
             //draw scene
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, renderFramebuffer.framebuffer);
+            //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             TeapotGL.drawScene(gl, 
                                 teapotProgramInfo, 
                                 buffers, 
@@ -125,6 +144,10 @@ export default class Teapot extends React.Component {
                                 lightPosition);
             //*/
 
+            //vignette
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            TeapotGL.vignette(gl, vProgramInfo, buffers, renderFramebuffer.texture);
+       
             animId = requestAnimationFrame(renderFrame);
         }
 
