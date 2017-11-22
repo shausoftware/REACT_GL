@@ -27,6 +27,7 @@
     "webpack": "^2.7.0"
   },
   "scripts": {
+    "start": "node --max_old_space_size=8092 ./node_modules/webpack/bin/webpack.js",
     "test": "jest --verbose",
     "watch": "webpack --watch -d"
   },

@@ -2,10 +2,11 @@
 
 const React = require('react');
 
-import InitialAttempt from './initialattempt';
-import MozillaCube from './mozillacube';
+import Particles from './particles';
 import Teapot from './teapot';
 import Bugatti from './bugatti';
+import IronMan from './ironman';
+import PeugeotOnyx from './peugeotonyx';
 
 export default class WebGLContentItem extends React.Component {
 
@@ -22,16 +23,23 @@ export default class WebGLContentItem extends React.Component {
 
     render() {
 
-        var contentItem = <InitialAttempt />;
-        var listPage = 'CONTENT_LIST_1';
-        if ('MozillaCube' === this.state.contentItemName) {
-            contentItem = <MozillaCube />;
-        }
+        var contentItem = <Particles />;
+        var listPage = 'CONTENT_LIST_2';
         if ('Teapot' === this.state.contentItemName) {
             contentItem = <Teapot />;
+            listPage = 'CONTENT_LIST_1';
         }
         if ('Bugatti' === this.state.contentItemName) {
             contentItem = <Bugatti />;
+            listPage = 'CONTENT_LIST_1';
+        }
+        if ('PeugeotOnyx' === this.state.contentItemName) {
+            contentItem = <PeugeotOnyx />;
+            listPage = 'CONTENT_LIST_1';
+        }
+        if ('IronMan' === this.state.contentItemName) {
+            contentItem = <IronMan />;
+            listPage = 'CONTENT_LIST_1';
         }
         
         return (

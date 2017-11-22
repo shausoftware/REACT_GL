@@ -8,6 +8,7 @@ function fragmentSource() {
     
     uniform sampler2D u_ssao_texture; 
     uniform sampler2D u_image_texture;
+    uniform float u_dof;
     
     const float GA = 2.399; 
     const mat2 rot = mat2(cos(GA), sin(GA), -sin(GA), cos(GA));
@@ -41,7 +42,7 @@ function fragmentSource() {
         vec2 uv = gl_FragCoord.xy / iResolution.xy;
 
         float depth = decodeFloat(texture2D(u_ssao_texture, uv));
-        vec3 pc = dof(u_image_texture, uv, depth * 0.1, iResolution);
+        vec3 pc = dof(u_image_texture, uv, depth * u_dof, iResolution);
 
         gl_FragColor = vec4(pc, 1.0);
         //gl_FragColor = vec4(vec3(depth), 1.0);

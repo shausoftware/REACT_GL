@@ -1,11 +1,17 @@
 'use strict';
 
+import VertexShader from './shaders/vertex_shader';
+import LoadScreenFragmentShader from './shaders/load_screen_fragment_shader';
 import ShadowVertexShader from './shaders/shadow_vertex_shader';
 import ShadowFragmentShader from './shaders/shadow_fragment_shader';
 import SSAOVertexShader from './shaders/ssao_vertex_shader';
 import SSAOFragmentShader from './shaders/ssao_fragment_shader';
 import PostProcessVertexShader from './shaders/post_process_vertex_shader';
 import PostProcessFragmentShader from './shaders/post_process_fragment_shader';
+import GlowVertexShader from './shaders/glow_vertex_shader';
+import GlowFragmentShader from './shaders/glow_fragment_shader';
+import BlurVertexShader from './shaders/blur_vertex_shader';
+import BlurFragmentShader from './shaders/blur_fragment_shader';
 
 const glm = require('gl-matrix');
 
@@ -97,6 +103,44 @@ function initShadowProgram(gl) {
     return shadowMapProgramInfo;
 }
 
+function initGlowProgram(gl) {
+    const glowVsSource = GlowVertexShader.vertexSource();
+    const glowFsSource = GlowFragmentShader.fragmentSource();
+    const glowShaderProgram = initShaderProgram(gl, glowVsSource, glowFsSource);
+    const glowProgramInfo = {
+        program: glowShaderProgram,
+        attribLocations: {
+            positionAttributePosition: gl.getAttribLocation(glowShaderProgram, 'a_position')
+        },
+        uniformLocations: {
+            modelViewMatrixUniformLocation: gl.getUniformLocation(glowShaderProgram, 'u_model_view_matrix'),
+            projectionMatrixUniformLocation: gl.getUniformLocation(glowShaderProgram, 'u_projection_matrix'),
+            colourUniformLocation: gl.getUniformLocation(glowShaderProgram, 'u_colour')
+        }
+    };
+    return glowProgramInfo;
+}
+
+function initBlurProgram(gl) {
+    const blurVsSource = BlurVertexShader.vertexSource();
+    const blurFsSource = BlurFragmentShader.fragmentSource();
+    const blurShaderProgram = initShaderProgram(gl, blurVsSource, blurFsSource);
+    const blurProgramInfo = {
+        program: blurShaderProgram,
+        attribLocations: {
+            positionAttributePosition: gl.getAttribLocation(blurShaderProgram, 'a_position')
+        },
+        uniformLocations: {
+            imageTextureUniformLocation: gl.getUniformLocation(blurShaderProgram, 'u_image_texture'),
+            orientationUniformLocation: gl.getUniformLocation(blurShaderProgram, 'u_orientation'),
+            blurAmountUniformLocation: gl.getUniformLocation(blurShaderProgram, 'u_blur_amount'),
+            blurScaleUniformLocation: gl.getUniformLocation(blurShaderProgram, 'u_blur_scale'),
+            blurStrengthUniformLocation: gl.getUniformLocation(blurShaderProgram, 'u_blur_strength')
+        }
+    };
+    return blurProgramInfo;
+};
+
 function initSSAOProgram(gl) {
     const ssaoVsSource = SSAOVertexShader.vertexSource();
     const ssaoFsSource = SSAOFragmentShader.fragmentSource();
@@ -132,6 +176,23 @@ function initPostProcessProgram(gl) {
         }
     };
     return ppProgramInfo;
+}
+
+function initLoadScreenProgram(gl) {
+    const lsVsSource = VertexShader.vertexSource();
+    const lsFsSource = LoadScreenFragmentShader.fragmentSource();
+    const lsShaderProgram = initShaderProgram(gl, lsVsSource, lsFsSource);
+    const lsProgramInfo = {
+        program: lsShaderProgram,
+        attribLocations: {
+            positionAttributeLocation: gl.getAttribLocation(lsShaderProgram, 'a_position')
+        },
+        uniformLocations: {
+            resolutionUniformLocation: gl.getUniformLocation(lsShaderProgram, 'u_resolution'),
+            timeUniformLocation: gl.getUniformLocation(lsShaderProgram, 'u_time')
+        }
+    };
+    return lsProgramInfo;
 }
 
 function isPowerOf2(value) {
@@ -261,6 +322,7 @@ function initDepthFramebuffer(gl, width, height) {
     };
 }
 
+//process OBJ file
 function loadObj(objdata) {
     
     var lines = objdata.split('\n');
@@ -397,401 +459,17 @@ function loadMesh(uri, useMaterials) {
     });
 }
 
-//specific to model
-function initBuffers(gl, model) {
-
-    var modelBuffers = [];
-    var glassBuffers = [];
-
-    const screenQuad = [
-        -1.0, -1.0,
-        -1.0,  1.0,
-         1.0,  1.0,
-         1.0,  1.0,
-         1.0, -1.0,
-        -1.0, -1.0
-    ];
-    const screenQuadBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, screenQuadBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(screenQuad), gl.STATIC_DRAW);
-
-    for (var i = 0; i < model.length; i++) {
-
-        var colour = [0.0, 0.0, 0.0];
-        var specular = 0.0;
-        var transparency = 0.0;
-        var reflect = 0.0;
-        var shadow = 0.0;
-        var fresnel = 0.0;
-        var tex = 0.0;
-
-        switch(model[i].colour) {
-            //front inlet and logo
-            case 'silver_door_strip.004':
-                colour = [0.2, 0.5, 1.0];
-                specular = 0.8;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //all grills    
-            case 'GRILL.004':
-                colour = [0.0, 0.0, 0.0];
-                specular = 0.2;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //headlight core    
-            case 'headlight_square.004':
-                colour = [1.0, 1.0, 1.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //headlight surround
-            case 'headlight_glass.004':
-                colour = [1.0, 1.0, 1.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //wheel nut    
-            case 'Nut.004':
-                colour = [1.0, 1.0, 1.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //brake disk
-            case 'brake_disk.004':
-                colour = [0.2, 0.2, 0.2];
-                specular = 0.1;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 1.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //tyre
-            case 'tyre.004':
-                colour = [0.2, 0.2, 0.2];
-                specular = 0.1;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 1.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //wheel rim    
-            case 'rim_silver.004':
-                colour = [1.0, 1.0, 1.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.2;
-                shadow = 1.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //wheel rim detail    
-            case 'rim_blue.004':
-                colour = [0.2, 0.5, 1.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.2;
-                shadow = 1.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //brake callipers
-            case 'cALLIPERS.004':
-                colour = [1.0, 0.0, 0.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 1.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            case 'wheel_joint.004':
-                colour = [0.0, 0.0, 0.0];
-                specular = 0.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 1.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            case 'breaks_':
-                colour = [0.2, 0.5, 1.0];
-                specular = 0.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //rear trim    
-            case 'silver_trim colour':
-                colour = [0.2, 0.5, 1.0];
-                specular = 0.8;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //rear light
-            case 'red_glass':
-                colour = [1.0, 0.0, 0.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.2;
-                shadow = 1.0;
-                fresnel = 0.6;
-                tex = 0.0;
-                break;
-            //rear light
-            case 'red.002':
-                colour = [1.0, 0.4, 0.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.2;
-                shadow = 0.0;
-                fresnel = 0.6;
-                tex = 0.0;
-                break;
-            //engine block    
-            case 'ENGINE':
-                colour = [1.0, 1.0, 1.0];
-                specular = 0.5;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 1.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //engine letters
-            case 'WHITE.002':
-                colour = [0.0, 0.0, 0.0];
-                specular = 0.5;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //engine mount
-            case 'None':
-                colour = [0.0, 0.0, 0.0];
-                specular = 0.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //rear light trim
-            case 'silver_trim':
-                colour = [1.0, 1.0, 1.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.4;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //BODY
-            //roof
-            case 'NAVY':
-                colour = [0.02, 0.02, 0.02];
-                specular = 0.8;
-                transparency = 0.0;
-                reflect = 0.4;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //bonnet
-            case 'BLUE.002':
-                colour = [0.02, 0.02, 0.02];
-                specular = 0.8;
-                transparency = 0.0;
-                reflect = 0.4;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //front windows
-            case 'front_window.004':
-                colour = [0.0, 0.0, 0.0];
-                specular = 1.0;
-                transparency = 1.0;
-                reflect = 0.8;
-                shadow = 0.0;
-                fresnel = 0.8;
-                tex = 0.0;
-                break;   
-            //front light glass
-            case 'glass_front.004':
-                colour = [0.0, 0.0, 0.0];
-                specular = 1.0;
-                transparency = 1.0;
-                reflect = 0.8;
-                shadow = 0.0;
-                fresnel = 0.8;
-                tex = 0.0;
-                break;   
-            //wheel arch inside             
-            case 'WHEEL_CURB.004':
-                colour = [0.0, 0.0, 0.0];
-                specular = 0.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //window strip    
-            case 'black_strip.004':
-                colour = [0.0, 0.0, 0.0];
-                specular = 0.8;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //rear window
-            case 'black_fuel_tank.004':
-                colour = [0.0, 0.0, 0.0];
-                specular = 0.8;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //air intake
-            case 'black_side_vent':
-                colour = [0.0, 0.0, 0.0];
-                specular = 0.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            //front window vent 
-            case 'black_vent.004':
-                colour = [0.2, 0.5, 1.0];
-                specular = 0.8;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;  
-            //wing mirrors 
-            case 'Mirrors':
-                colour = [1.0, 1.0, 1.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;  
-            //exhaust pipes
-            case 'exhaust':
-                colour = [1.0, 1.0, 1.0];
-                specular = 1.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 1.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;  
-            //boot
-            case 'black':
-                colour = [0.02, 0.02, 0.02];
-                specular = 0.8;
-                transparency = 0.0;
-                reflect = 0.4;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-                break;
-            default:
-                colour = [1.0, 1.0, 1.0];
-                specular = 0.0;
-                transparency = 0.0;
-                reflect = 0.0;
-                shadow = 0.0;
-                fresnel = 0.0;
-                tex = 0.0;
-        }
-
-        //console.log('model:' + model[i].groupid + ' colour:' + colour);
-
-        const groupInterleavedBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, groupInterleavedBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model[i].interleaved), gl.STATIC_DRAW);
-        var modelBuffer = {groupId: model[i].groupid,
-                           interleavedBuffer: groupInterleavedBuffer,
-                           indexCount: model[i].interleaved.length / 6,
-                           colour: colour,
-                           specular: specular,
-                           transparency: transparency,
-                           reflect: reflect,
-                           shadow: shadow,
-                           fresnel: fresnel,
-                           tex: tex};
-
-        if (transparency > 0.0) {
-            glassBuffers.push(modelBuffer);
-        } else {
-            modelBuffers.push(modelBuffer);
-        }                  
-    }
-
-    var floorData = [-100.0, -0.1,  100.0,   0.0, 1.0, 0.0,
-                      100.0, -0.1,  100.0,   0.0, 1.0, 0.0,
-                      100.0, -0.1, -100.0,   0.0, 1.0, 0.0,
-                     -100.0, -0.1,  100.0,   0.0, 1.0, 0.0,
-                      100.0, -0.1, -100.0,   0.0, 1.0, 0.0,
-                     -100.0, -0.1, -100.0,   0.0, 1.0, 0.0];
-    const floorInterleavedBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, floorInterleavedBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(floorData), gl.STATIC_DRAW);
-    var floorBuffer =  {groupId: 'floor',
-                        interleavedBuffer: floorInterleavedBuffer,
-                        indexCount: 6,
-                        colour: [0.02, 0.0, 0.3],
-                        specular: 0.0,
-                        transparency: 0.0,
-                        reflect: 0.0,
-                        shadow: 1.0,
-                        fresnel: 0.0,
-                        tex: 0.0};    
-
-    return {modelBuffers: modelBuffers,
-            glassBuffers: glassBuffers,
-            floorBuffer: floorBuffer,
-            screenQuadBuffer: screenQuadBuffer};
+function loadJsonMesh(uri) {
+    return new Promise(resolve => {
+        $.ajax({
+            url: uri,
+            dataType: 'text'
+        }).done(function(data) {
+            resolve(data);
+        }).fail(function() {
+            alert('Faild to retrieve [' + uri + "]");
+        });     
+    });
 }
 
 function setupCamera(cameraPosition, target, projectionMatrix) {
@@ -812,310 +490,26 @@ function setupCamera(cameraPosition, target, projectionMatrix) {
     };
 }
 
-function drawShadowMap(gl, programInfo, buffers, cameraMatrices, depthRez) {
+function renderLoadScreen(gl, programInfo, buffers, runningTime) {
+
+    gl.viewport(0, 0, 640, 480);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0); //clear to white fully opaque
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     gl.useProgram(programInfo.program);
-    
-    // Set the viewport to our shadow texture's size
-    gl.viewport(0, 0, depthRez, depthRez);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clearDepth(1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrixUniformLocation,
-                        false,
-                        cameraMatrices.projectionMatrix);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrixUniformLocation,
-                        false,
-                        cameraMatrices.modelViewMatrix);
-
-    //draw glass                  
-    for (var i = 0; i < buffers.glassBuffers.length; i++) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.glassBuffers[i].interleavedBuffer);
-        gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 
-                                3, 
-                                gl.FLOAT, 
-                                gl.FALSE, 
-                                Float32Array.BYTES_PER_ELEMENT * 6, 
-                                0);
-        gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-        gl.drawArrays(gl.TRIANGLES, 0, buffers.glassBuffers[i].indexCount);                       
-    }    
-
-    //draw model                    
-    for (var i = 0; i < buffers.modelBuffers.length; i++) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.modelBuffers[i].interleavedBuffer);
-        gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 
-                               3, 
-                               gl.FLOAT, 
-                               gl.FALSE, 
-                               Float32Array.BYTES_PER_ELEMENT * 6, 
-                               0);
-        gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-        gl.drawArrays(gl.TRIANGLES, 0, buffers.modelBuffers[i].indexCount);                       
-    }
-}
-
-function drawSSAODepthMap(gl, programInfo, buffers, viewCameraMatrices, far) {
-    
-    gl.useProgram(programInfo.program);
-    
-    // Set the viewport to our shadow texture's size
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clearDepth(1.0);
-    gl.enable(gl.DEPTH_TEST); // Enable depth testing
-    gl.depthFunc(gl.LESS); // Near things obscure far things  
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrixUniformLocation,
-                        false,
-                        viewCameraMatrices.projectionMatrix);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrixUniformLocation,
-                        false,
-                        viewCameraMatrices.modelViewMatrix);
-
-    //far
-    gl.uniform1f(programInfo.uniformLocations.farUniformLocation, far);
-
-    //draw model                    
-    for (var i = 0; i < buffers.modelBuffers.length; i++) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.modelBuffers[i].interleavedBuffer);
-        gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 
-                               3, 
-                               gl.FLOAT, 
-                               gl.FALSE, 
-                               Float32Array.BYTES_PER_ELEMENT * 6, 
-                               0);
-        gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-        gl.drawArrays(gl.TRIANGLES, 0, buffers.modelBuffers[i].indexCount);                       
-    }            
-
-    //draw floor
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.floorBuffer.interleavedBuffer);
-    gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 
-                           3, 
-                           gl.FLOAT, 
-                           gl.FALSE, 
-                           Float32Array.BYTES_PER_ELEMENT * 6, 
-                           0);
-    gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-    gl.drawArrays(gl.TRIANGLES, 0, buffers.floorBuffer.indexCount);                       
-
-    //draw glass
-    for (var i = 0; i < buffers.glassBuffers.length; i++) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.glassBuffers[i].interleavedBuffer);
-        gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 
-                                3, 
-                                gl.FLOAT, 
-                                gl.FALSE, 
-                                Float32Array.BYTES_PER_ELEMENT * 6, 
-                                0);
-        gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-        gl.drawArrays(gl.TRIANGLES, 0, buffers.glassBuffers[i].indexCount);                       
-    }    
-}
- 
-function drawScene(gl, 
-                   programInfo, 
-                   buffers,
-                   viewCameraMatrices,
-                   shadowMapCameraMatrices,
-                   shadowMapTexture,
-                   ssaoTexture,
-                   lightPosition,
-                   camera) {
-
-    gl.useProgram(programInfo.program);
-    
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.enable(gl.DEPTH_TEST); // Enable depth testing
-    gl.depthFunc(gl.LESS); // Near things obscure far things            
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    //camera matrices
-    gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrixUniformLocation,
-                        false,
-                        viewCameraMatrices.projectionMatrix);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrixUniformLocation,
-                        false,
-                        viewCameraMatrices.modelViewMatrix);
-    //shadow map matrices
-    gl.uniformMatrix4fv(programInfo.uniformLocations.smProjectionMatrixUniformLocation,
-                        false,
-                        shadowMapCameraMatrices.projectionMatrix);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.smModelViewMatrixUniformLocation,
-                        false,
-                        shadowMapCameraMatrices.modelViewMatrix);
-    //normals matrix
-    gl.uniformMatrix4fv(programInfo.uniformLocations.normalsMatrixUniformLocation,
-                        false,
-                        viewCameraMatrices.normalMatrix);
-            
-    //shadow map texture
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, shadowMapTexture);
-    gl.uniform1i(programInfo.uniformLocations.depthColourTextureUniformLocation, 0);
-
-    //ssao texture
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, ssaoTexture);
-    gl.uniform1i(programInfo.uniformLocations.ssaoTextureUniformLocation, 1);
-
-    //light position
-    gl.uniform3fv(programInfo.uniformLocations.lightPositionUniformLocation, lightPosition);
-    //eye position
-    gl.uniform3fv(programInfo.uniformLocations.eyePositionUniformLocation, camera.position);
-    
-    //draw model                    
-    for (var i = 0; i < buffers.modelBuffers.length; i++) {
-        //vertices
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.modelBuffers[i].interleavedBuffer);
-        gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 
-                               3, 
-                               gl.FLOAT, 
-                               gl.FALSE, 
-                               Float32Array.BYTES_PER_ELEMENT * 6, 
-                               0);
-        gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-        //normals
-        gl.vertexAttribPointer(programInfo.attribLocations.normalAttributeLocation, 
-                               3, 
-                               gl.FLOAT, 
-                               gl.FALSE,
-                               Float32Array.BYTES_PER_ELEMENT * 6,
-                               Float32Array.BYTES_PER_ELEMENT * 3);   
-        gl.enableVertexAttribArray(programInfo.attribLocations.normalAttributeLocation);
-
-        //colour
-        gl.uniform3fv(programInfo.uniformLocations.colourUniformLocation, buffers.modelBuffers[i].colour);        
-        //specular
-        gl.uniform1f(programInfo.uniformLocations.specularUniformLocation, buffers.modelBuffers[i].specular);        
-        //transparency
-        gl.disable(gl.BLEND);
-        gl.uniform1f(programInfo.uniformLocations.transparencyUniformLocation, buffers.modelBuffers[i].transparency);        
-        //reflectivity
-        gl.uniform1f(programInfo.uniformLocations.reflectUniformLocation, buffers.modelBuffers[i].reflect);        
-        //shadow
-        gl.uniform1f(programInfo.uniformLocations.shadowUniformLocation, buffers.modelBuffers[i].shadow);        
-        //fresnel
-        gl.uniform1f(programInfo.uniformLocations.fresnelUniformLocation, buffers.modelBuffers[i].fresnel);
-        //texture id
-        gl.uniform1f(programInfo.uniformLocations.texUniformLocation, buffers.modelBuffers[i].tex);
-        
-        gl.drawArrays(gl.TRIANGLES, 0, buffers.modelBuffers[i].indexCount);                       
-    }  
-    //*/
-
-    //draw glass
-    for (var i = 0; i < buffers.glassBuffers.length; i++) {
-        //vertices
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.glassBuffers[i].interleavedBuffer);
-        gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 
-                               3, 
-                               gl.FLOAT, 
-                               gl.FALSE, 
-                               Float32Array.BYTES_PER_ELEMENT * 6, 
-                               0);
-        gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-        //normals
-        gl.vertexAttribPointer(programInfo.attribLocations.normalAttributeLocation, 
-                               3, 
-                               gl.FLOAT, 
-                               gl.FALSE,
-                               Float32Array.BYTES_PER_ELEMENT * 6,
-                               Float32Array.BYTES_PER_ELEMENT * 3);   
-        gl.enableVertexAttribArray(programInfo.attribLocations.normalAttributeLocation);
-
-        //colour
-        gl.uniform3fv(programInfo.uniformLocations.colourUniformLocation, buffers.glassBuffers[i].colour);        
-        //specular
-        gl.uniform1f(programInfo.uniformLocations.specularUniformLocation, buffers.glassBuffers[i].specular);        
-        //transparency
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-        gl.uniform1f(programInfo.uniformLocations.transparencyUniformLocation, buffers.glassBuffers[i].transparency);        
-        //reflectivity
-        gl.uniform1f(programInfo.uniformLocations.reflectUniformLocation, buffers.glassBuffers[i].reflect);        
-        //shadow
-        gl.uniform1f(programInfo.uniformLocations.shadowUniformLocation, buffers.glassBuffers[i].shadow);        
-        //fresnel
-        gl.uniform1f(programInfo.uniformLocations.fresnelUniformLocation, buffers.glassBuffers[i].fresnel);
-        //texture id
-        gl.uniform1f(programInfo.uniformLocations.texUniformLocation, buffers.glassBuffers[i].tex);
-        
-        gl.drawArrays(gl.TRIANGLES, 0, buffers.glassBuffers[i].indexCount);                               
-    }
-    //*/
-
-    //draw floor
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.floorBuffer.interleavedBuffer);
-    gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 
-                           3, 
-                           gl.FLOAT, 
-                           gl.FALSE, 
-                           Float32Array.BYTES_PER_ELEMENT * 6, 
-                           0);
-    gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-    //normals
-    gl.vertexAttribPointer(programInfo.attribLocations.normalAttributeLocation, 
-                           3, 
-                           gl.FLOAT, 
-                           gl.FALSE,
-                           Float32Array.BYTES_PER_ELEMENT * 6,
-                           Float32Array.BYTES_PER_ELEMENT * 3);   
-    gl.enableVertexAttribArray(programInfo.attribLocations.normalAttributeLocation);
-    
-    //colour
-    gl.uniform3fv(programInfo.uniformLocations.colourUniformLocation, buffers.floorBuffer.colour);        
-    //specular
-    gl.uniform1f(programInfo.uniformLocations.specularUniformLocation, buffers.floorBuffer.specular);        
-    //transparency
-    gl.disable(gl.BLEND);
-    gl.uniform1f(programInfo.uniformLocations.transparencyUniformLocation, buffers.floorBuffer.transparency);        
-    //reflectivity
-    gl.uniform1f(programInfo.uniformLocations.reflectUniformLocation, buffers.floorBuffer.reflect);        
-    //shadow
-    gl.uniform1f(programInfo.uniformLocations.shadowUniformLocation, buffers.floorBuffer.shadow);        
-    //fresnel
-    gl.uniform1f(programInfo.uniformLocations.fresnelUniformLocation, buffers.floorBuffer.fresnel);
-    //texture id
-    gl.uniform1f(programInfo.uniformLocations.texUniformLocation, buffers.floorBuffer.tex);
-        
-    gl.drawArrays(gl.TRIANGLES, 0, buffers.floorBuffer.indexCount); 
-
-}
-
-function postProcess(gl, 
-                     programInfo, 
-                     buffers,
-                     imageTexture,
-                     ssaoTexture) {
-
-    gl.useProgram(programInfo.program);
-    
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.enable(gl.DEPTH_TEST); // Enable depth testing
-    gl.depthFunc(gl.LESS); // Near things obscure far things            
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
     gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
     gl.bindBuffer(gl.ARRAY_BUFFER, buffers.screenQuadBuffer);
     gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-    
-    //image texture
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, imageTexture);
-    gl.uniform1i(programInfo.uniformLocations.imageTextureUniformLocation, 0);
 
-    //ssao texture
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, ssaoTexture);
-    gl.uniform1i(programInfo.uniformLocations.ssaoTextureUniformLocation, 1);
+    gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+    gl.uniform1f(programInfo.uniformLocations.timeUniformLocation, runningTime);
     
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
+    gl.useProgram(null);
 }
 
 module.exports = {
@@ -1125,16 +519,16 @@ module.exports = {
     checkExtensions: checkExtensions,
     initShadowProgram: initShadowProgram,
     initSSAOProgram: initSSAOProgram,
+    initGlowProgram: initGlowProgram,
+    initBlurProgram: initBlurProgram,
     initPostProcessProgram: initPostProcessProgram,
+    initLoadScreenProgram: initLoadScreenProgram,
     initTexture: initTexture,
     loadImageAndInitTextureInfo: loadImageAndInitTextureInfo,
     initFramebuffer: initFramebuffer,
     initDepthFramebuffer: initDepthFramebuffer,
     loadMesh: loadMesh,
-    initBuffers: initBuffers,
+    loadJsonMesh: loadJsonMesh,
     setupCamera: setupCamera,
-    drawShadowMap: drawShadowMap,
-    drawSSAODepthMap: drawSSAODepthMap,
-    drawScene: drawScene,
-    postProcess: postProcess
+    renderLoadScreen: renderLoadScreen
 };

@@ -3,6 +3,7 @@
 const React = require('react');
 
 import WebGLContentList1 from './webglcontentlist1';
+import WebGLContentList2 from './webglcontentlist2';
 import WebGLContentItem from './webglcontentitem';
 import Pagination from '../pagination';
 
@@ -26,10 +27,22 @@ export default class Experiments extends React.Component {
     render() {
 
         var viewItem = <WebGLContentList1 handleViewContentItem={this.handleViewContentItem} />;
-        var pagination = [];
-        
-        if (this.state.currentView === 'CONTENT_ITEM') {
+        var pagination = {
+            first: {href: 'CONTENT_LIST_1'},
+            next: {href: 'CONTENT_LIST_2'},
+            last:  {href: 'CONTENT_LIST_2'}                 
+        };
+
+        if (this.state.currentView === 'CONTENT_LIST_2') {
+            viewItem = <WebGLContentList2 handleViewContentItem={this.handleViewContentItem} />;
+            pagination = {
+                first: {href: 'CONTENT_LIST_1'},
+                prev: {href: 'CONTENT_LIST_1'},
+                last:  {href: 'CONTENT_LIST_2'}                 
+            };
+        } else if (this.state.currentView === 'CONTENT_ITEM') {
             viewItem = <WebGLContentItem contentItemName={this.state.contentItemName} onNavigate={this.onNavigate} />;
+            pagination = {};
         }
 
         return (
@@ -37,9 +50,7 @@ export default class Experiments extends React.Component {
             <div className='panel-heading'>Experiments and learning</div>
                 <div className='panel-body'>
                     <p className='text-center'>
-                        WebGL experiments and learning materials. I thought it might be nice to document
-                        my learning curve with WebGL. There seems to be lot's of good examples of the basics
-                        but materials on more advanced subjects seem to be a little thin on the ground.  
+                        General WebGL experiments.  
                     </p>
 
                     <div className='text-center'>

@@ -7,7 +7,7 @@ const noiseSrc = require('../static/images/colournoise.png');
 const teapotObjSrc = require('../static/teapot.obj');
 
 import ShauGL from '../shaugl3D';
-import TeapotGL from '../teapotgl';
+import TeapotGL from './teapotgl';
 import TeapotVertexShader from '../shaders/teapot_vertex_shader';
 import TeapotFragmentShader from '../shaders/teapot_fragment_shader';
 

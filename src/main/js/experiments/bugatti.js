@@ -3,9 +3,10 @@
 const React = require('react');
 var glm = require('gl-matrix');
 
-const bugattiObjSrc = require('../static/bugatti.obj');
+const bugattiJsonSrc = require('../static/bugatti.obj');
 
 import ShauGL from '../shaugl3D';
+import BugattiGL from './bugattigl';
 
 import ModelVertexShader from '../shaders/model_vertex_shader';
 import BugattiFragmentShader from '../shaders/bugatti_fragment_shader';
@@ -57,109 +58,116 @@ export default class Bugatti extends React.Component {
                 fresnelUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_fresnel'),
                 texUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_tex'),
                 lightPositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_light_position'),
+                dofUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_dof'),
                 eyePositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_eye_position'),
                 ssaoTextureUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_ssao_texture')
             }
         }
 
+        const loadScreenProgramInfo = ShauGL.initLoadScreenProgram(gl);
         const shadowMapProgramInfo = ShauGL.initShadowProgram(gl);
         const ssaoProgramInfo = ShauGL.initSSAOProgram(gl);
         const postProcessProgramInfo = ShauGL.initPostProcessProgram(gl);
 
-        var buffers = undefined;
+        var buffers = BugattiGL.initBuffers(gl);
         var shadowMapFramebuffer = ShauGL.initDepthFramebuffer(gl, shadowDepthTextureSize, shadowDepthTextureSize);
         var ssaoFramebuffer = ShauGL.initDepthFramebuffer(gl, gl.canvas.width, gl.canvas.height);
         var imageFrameBuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height);
 
-        var then = 0;
+        var modelLoaded = false;
         function renderFrame(now) {
 
             now *= 0.001; // convert to seconds
-            const deltaTime = now - then;
-            then = now;
+            
+            if (!modelLoaded) {
+                //loading screen
+                ShauGL.renderLoadScreen(gl, loadScreenProgramInfo, buffers, now);
+            } else {
 
-            var cameraPosition = glm.vec3.fromValues(7.0, 3.0, 9.0);
-            var target = glm.vec3.fromValues(0.0, 0.0, 0.5);
-            glm.vec3.rotateY(cameraPosition, cameraPosition, target, now * 0.02);
-
-            var camera = {
-                position: cameraPosition,
-                target: target,
-                near: 0.01,
-                far: 400.0,
-                fov: 45.0,
-                aspectRatio: gl.canvas.width / gl.canvas.height
-            };    
-            var lightProjectionMatrix = glm.mat4.create();
-            glm.mat4.ortho(lightProjectionMatrix,                   
-                            -10.0,
-                            10.0,
-                            -10.0,
-                            10.0,
-                            -10.0, 
-                            20.0);
-            var cameraProjectionMatrix = glm.mat4.create();
-            glm.mat4.perspective(cameraProjectionMatrix,
-                                    camera.fov,
-                                    camera.aspectRatio,
-                                    camera.near,
-                                    camera.far);
-            var viewCameraMatrices = ShauGL.setupCamera(camera.position, camera.target, cameraProjectionMatrix);
-            var shadowMapCameraMatrices = ShauGL.setupCamera(lightPosition, camera.target, lightProjectionMatrix);
+                var cameraPosition = glm.vec3.fromValues(7.0, 3.0, 9.0);
+                var target = glm.vec3.fromValues(0.0, 0.0, 0.5);
+                glm.vec3.rotateY(cameraPosition, cameraPosition, target, now * 0.02);
     
-            // Draw to our off screen drawing buffer for shadow map
-            gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMapFramebuffer.framebuffer);
-            //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauGL.drawShadowMap(gl, 
-                                    shadowMapProgramInfo, 
+                var camera = {
+                    position: cameraPosition,
+                    target: target,
+                    near: 0.01,
+                    far: 400.0,
+                    fov: 45.0,
+                    aspectRatio: gl.canvas.width / gl.canvas.height
+                };    
+                var lightProjectionMatrix = glm.mat4.create();
+                glm.mat4.ortho(lightProjectionMatrix,                   
+                                -10.0,
+                                10.0,
+                                -10.0,
+                                10.0,
+                                -10.0, 
+                                20.0);
+                var cameraProjectionMatrix = glm.mat4.create();
+                glm.mat4.perspective(cameraProjectionMatrix,
+                                        camera.fov,
+                                        camera.aspectRatio,
+                                        camera.near,
+                                        camera.far);
+                var viewCameraMatrices = ShauGL.setupCamera(camera.position, camera.target, cameraProjectionMatrix);
+                var shadowMapCameraMatrices = ShauGL.setupCamera(lightPosition, camera.target, lightProjectionMatrix);
+                    
+                // Draw to our off screen drawing buffer for shadow map
+                gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMapFramebuffer.framebuffer);
+                //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                BugattiGL.drawShadowMap(gl, 
+                                        shadowMapProgramInfo, 
+                                        buffers, 
+                                        shadowMapCameraMatrices,  
+                                        shadowDepthTextureSize);
+                //*/
+                
+                //ssao depth to off screen buffer
+                gl.bindFramebuffer(gl.FRAMEBUFFER, ssaoFramebuffer.framebuffer);
+                //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                BugattiGL.drawSSAODepthMap(gl, 
+                                        ssaoProgramInfo, 
+                                        buffers,
+                                        viewCameraMatrices, 
+                                        camera.far);
+                //*/
+    
+                //draw scene
+                gl.bindFramebuffer(gl.FRAMEBUFFER, imageFrameBuffer.framebuffer);
+                //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                BugattiGL.drawScene(gl, 
+                                    bugattiProgramInfo, 
                                     buffers, 
-                                    shadowMapCameraMatrices,  
-                                    shadowDepthTextureSize);
-            //*/
-            
-        
-            //ssao depth to off screen buffer
-            gl.bindFramebuffer(gl.FRAMEBUFFER, ssaoFramebuffer.framebuffer);
-            //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauGL.drawSSAODepthMap(gl, 
-                                    ssaoProgramInfo, 
+                                    viewCameraMatrices,
+                                    shadowMapCameraMatrices,
+                                    shadowMapFramebuffer.texture,
+                                    ssaoFramebuffer.texture,
+                                    lightPosition,
+                                    camera);
+                //*/
+                                            
+                //post processing
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                BugattiGL.postProcess(gl,
+                                    postProcessProgramInfo,
                                     buffers,
-                                    viewCameraMatrices, 
-                                    camera.far);
-            //*/
-
-            //draw scene
-            gl.bindFramebuffer(gl.FRAMEBUFFER, imageFrameBuffer.framebuffer);
-            //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauGL.drawScene(gl, 
-                                bugattiProgramInfo, 
-                                buffers, 
-                                viewCameraMatrices,
-                                shadowMapCameraMatrices,
-                                shadowMapFramebuffer.texture,
-                                ssaoFramebuffer.texture,
-                                lightPosition,
-                                camera);
-            //*/
-
-            
-            //post processing
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauGL.postProcess(gl,
-                                postProcessProgramInfo,
-                                buffers,
-                                imageFrameBuffer.texture,
-                                ssaoFramebuffer.texture);
-            //*/                   
+                                    imageFrameBuffer.texture,
+                                    ssaoFramebuffer.texture,
+                                    0.1);
+                //*/                   
+            }
 
             animId = requestAnimationFrame(renderFrame);
         }
         //*/
 
-        ShauGL.loadMesh(bugattiObjSrc).then(mesh => {
-            buffers = ShauGL.initBuffers(gl, mesh);
-            animId = requestAnimationFrame(renderFrame);
+        ShauGL.loadJsonMesh(bugattiJsonSrc).then(mesh => {
+            var model = JSON.parse(mesh);
+            BugattiGL.initModelBuffers(buffers, gl, model);
+            modelLoaded = true;
         });
+        animId = requestAnimationFrame(renderFrame);
     }
         
     componentWillUnmount() {

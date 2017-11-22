@@ -3,12 +3,13 @@
 const React = require('react');
 var glm = require('gl-matrix');
 
-const bugattiObjSrc = require('./static/bugatti.obj');
+import ironManJsonSrc from './static/IronMan.obj';
 
 import ShauGL from './shaugl3D';
+import IronManGL from './experiments/ironmangl';
 
 import ModelVertexShader from './shaders/model_vertex_shader';
-import BugattiFragmentShader from './shaders/bugatti_fragment_shader';
+import IronManFragmentShader from './shaders/iron_man_fragment_shader';
 
 var animId = undefined;
 
@@ -30,136 +31,187 @@ export default class TestPage extends React.Component {
         ShauGL.checkExtensions(gl);
         
         var shadowDepthTextureSize = 4096;
-        var lightPosition = [-3.0, 8.0, 2.0];
+        var lightPosition = [-3.0, 15.0, 2.0];
         
         //bugatti program
         const modelVsSource = ModelVertexShader.vertexSource();
-        const bugattiFsSource = BugattiFragmentShader.fragmentSource();
-        const bugattiShaderProgram = ShauGL.initShaderProgram(gl, modelVsSource, bugattiFsSource);
-        const bugattiProgramInfo = {
-            program: bugattiShaderProgram,
+        const ironManFsSource = IronManFragmentShader.fragmentSource();
+        const ironManShaderProgram = ShauGL.initShaderProgram(gl, modelVsSource, ironManFsSource);
+        const ironManProgramInfo = {
+            program: ironManShaderProgram,
             attribLocations: {
-                positionAttributeLocation: gl.getAttribLocation(bugattiShaderProgram, 'a_position'),
-                normalAttributeLocation: gl.getAttribLocation(bugattiShaderProgram, 'a_normal')
+                positionAttributeLocation: gl.getAttribLocation(ironManShaderProgram, 'a_position'),
+                normalAttributeLocation: gl.getAttribLocation(ironManShaderProgram, 'a_normal')
             },
             uniformLocations: {
-                modelViewMatrixUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_model_view_matrix'),
-                projectionMatrixUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_projection_matrix'),
-                smModelViewMatrixUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_sm_model_view_matrix'),
-                smProjectionMatrixUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_sm_projection_matrix'),
-                normalsMatrixUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_normals_matrix'),
-                depthColourTextureUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_depth_colour_texture'),
-                colourUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_colour'),
-                specularUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_specular'),
-                transparencyUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_transparency'),
-                reflectUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_reflect'),
-                shadowUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_shadow'),
-                fresnelUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_fresnel'),
-                texUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_tex'),
-                lightPositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_light_position'),
-                eyePositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_eye_position'),
-                ssaoTextureUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_ssao_texture')
+                modelViewMatrixUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_model_view_matrix'),
+                projectionMatrixUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_projection_matrix'),
+                smModelViewMatrixUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_sm_model_view_matrix'),
+                smProjectionMatrixUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_sm_projection_matrix'),
+                normalsMatrixUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_normals_matrix'),
+                depthColourTextureUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_depth_colour_texture'),
+                colourUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_colour'),
+                specularUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_specular'),
+                transparencyUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_transparency'),
+                reflectUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_reflect'),
+                shadowUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_shadow'),
+                fresnelUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_fresnel'),
+                texUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_tex'),
+                lightPositionUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_light_position'),
+                lightStrengthUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_light_strength'),
+                eyePositionUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_eye_position'),
+                ssaoTextureUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_ssao_texture'),
+                glowMapTextureUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_glow_map_texture')
             }
         }
 
+        const loadScreenProgramInfo = ShauGL.initLoadScreenProgram(gl);
         const shadowMapProgramInfo = ShauGL.initShadowProgram(gl);
+        const glowProgramInfo = ShauGL.initGlowProgram(gl);
+        const blurProgramInfo = ShauGL.initBlurProgram(gl);
         const ssaoProgramInfo = ShauGL.initSSAOProgram(gl);
         const postProcessProgramInfo = ShauGL.initPostProcessProgram(gl);
 
-        var buffers = undefined;
+        var buffers = IronManGL.initBuffers(gl);
         var shadowMapFramebuffer = ShauGL.initDepthFramebuffer(gl, shadowDepthTextureSize, shadowDepthTextureSize);
         var ssaoFramebuffer = ShauGL.initDepthFramebuffer(gl, gl.canvas.width, gl.canvas.height);
+        var glowMapFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height);
+        var blurHFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height);
+        var blurVFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height);
         var imageFrameBuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height);
 
-        var then = 0;
+        var blurAmount = 8; //0 - 10
+        var blurScale = 0.9;
+        var blurStrength = 0.6; //0.0 - 1.0
+
+        var modelLoaded = false;
         function renderFrame(now) {
 
             now *= 0.001; // convert to seconds
-            const deltaTime = now - then;
-            then = now;
 
-            var cameraPosition = glm.vec3.fromValues(7.0, 3.0, 9.0);
-            var target = glm.vec3.fromValues(0.0, 0.0, 0.5);
-            glm.vec3.rotateY(cameraPosition, cameraPosition, target, now * 0.02);
+            if (!modelLoaded) {
+                ShauGL.renderLoadScreen(gl, loadScreenProgramInfo, buffers, now);
+            } else {
 
-            var camera = {
-                position: cameraPosition,
-                target: target,
-                near: 0.01,
-                far: 400.0,
-                fov: 45.0,
-                aspectRatio: gl.canvas.width / gl.canvas.height
-            };    
-            var lightProjectionMatrix = glm.mat4.create();
-            glm.mat4.ortho(lightProjectionMatrix,                   
-                            -10.0,
-                            10.0,
-                            -10.0,
-                            10.0,
-                            -10.0, 
-                            20.0);
-            var cameraProjectionMatrix = glm.mat4.create();
-            glm.mat4.perspective(cameraProjectionMatrix,
-                                    camera.fov,
-                                    camera.aspectRatio,
-                                    camera.near,
-                                    camera.far);
-            var viewCameraMatrices = ShauGL.setupCamera(camera.position, camera.target, cameraProjectionMatrix);
-            var shadowMapCameraMatrices = ShauGL.setupCamera(lightPosition, camera.target, lightProjectionMatrix);
+                var cameraPosition = glm.vec3.fromValues(4.0, 10.0, 5.0);
+                var target = glm.vec3.fromValues(0.0, 6.0, 0.5);
+                glm.vec3.rotateY(cameraPosition, cameraPosition, target, now * 0.2);
     
-            // Draw to our off screen drawing buffer for shadow map
-            gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMapFramebuffer.framebuffer);
-            //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauGL.drawShadowMap(gl, 
-                                    shadowMapProgramInfo, 
-                                    buffers, 
-                                    shadowMapCameraMatrices,  
-                                    shadowDepthTextureSize);
-            //*/
-            
-        
-            //ssao depth to off screen buffer
-            gl.bindFramebuffer(gl.FRAMEBUFFER, ssaoFramebuffer.framebuffer);
-            //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauGL.drawSSAODepthMap(gl, 
-                                    ssaoProgramInfo, 
-                                    buffers,
-                                    viewCameraMatrices, 
-                                    camera.far);
-            //*/
+                var camera = {
+                    position: cameraPosition,
+                    target: target,
+                    near: 0.01,
+                    far: 400.0,
+                    fov: 45.0,
+                    aspectRatio: gl.canvas.width / gl.canvas.height
+                };    
+                var lightProjectionMatrix = glm.mat4.create();
+                glm.mat4.ortho(lightProjectionMatrix,                   
+                                -20.0,
+                                 20.0,
+                                -20.0,
+                                 20.0,
+                                -20.0, 
+                                 40.0);
+                var cameraProjectionMatrix = glm.mat4.create();
+                glm.mat4.perspective(cameraProjectionMatrix,
+                                        camera.fov,
+                                        camera.aspectRatio,
+                                        camera.near,
+                                        camera.far);
+                var viewCameraMatrices = ShauGL.setupCamera(camera.position, camera.target, cameraProjectionMatrix);
+                var shadowMapCameraMatrices = ShauGL.setupCamera(lightPosition, camera.target, lightProjectionMatrix);
+                var lightStrength = Math.sin(now * 0.2);
 
-            //draw scene
-            gl.bindFramebuffer(gl.FRAMEBUFFER, imageFrameBuffer.framebuffer);
-            //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauGL.drawScene(gl, 
-                                bugattiProgramInfo, 
+                // Draw to our off screen drawing buffer for shadow map
+                gl.bindFramebuffer(gl.FRAMEBUFFER, shadowMapFramebuffer.framebuffer);
+                //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                IronManGL.drawShadowMap(gl, 
+                                        shadowMapProgramInfo, 
+                                        buffers, 
+                                        shadowMapCameraMatrices,  
+                                        shadowDepthTextureSize);
+                //*/
+                                
+                //ssao depth to off screen buffer
+                gl.bindFramebuffer(gl.FRAMEBUFFER, ssaoFramebuffer.framebuffer);
+                //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                IronManGL.drawSSAODepthMap(gl, 
+                                           ssaoProgramInfo, 
+                                           buffers,
+                                           viewCameraMatrices, 
+                                           camera.far);
+                //*/
+    
+                //glow map to offscreen buffer
+                gl.bindFramebuffer(gl.FRAMEBUFFER, glowMapFramebuffer.framebuffer);
+                //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                IronManGL.drawGlowMap(gl,
+                                        glowProgramInfo,
+                                        buffers,
+                                        viewCameraMatrices);
+                //then box blur glow map to offscreen buffer
+                //horizontal pass
+                gl.bindFramebuffer(gl.FRAMEBUFFER, blurHFramebuffer.framebuffer);
+                IronManGL.blur(gl, 
+                               blurProgramInfo, 
+                               buffers, 
+                               glowMapFramebuffer.texture,
+                               blurAmount, 
+                               blurScale, 
+                               blurStrength, 
+                               0);
+                //vertical pass               
+                gl.bindFramebuffer(gl.FRAMEBUFFER, blurVFramebuffer.framebuffer);
+                //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                IronManGL.blur(gl, 
+                                blurProgramInfo, 
                                 buffers, 
-                                viewCameraMatrices,
-                                shadowMapCameraMatrices,
-                                shadowMapFramebuffer.texture,
-                                ssaoFramebuffer.texture,
-                                lightPosition,
-                                camera);
-            //*/
-
-            
-            //post processing
-            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            ShauGL.postProcess(gl,
-                                postProcessProgramInfo,
-                                buffers,
-                                imageFrameBuffer.texture,
-                                ssaoFramebuffer.texture);
-            //*/                   
+                                blurHFramebuffer.texture,
+                                blurAmount, 
+                                blurScale, 
+                                blurStrength, 
+                                1);
+                //*/
+               
+                //draw scene
+                gl.bindFramebuffer(gl.FRAMEBUFFER, imageFrameBuffer.framebuffer);
+                //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                IronManGL.drawScene(gl, 
+                                    ironManProgramInfo, 
+                                    buffers, 
+                                    viewCameraMatrices,
+                                    shadowMapCameraMatrices,
+                                    shadowMapFramebuffer.texture,
+                                    ssaoFramebuffer.texture,
+                                    blurVFramebuffer.texture,
+                                    lightPosition,
+                                    lightStrength,
+                                    camera);
+                //*/
+    
+                
+                //post processing
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                IronManGL.postProcess(gl,
+                                    postProcessProgramInfo,
+                                    buffers,
+                                    imageFrameBuffer.texture,
+                                    ssaoFramebuffer.texture,
+                                    0.3);
+                //*/                   
+            }
 
             animId = requestAnimationFrame(renderFrame);
         }
         //*/
 
-        ShauGL.loadMesh(bugattiObjSrc).then(mesh => {
-            buffers = ShauGL.initBuffers(gl, mesh);
-            animId = requestAnimationFrame(renderFrame);
+        ShauGL.loadJsonMesh(ironManJsonSrc).then(mesh => {
+            var model = JSON.parse(mesh);
+            IronManGL.initModelBuffers(buffers, gl, model);
+            modelLoaded = true;
         });
+        animId = requestAnimationFrame(renderFrame);
     }
 
     componentWillUnmount() {

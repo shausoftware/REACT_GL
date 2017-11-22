@@ -7,11 +7,9 @@ const cat4 = require('./static/images/cat4.jpg');
 
 const React = require('react');
 import ShauRMGL from './shaurmgl';
-import ShauImageGL from './shauimagegl';
+import ShauImageGL from './homegl';
 import HomeVertexShader from './shaders/home_vertex_shader';
 import HomeFragmentShader from './shaders/home_fragment_shader';
-
-const m4 = require('./m4');
 
 var animId = undefined;
 
