@@ -5,13 +5,17 @@ const React = require('react');
 require('bootstrap-loader');
 
 import ShauNavBar from './shaunavbar';
-import Home from './home';
-import TestPage from './testpage';
-import Raymarching from './raymarching/raymarching';
-import Experiments from './experiments/experiments';
-import ShauForm from './shauform';
-import ShauLinks from './shaulinks';
+
+import WebGLContentItem from './webglcontentitem';
+import HomeContent from './content/scripts/homecontent';
+
 import ShauCss from './shaucss';
+
+import Home from './home';
+import Experiments from './experiments';
+import ShauLinks from './shaulinks';
+
+import TestPage from './testpage';
 
 const TEST_MODE = false;
 
@@ -21,12 +25,6 @@ export default class App extends React.Component {
 		super(props);
 		this.state = {currentPage: 'PAGE_HOME'};
         this.handleChangePage = this.handleChangePage.bind(this);
-	}
-	
-    componentDidMount() {
-		var script = document.createElement('script');
-        script.src = 'http://webplayer.unity3d.com/download_webplayer-3.x/3.0/uo/UnityObject2.js';
-        document.body.appendChild(script);
 	}
 
 	handleChangePage(pageName) {
@@ -39,23 +37,15 @@ export default class App extends React.Component {
 		var rgb = [255, 0, 0]; //red
 		
 		if (TEST_MODE) {
-            content = <TestPage />
+			content = <TestPage />
 		} 
-		if ('PAGE_RAYMARCHING' === this.state.currentPage) {
-			content = <Raymarching />;
-			rgb = [0, 255, 0]; //yellow
-		}
 		if ('PAGE_EXPERIMENTS' === this.state.currentPage) {
 			content = <Experiments />;
-			rgb = [0, 0, 255]; //blue
-		}
-		if ('PAGE_SHAUFORM' === this.state.currentPage) {
-			content = <ShauForm />
-			rgb = [255, 0, 255]; //purple
+			rgb = [0, 255, 0]; //green
 		}
 		if ('PAGE_LINKS' === this.state.currentPage) {
 			content = <ShauLinks />;
-			rgb = [255, 255, 255]; //white
+			rgb = [0, 0, 255]; //blue
 		}
 		ShauCss.pageCss(rgb);	
 

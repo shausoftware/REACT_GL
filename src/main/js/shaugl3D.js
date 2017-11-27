@@ -1,6 +1,6 @@
 'use strict';
 
-import VertexShader from './shaders/vertex_shader';
+import SimpleVertexShader from './shaders/simple_vertex_shader';
 import LoadScreenFragmentShader from './shaders/load_screen_fragment_shader';
 import ShadowVertexShader from './shaders/shadow_vertex_shader';
 import ShadowFragmentShader from './shaders/shadow_fragment_shader';
@@ -12,18 +12,10 @@ import GlowVertexShader from './shaders/glow_vertex_shader';
 import GlowFragmentShader from './shaders/glow_fragment_shader';
 import BlurVertexShader from './shaders/blur_vertex_shader';
 import BlurFragmentShader from './shaders/blur_fragment_shader';
+import SkyVertexShader from './shaders/sky_vertex_shader';
+import SkyFragmentSHader from './shaders/sky_fragment_shader';
 
 const glm = require('gl-matrix');
-
-function initWebGL(glCanvas) {
-
-    const gl = glCanvas.getContext('webgl');
-
-    if (!gl) {
-        alert('Please update to a web browser that supports WebGL.');
-        return;
-    }
-};
 
 function initShaderProgram(gl, vsSource, fsSource) {
 
@@ -86,6 +78,28 @@ function checkExtensions(gl) {
     return ext2;
 }
 
+function initSkyProgram(gl) {
+    const skyVsSource = SkyVertexShader.vertexSource();
+    const skyFsSource = SkyFragmentSHader.fragmentSource();
+    const skyShaderProgram = initShaderProgram(gl, skyVsSource, skyFsSource);
+    const skyProgramInfo = {
+        program: skyShaderProgram,
+        attribLocations: {
+            positionAttributeLocation: gl.getAttribLocation(skyShaderProgram, 'a_position')
+        },
+        uniformLocations: {
+            resolutionUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_resolution'),
+            lightPositionUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_light_position'),
+            cameraPositionUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_camera_position'),
+            targetUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_target'),
+            fovUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_fov'),
+            farUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_far'),
+            yScaleUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_y_scale')            
+        }
+    };
+    return skyProgramInfo;
+}
+
 function initShadowProgram(gl) {
     const shadowMapVsSource = ShadowVertexShader.vertexSource();
     const shadowMapFsSource = ShadowFragmentShader.fragmentSource();
@@ -97,7 +111,8 @@ function initShadowProgram(gl) {
         },
         uniformLocations: {
             modelViewMatrixUniformLocation: gl.getUniformLocation(shadowMapShaderProgram, 'u_model_view_matrix'),
-            projectionMatrixUniformLocation: gl.getUniformLocation(shadowMapShaderProgram, 'u_projection_matrix')
+            projectionMatrixUniformLocation: gl.getUniformLocation(shadowMapShaderProgram, 'u_projection_matrix'),
+            yScaleUniformLocation: gl.getUniformLocation(shadowMapShaderProgram, 'u_y_scale')            
         }
     };
     return shadowMapProgramInfo;
@@ -155,7 +170,8 @@ function initSSAOProgram(gl) {
             modelViewMatrixUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_model_view_matrix'),
             projectionMatrixUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_projection_matrix'),
             normalsMatrixUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_normals_matrix'),
-            farUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_far')                
+            farUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_far'),
+            yScaleUniformLocation: gl.getUniformLocation(ssaoShaderProgram, 'u_y_scale')            
         }
     };  
     return ssaoProgramInfo;  
@@ -179,7 +195,7 @@ function initPostProcessProgram(gl) {
 }
 
 function initLoadScreenProgram(gl) {
-    const lsVsSource = VertexShader.vertexSource();
+    const lsVsSource = SimpleVertexShader.vertexSource();
     const lsFsSource = LoadScreenFragmentShader.fragmentSource();
     const lsShaderProgram = initShaderProgram(gl, lsVsSource, lsFsSource);
     const lsProgramInfo = {
@@ -235,7 +251,7 @@ function loadImageAndInitTextureInfo(gl, url) {
                   0, 
                   gl.RGBA, 
                   gl.UNSIGNED_BYTE,
-                  new Uint8Array([0, 0, 255, 255]));
+                  new Uint8Array([0, 0, 0, 255]));
   
     const image = new Image();
     image.onload = function() {
@@ -262,7 +278,7 @@ function loadImageAndInitTextureInfo(gl, url) {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         }
     };
-    image.src = cubeTextureSrc;
+    image.src = url;
   
     return {
         texture: texture,
@@ -271,16 +287,14 @@ function loadImageAndInitTextureInfo(gl, url) {
     };
 }
 
-function initFramebuffer(gl, width, height) {
+function initFramebuffer(gl, width, height, scale) {
     
-    var texture = this.initTexture(gl, width, height);
+    var texture = this.initTexture(gl, width * scale, height * scale);
     
     var fbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = gl.canvas.width;
     fbo.height = gl.canvas.height;
-
-    //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, fbo.width, fbo.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 
     var renderbuffer = gl.createRenderbuffer();
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
@@ -492,7 +506,7 @@ function setupCamera(cameraPosition, target, projectionMatrix) {
 
 function renderLoadScreen(gl, programInfo, buffers, runningTime) {
 
-    gl.viewport(0, 0, 640, 480);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0.0, 0.0, 0.0, 1.0); //clear to white fully opaque
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -512,11 +526,53 @@ function renderLoadScreen(gl, programInfo, buffers, runningTime) {
     gl.useProgram(null);
 }
 
+function renderSky(gl, 
+                   programInfo, 
+                   buffers, 
+                   lightPosition, 
+                   camera,
+                   yScale) {
+
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(gl.DEPTH_TEST); // Enable depth testing
+    gl.depthFunc(gl.LESS); // Near things obscure far things            
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.useProgram(programInfo.program);
+    
+    gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.screenQuadBuffer);
+    gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+
+    //resolution
+    gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, gl.canvas.width, gl.canvas.height);    
+    //light position
+    gl.uniform3fv(programInfo.uniformLocations.lightPositionUniformLocation, lightPosition);
+    //camera position
+    gl.uniform3fv(programInfo.uniformLocations.cameraPositionUniformLocation, camera.position);
+    //target
+    gl.uniform3fv(programInfo.uniformLocations.targetUniformLocation, camera.target);
+    //fov
+    gl.uniform1f(programInfo.uniformLocations.fovUniformLocation, camera.fov);
+    //far
+    gl.uniform1f(programInfo.uniformLocations.farUniformLocation, camera.far);
+    //y scale
+    gl.uniform1f(programInfo.uniformLocations.yScaleUniformLocation, yScale);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
+    gl.useProgram(null);
+}
+
 module.exports = {
-    initWebGL: initWebGL,
     initShaderProgram: initShaderProgram,
     loadShader: loadShader,
     checkExtensions: checkExtensions,
+    initSkyProgram: initSkyProgram,
     initShadowProgram: initShadowProgram,
     initSSAOProgram: initSSAOProgram,
     initGlowProgram: initGlowProgram,
@@ -530,5 +586,6 @@ module.exports = {
     loadMesh: loadMesh,
     loadJsonMesh: loadJsonMesh,
     setupCamera: setupCamera,
-    renderLoadScreen: renderLoadScreen
+    renderLoadScreen: renderLoadScreen,
+    renderSky: renderSky
 };

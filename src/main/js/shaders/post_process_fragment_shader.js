@@ -46,7 +46,7 @@ function fragmentSource() {
 
         gl_FragColor = vec4(pc, 1.0);
         //gl_FragColor = vec4(vec3(depth), 1.0);
-       // gl_FragColor = texture2D(u_image_texture, uv);
+        //gl_FragColor = texture2D(u_image_texture, uv);
     }
     
     `;

@@ -54,13 +54,7 @@ export default class ShauNavBar extends React.Component {
                                 <a className='shau-home' href='#' name='PAGE_HOME' onClick={this.handleChangePage}>Home</a>
                             </li>
                             <li className={'PAGE_EXPERIMENTS' === this.state.currentPage ? 'active' : undefined}>
-                                <a className='shau-experiments' href='#' name='PAGE_EXPERIMENTS' onClick={this.handleChangePage}>Experiments</a>
-                            </li>
-                            <li className={'PAGE_RAYMARCHING' === this.state.currentPage ? 'active' : undefined}>
-                                <a className='shau-raymarching' href='#' name='PAGE_RAYMARCHING' onClick={this.handleChangePage} >Raymarching and Raytracers</a>
-                            </li>
-                            <li className={'PAGE_SHAUFORM' === this.state.currentPage ? 'active' : undefined}>
-                                <a className='shau-form' href='#' name='PAGE_SHAUFORM' onClick={this.handleChangePage}>Form 3D</a>
+                                <a className='shau-experiments' href='#' name='PAGE_EXPERIMENTS' onClick={this.handleChangePage}>WebGL Experiments</a>
                             </li>
                             <li className={'PAGE_LINKS' === this.state.currentPage ? 'active' : undefined}>
                                 <a className='shau-links' href='#' name='PAGE_LINKS' onClick={this.handleChangePage}>Links</a>

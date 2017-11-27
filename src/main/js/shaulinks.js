@@ -18,19 +18,31 @@ export default class ShauLinks extends React.Component {
     }
 
     loadShauLinksFromServer(pageSize) {
+        /*
         ApiUtils.loadLinksFromServer(pageSize).then(entity => {
             this.setState({shauLinks: entity._embedded.shauLinks,
                            pageSize: this.state.pageSize,
                            links: entity._links});
         });
+        */
+        var entity = ApiUtils.loadLinksFromServer(3);
+        this.setState({shauLinks: entity._embedded.shauLinks,
+                       pageSize: this.state.pageSize,
+                       links: entity._links});
     }
 
     onNavigate(navUri) {
+        /*
         ApiUtils.onLinksNavigate(navUri).then(entity => {
             this.setState({shauLinks: entity._embedded.shauLinks,
                            pageSize: this.state.pageSize,
                            links: entity._links}); 
         });
+        */
+        var entity = ApiUtils.onLinksNavigate(navUri);
+        this.setState({shauLinks: entity._embedded.shauLinks,
+                       pageSize: this.state.pageSize,
+                       links: entity._links}); 
     }
 
     render() {
