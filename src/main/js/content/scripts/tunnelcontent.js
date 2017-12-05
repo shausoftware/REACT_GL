@@ -15,7 +15,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Classic tunnel inspired by Beeple.";
+    var description = "WIP.";
     return description;
 }
 
@@ -41,7 +41,7 @@ function initGLContent(gl, mBuffExt) {
         },
         uniformLocations: {
             texture1UniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture1'),
-            texture2UniformLocation2: gl.getUniformLocation(shaderProgram, 'u_texture2'),
+            texture2UniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture2'),
             resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
             timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
         }

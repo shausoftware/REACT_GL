@@ -15,7 +15,8 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Disco wall.";
+    var description = "I created this shader I created a while back. It utilises " +
+                      " raytracing and volumetric raymarching for the glow/light effect.";
     return description;
 }
 

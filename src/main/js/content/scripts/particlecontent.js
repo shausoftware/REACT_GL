@@ -23,7 +23,9 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Curl Particles.";
+    var description = "My first attempt at a particle shader. The particle positions and velocities " +
+                      "are computated in fragment buffers before rendering. Curl noise is used " +
+                      "for the FBM type motion.";
     return description;
 }
 

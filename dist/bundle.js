@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 152);
+/******/ 	return __webpack_require__(__webpack_require__.s = 153);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -11783,55 +11783,55 @@ var _simple_vertex_shader = __webpack_require__(19);
 
 var _simple_vertex_shader2 = _interopRequireDefault(_simple_vertex_shader);
 
-var _load_screen_fragment_shader = __webpack_require__(142);
+var _load_screen_fragment_shader = __webpack_require__(143);
 
 var _load_screen_fragment_shader2 = _interopRequireDefault(_load_screen_fragment_shader);
 
-var _shadow_vertex_shader = __webpack_require__(146);
+var _shadow_vertex_shader = __webpack_require__(147);
 
 var _shadow_vertex_shader2 = _interopRequireDefault(_shadow_vertex_shader);
 
-var _shadow_fragment_shader = __webpack_require__(145);
+var _shadow_fragment_shader = __webpack_require__(146);
 
 var _shadow_fragment_shader2 = _interopRequireDefault(_shadow_fragment_shader);
 
-var _ssao_vertex_shader = __webpack_require__(150);
+var _ssao_vertex_shader = __webpack_require__(151);
 
 var _ssao_vertex_shader2 = _interopRequireDefault(_ssao_vertex_shader);
 
-var _ssao_fragment_shader = __webpack_require__(149);
+var _ssao_fragment_shader = __webpack_require__(150);
 
 var _ssao_fragment_shader2 = _interopRequireDefault(_ssao_fragment_shader);
 
-var _post_process_vertex_shader = __webpack_require__(144);
+var _post_process_vertex_shader = __webpack_require__(145);
 
 var _post_process_vertex_shader2 = _interopRequireDefault(_post_process_vertex_shader);
 
-var _post_process_fragment_shader = __webpack_require__(143);
+var _post_process_fragment_shader = __webpack_require__(144);
 
 var _post_process_fragment_shader2 = _interopRequireDefault(_post_process_fragment_shader);
 
-var _glow_vertex_shader = __webpack_require__(141);
+var _glow_vertex_shader = __webpack_require__(142);
 
 var _glow_vertex_shader2 = _interopRequireDefault(_glow_vertex_shader);
 
-var _glow_fragment_shader = __webpack_require__(140);
+var _glow_fragment_shader = __webpack_require__(141);
 
 var _glow_fragment_shader2 = _interopRequireDefault(_glow_fragment_shader);
 
-var _blur_vertex_shader = __webpack_require__(139);
+var _blur_vertex_shader = __webpack_require__(140);
 
 var _blur_vertex_shader2 = _interopRequireDefault(_blur_vertex_shader);
 
-var _blur_fragment_shader = __webpack_require__(138);
+var _blur_fragment_shader = __webpack_require__(139);
 
 var _blur_fragment_shader2 = _interopRequireDefault(_blur_fragment_shader);
 
-var _sky_vertex_shader = __webpack_require__(148);
+var _sky_vertex_shader = __webpack_require__(149);
 
 var _sky_vertex_shader2 = _interopRequireDefault(_sky_vertex_shader);
 
-var _sky_fragment_shader = __webpack_require__(147);
+var _sky_fragment_shader = __webpack_require__(148);
 
 var _sky_fragment_shader2 = _interopRequireDefault(_sky_fragment_shader);
 
@@ -12015,6 +12015,7 @@ function initPostProcessProgram(gl) {
             positionAttributeLocation: gl.getAttribLocation(ppShaderProgram, 'a_position')
         },
         uniformLocations: {
+            dofUniformLocation: gl.getUniformLocation(ppShaderProgram, 'u_dof'),
             imageTextureUniformLocation: gl.getUniformLocation(ppShaderProgram, 'u_image_texture'),
             ssaoTextureUniformLocation: gl.getUniformLocation(ppShaderProgram, 'u_ssao_texture')
         }
@@ -17742,7 +17743,7 @@ module.exports = lowPriorityWarning;
 "use strict";
 
 
-var _sitedata = __webpack_require__(156);
+var _sitedata = __webpack_require__(157);
 
 var _sitedata2 = _interopRequireDefault(_sitedata);
 
@@ -18045,7 +18046,7 @@ exports.default = Pagination;
 
 function vertexSource() {
 
-    var vsSource = '\n\n    attribute vec3 a_position;\n    attribute vec3 a_normal;\n    \n    uniform mat4 u_model_view_matrix;\n    uniform mat4 u_projection_matrix;\n    uniform mat4 u_normals_matrix;\n    uniform mat4 u_sm_model_view_matrix;\n    uniform mat4 u_sm_projection_matrix;\n    uniform float u_y_scale;\n\n    varying vec4 v_shadow_position;\n    varying vec3 v_position;\n    varying vec3 v_normal;    \n    varying vec3 v_w_position;\n    varying float v_discard;\n\n    // Used to normalize our coordinates from clip space to (0 - 1)\n    // so that we can access the corresponding point in our depth color texture\n    const mat4 texUnitConverter = mat4(0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.5, 0.5, 1.0);\n    \n    void main(void) {\n        vec4 pos = vec4(a_position, 1.0);\n        vec4 n = vec4(a_normal, 1.0);\n        v_discard = u_y_scale > 0.0 ? 0.0 : 1.0;\n        pos.y *= u_y_scale;\n        v_w_position = pos.xyz;\n        v_position = (u_model_view_matrix * pos).xyz;\n        v_normal = (u_normals_matrix * vec4(a_normal, 1.0)).xyz;\n        gl_Position = u_projection_matrix * u_model_view_matrix * pos;\n        v_shadow_position = texUnitConverter * u_sm_projection_matrix * u_sm_model_view_matrix * vec4(a_position, 1.0);\n    }\n\n    ';
+    var vsSource = '\n\n    attribute vec3 a_position;\n    attribute vec3 a_normal;\n    \n    uniform mat4 u_model_view_matrix;\n    uniform mat4 u_projection_matrix;\n    uniform mat4 u_normals_matrix;\n    uniform mat4 u_sm_model_view_matrix;\n    uniform mat4 u_sm_projection_matrix;\n    uniform float u_y_scale;\n\n    varying vec4 v_shadow_position;\n    varying vec3 v_position;\n    varying vec3 v_normal;    \n    varying vec3 v_w_position;\n    varying vec3 v_w_normal;\n    varying float v_discard;\n\n    // Used to normalize our coordinates from clip space to (0 - 1)\n    // so that we can access the corresponding point in our depth color texture\n    const mat4 texUnitConverter = mat4(0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.5, 0.5, 1.0);\n    \n    void main(void) {\n        vec4 pos = vec4(a_position, 1.0);\n        v_discard = 0.0;\n        v_w_normal = a_normal;\n        if (u_y_scale < 0.0) {\n            v_discard = 1.0;\n            v_w_normal.y *= -1.0;\n        }\n        pos.y *= u_y_scale;\n        v_w_position = pos.xyz;\n        v_position = (u_model_view_matrix * pos).xyz;\n        v_normal = (u_normals_matrix * vec4(a_normal, 1.0)).xyz;\n        gl_Position = u_projection_matrix * u_model_view_matrix * pos;\n        v_shadow_position = texUnitConverter * u_sm_projection_matrix * u_sm_model_view_matrix * vec4(a_position, 1.0);\n    }\n\n    ';
 
     return vsSource;
 }
@@ -23589,7 +23590,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _shaunavbar = __webpack_require__(155);
+var _shaunavbar = __webpack_require__(156);
 
 var _shaunavbar2 = _interopRequireDefault(_shaunavbar);
 
@@ -23605,15 +23606,15 @@ var _shaucss = __webpack_require__(61);
 
 var _shaucss2 = _interopRequireDefault(_shaucss);
 
-var _home = __webpack_require__(137);
+var _home = __webpack_require__(138);
 
 var _home2 = _interopRequireDefault(_home);
 
-var _experiments = __webpack_require__(136);
+var _experiments = __webpack_require__(137);
 
 var _experiments2 = _interopRequireDefault(_experiments);
 
-var _shaulinks = __webpack_require__(154);
+var _shaulinks = __webpack_require__(155);
 
 var _shaulinks2 = _interopRequireDefault(_shaulinks);
 
@@ -23849,14 +23850,14 @@ var ShauRMGL = __webpack_require__(17); //raymarching utils
 var glm = __webpack_require__(20);
 
 var shadowDepthTextureSize = 4096;
-var lightPosition = [-3.0, 8.0, 2.0];
+var lightPosition = [-3.5, 8.0, 6.0];
 
 function getTitle() {
     return "Bugatti";
 }
 
 function getDescription() {
-    var description = "Bugatti model by Kimzauto.";
+    var description = "This is my first attempt at loading at loading and rendering " + "a reasonably complex OBJ model file. I had to create a pre-processor that " + "optimises and breaks up the geometry by material assignment " + "before parsing to JSON. " + "The excellent Bugatti model is by Kimzauto. The lighting uses screen space " + "ambient occlusion, shadow maps and opacity.";
     return description;
 }
 
@@ -23891,7 +23892,6 @@ function initGLContent(gl, mBuffExt) {
             fresnelUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_fresnel'),
             texUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_tex'),
             lightPositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_light_position'),
-            dofUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_dof'),
             eyePositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_eye_position'),
             ssaoTextureUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_ssao_texture'),
             yScaleUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_y_scale')
@@ -23977,22 +23977,22 @@ function loadGLContent(gl, mBuffExt, content) {
                 }
             }
 
-            var floorData = [-100.0, -0.1, 100.0, 0.0, 1.0, 0.0, 100.0, -0.1, 100.0, 0.0, 1.0, 0.0, 100.0, -0.1, -100.0, 0.0, 1.0, 0.0, -100.0, -0.1, 100.0, 0.0, 1.0, 0.0, 100.0, -0.1, -100.0, 0.0, 1.0, 0.0, -100.0, -0.1, -100.0, 0.0, 1.0, 0.0];
+            var floorData = [-100.0, -0.15, 100.0, 0.0, 1.0, 0.0, 100.0, -0.15, 100.0, 0.0, 1.0, 0.0, 100.0, -0.15, -100.0, 0.0, 1.0, 0.0, -100.0, -0.15, 100.0, 0.0, 1.0, 0.0, 100.0, -0.15, -100.0, 0.0, 1.0, 0.0, -100.0, -0.15, -100.0, 0.0, 1.0, 0.0];
             var floorInterleavedBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, floorInterleavedBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(floorData), gl.STATIC_DRAW);
             var floorBuffer = { partid: 'floor',
                 interleavedBuffer: floorInterleavedBuffer,
                 indexcount: 6,
-                basecolour: [0.05, 0.0, 0.3],
+                basecolour: [0.00, 0.3, 0.05],
                 metalcolour: [0.0, 0.0, 0.0],
                 emission: 0.0,
-                specular: 0.0,
+                specular: 0.6,
                 transparency: 0.0,
                 reflect: 0.0,
                 shadow: 1.0,
                 fresnel: 0.0,
-                textureid: 0.0 };
+                textureid: 1.0 };
 
             content.buffers.modelBuffers = modelBuffers;
             content.buffers.glassBuffers = glassBuffers;
@@ -24007,7 +24007,7 @@ function renderGLContent(gl, content, dt) {
 
     var cameraPosition = glm.vec3.fromValues(7.0, 3.0, 9.0);
     var target = glm.vec3.fromValues(0.0, 0.0, 0.5);
-    glm.vec3.rotateY(cameraPosition, cameraPosition, target, dt * 0.02);
+    glm.vec3.rotateY(cameraPosition, cameraPosition, target, dt * 0.04);
 
     var camera = {
         position: cameraPosition,
@@ -24038,7 +24038,7 @@ function renderGLContent(gl, content, dt) {
 
     //post processing
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    postProcess(gl, content.programInfos.postProcessProgramInfo, content.buffers, content.framebuffers.imageFramebuffer.texture, content.framebuffers.ssaoFramebuffer.texture, 0.1);
+    postProcess(gl, content.programInfos.postProcessProgramInfo, content.buffers, content.framebuffers.imageFramebuffer.texture, content.framebuffers.ssaoFramebuffer.texture, 0.05);
 }
 
 function drawShadowMap(gl, programInfo, buffers, cameraMatrices, depthRez) {
@@ -24307,7 +24307,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Disco wall.";
+    var description = "I created this shader I created a while back. It utilises " + " raytracing and volumetric raymarching for the glow/light effect.";
     return description;
 }
 
@@ -24375,6 +24375,10 @@ var _iron_man_fragment_shader = __webpack_require__(124);
 
 var _iron_man_fragment_shader2 = _interopRequireDefault(_iron_man_fragment_shader);
 
+var _iron_man_reflection_fragment_shader = __webpack_require__(125);
+
+var _iron_man_reflection_fragment_shader2 = _interopRequireDefault(_iron_man_reflection_fragment_shader);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var ironManImgSrc = __webpack_require__(109);
@@ -24386,7 +24390,8 @@ var ShauRMGL = __webpack_require__(17); //raymarching utils
 var glm = __webpack_require__(20);
 
 var shadowDepthTextureSize = 4096;
-var lightPosition = [-3.0, 15.0, 2.0];
+var lightPosition = [-3.0, 15.0, 4.0];
+var reflectionLightPosition = [-3.0, -15.0, 4.0];
 
 var blurAmount = 8; //0 - 10
 var blurScale = 0.9;
@@ -24397,7 +24402,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Iron Man model by Deadcode3.";
+    var description = "This is my second attempt at loading and rendering an OBJ model. " + "The Iron Man model is by Deadcode3. This time I tried adding " + "a glow effect to the eyes and transformer and some planar " + "reflections in the floor.";
     return description;
 }
 
@@ -24436,7 +24441,36 @@ function initGLContent(gl, mBuffExt) {
             eyePositionUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_eye_position'),
             ssaoTextureUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_ssao_texture'),
             glowMapTextureUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_glow_map_texture'),
+            reflectionTextureUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_reflection_texture'),
             yScaleUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_y_scale')
+        }
+
+        //bugatti reflection program
+    };var ironManReflectionFsSource = _iron_man_reflection_fragment_shader2.default.fragmentSource();
+    var ironManReflectionShaderProgram = ShauGL.initShaderProgram(gl, modelVsSource, ironManReflectionFsSource);
+    var ironManReflectionProgramInfo = {
+        program: ironManReflectionShaderProgram,
+        attribLocations: {
+            positionAttributeLocation: gl.getAttribLocation(ironManReflectionShaderProgram, 'a_position'),
+            normalAttributeLocation: gl.getAttribLocation(ironManReflectionShaderProgram, 'a_normal')
+        },
+        uniformLocations: {
+            modelViewMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_model_view_matrix'),
+            projectionMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_projection_matrix'),
+            smModelViewMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_sm_model_view_matrix'),
+            smProjectionMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_sm_projection_matrix'),
+            normalsMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_normals_matrix'),
+            colourUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_colour'),
+            specularUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_specular'),
+            transparencyUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_transparency'),
+            reflectUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_reflect'),
+            shadowUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_shadow'),
+            fresnelUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_fresnel'),
+            texUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_tex'),
+            lightPositionUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_light_position'),
+            lightStrengthUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_light_strength'),
+            eyePositionUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_eye_position'),
+            yScaleUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_y_scale')
         }
     };
 
@@ -24447,6 +24481,7 @@ function initGLContent(gl, mBuffExt) {
     var postProcessProgramInfo = ShauGL.initPostProcessProgram(gl);
 
     var programInfos = { renderProgramInfo: ironManProgramInfo,
+        reflectionProgramInfo: ironManReflectionProgramInfo,
         shadowMapProgramInfo: shadowMapProgramInfo,
         glowProgramInfo: glowProgramInfo,
         blurProgramInfo: blurProgramInfo,
@@ -24474,6 +24509,7 @@ function initGLContent(gl, mBuffExt) {
     var glowMapFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
     var blurHFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
     var blurVFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
+    var reflectionFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
     var imageFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
 
     var framebuffers = { shadowMapFramebuffer: shadowMapFramebuffer,
@@ -24481,6 +24517,7 @@ function initGLContent(gl, mBuffExt) {
         glowMapFramebuffer: glowMapFramebuffer,
         blurHFramebuffer: blurHFramebuffer,
         blurVFramebuffer: blurVFramebuffer,
+        reflectionFramebuffer: reflectionFramebuffer,
         imageFramebuffer: imageFramebuffer };
 
     return { programInfos: programInfos,
@@ -24536,15 +24573,15 @@ function loadGLContent(gl, mBuffExt, content) {
             var floorBuffer = { partid: 'floor',
                 interleavedBuffer: floorInterleavedBuffer,
                 indexcount: 6,
-                basecolour: [0.05, 0.0, 0.3],
+                basecolour: [0.0, 0.3, 0.05],
                 metalcolour: [1.0, 1.0, 1.0],
                 emission: 0.0,
-                specular: 0.0,
+                specular: 0.8,
                 transparency: 0.0,
                 reflect: 0.0,
                 shadow: 1.0,
                 fresnel: 0.0,
-                textureid: 0.0 };
+                textureid: 1.0 };
 
             content.buffers.modelBuffers = modelBuffers;
             content.buffers.glassBuffers = glassBuffers;
@@ -24557,8 +24594,8 @@ function loadGLContent(gl, mBuffExt, content) {
 
 function renderGLContent(gl, content, dt) {
 
-    var cameraPosition = glm.vec3.fromValues(4.0, 10.0, 5.0);
-    var target = glm.vec3.fromValues(0.0, 6.0, 0.5);
+    var cameraPosition = glm.vec3.fromValues(4.0, 10.0 + Math.sin(dt * 0.2) * 2.0, 10.0 + Math.sin(dt * 0.2) * 2.0);
+    var target = glm.vec3.fromValues(0.0, 5.0 + Math.cos(dt * 0.2) * .0, 0.5);
     glm.vec3.rotateY(cameraPosition, cameraPosition, target, dt * 0.2);
 
     var camera = {
@@ -24577,33 +24614,46 @@ function renderGLContent(gl, content, dt) {
     var shadowMapCameraMatrices = ShauGL.setupCamera(lightPosition, camera.target, lightProjectionMatrix);
     var lightStrength = Math.sin(dt * 0.2);
 
-    // Draw to our off screen drawing buffer for shadow map
+    //shadow map
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.shadowMapFramebuffer.framebuffer);
     drawShadowMap(gl, content.programInfos.shadowMapProgramInfo, content.buffers, shadowMapCameraMatrices, shadowDepthTextureSize);
+    //*/
 
+    //ssao
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.ssaoFramebuffer.framebuffer);
     drawSSAODepthMap(gl, content.programInfos.ssaoProgramInfo, content.buffers, viewCameraMatrices, camera.far);
+    //*/
 
-    //glow map to offscreen buffer
+    //glow map
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.glowMapFramebuffer.framebuffer);
     drawGlowMap(gl, content.programInfos.glowProgramInfo, content.buffers, viewCameraMatrices);
+    //*/
 
-    //then box blur glow map to offscreen buffer
+    //box blur glow map
     //horizontal pass
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.blurHFramebuffer.framebuffer);
     blur(gl, content.programInfos.blurProgramInfo, content.buffers, content.framebuffers.glowMapFramebuffer.texture, blurAmount, blurScale, blurStrength, 0);
     //vertical pass               
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.blurVFramebuffer.framebuffer);
     blur(gl, content.programInfos.blurProgramInfo, content.buffers, content.framebuffers.blurHFramebuffer.texture, blurAmount, blurScale, blurStrength, 1);
+    //*/
+
+    //reflection     
+    gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.reflectionFramebuffer.framebuffer);
+    //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    drawReflectedScene(gl, content.programInfos.reflectionProgramInfo, content.buffers, viewCameraMatrices, shadowMapCameraMatrices, reflectionLightPosition, lightStrength, camera);
+    //*/
 
     //draw scene
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.imageFramebuffer.framebuffer);
     //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    drawScene(gl, content.programInfos.renderProgramInfo, content.buffers, viewCameraMatrices, shadowMapCameraMatrices, content.framebuffers.shadowMapFramebuffer.texture, content.framebuffers.ssaoFramebuffer.texture, content.framebuffers.blurVFramebuffer.texture, lightPosition, lightStrength, camera);
+    drawScene(gl, content.programInfos.renderProgramInfo, content.buffers, viewCameraMatrices, shadowMapCameraMatrices, content.framebuffers.shadowMapFramebuffer.texture, content.framebuffers.ssaoFramebuffer.texture, content.framebuffers.blurVFramebuffer.texture, content.framebuffers.reflectionFramebuffer.texture, lightPosition, lightStrength, camera);
+    //*/
 
     //post processing
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    postProcess(gl, content.programInfos.postProcessProgramInfo, content.buffers, content.framebuffers.imageFramebuffer.texture, content.framebuffers.ssaoFramebuffer.texture, 0.3);
+    postProcess(gl, content.programInfos.postProcessProgramInfo, content.buffers, content.framebuffers.imageFramebuffer.texture, content.framebuffers.ssaoFramebuffer.texture, 0.05);
+    //*/            
 }
 
 function drawShadowMap(gl, programInfo, buffers, cameraMatrices, depthRez) {
@@ -24703,7 +24753,65 @@ function drawSSAODepthMap(gl, programInfo, buffers, viewCameraMatrices, far) {
     gl.drawArrays(gl.TRIANGLES, 0, buffers.floorBuffer.indexcount);
 }
 
-function drawScene(gl, programInfo, buffers, viewCameraMatrices, shadowMapCameraMatrices, shadowMapTexture, ssaoTexture, glowMapTexture, lightPosition, lightStrength, camera) {
+function drawReflectedScene(gl, programInfo, buffers, viewCameraMatrices, shadowMapCameraMatrices, lightPosition, lightStrength, camera) {
+
+    gl.useProgram(programInfo.program);
+
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(gl.DEPTH_TEST); // Enable depth testing
+    gl.depthFunc(gl.LESS); // Near things obscure far things            
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    //camera matrices
+    gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrixUniformLocation, false, viewCameraMatrices.projectionMatrix);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrixUniformLocation, false, viewCameraMatrices.modelViewMatrix);
+    //shadow map matrices
+    gl.uniformMatrix4fv(programInfo.uniformLocations.smProjectionMatrixUniformLocation, false, shadowMapCameraMatrices.projectionMatrix);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.smModelViewMatrixUniformLocation, false, shadowMapCameraMatrices.modelViewMatrix);
+    //normals matrix
+    gl.uniformMatrix4fv(programInfo.uniformLocations.normalsMatrixUniformLocation, false, viewCameraMatrices.normalMatrix);
+
+    //light position
+    gl.uniform3fv(programInfo.uniformLocations.lightPositionUniformLocation, lightPosition);
+    //light strength
+    gl.uniform1f(programInfo.uniformLocations.lightStrengthUniformLocation, lightStrength);
+    //eye position
+    gl.uniform3fv(programInfo.uniformLocations.eyePositionUniformLocation, camera.position);
+    //y scale
+    gl.uniform1f(programInfo.uniformLocations.yScaleUniformLocation, -1.0);
+
+    //draw model                    
+    for (var i = 0; i < buffers.modelBuffers.length; i++) {
+        //vertices
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.modelBuffers[i].interleavedBuffer);
+        gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 3, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 6, 0);
+        gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
+        //normals
+        gl.vertexAttribPointer(programInfo.attribLocations.normalAttributeLocation, 3, gl.FLOAT, gl.FALSE, Float32Array.BYTES_PER_ELEMENT * 6, Float32Array.BYTES_PER_ELEMENT * 3);
+        gl.enableVertexAttribArray(programInfo.attribLocations.normalAttributeLocation);
+
+        //colour
+        gl.uniform3fv(programInfo.uniformLocations.colourUniformLocation, buffers.modelBuffers[i].basecolour);
+        //specular
+        gl.uniform1f(programInfo.uniformLocations.specularUniformLocation, buffers.modelBuffers[i].specular);
+        //transparency
+        gl.disable(gl.BLEND);
+        gl.uniform1f(programInfo.uniformLocations.transparencyUniformLocation, buffers.modelBuffers[i].transparency);
+        //reflectivity
+        gl.uniform1f(programInfo.uniformLocations.reflectUniformLocation, buffers.modelBuffers[i].reflect);
+        //shadow
+        gl.uniform1f(programInfo.uniformLocations.shadowUniformLocation, buffers.modelBuffers[i].shadow);
+        //fresnel
+        gl.uniform1f(programInfo.uniformLocations.fresnelUniformLocation, buffers.modelBuffers[i].fresnel);
+        //texture id
+        gl.uniform1f(programInfo.uniformLocations.texUniformLocation, buffers.modelBuffers[i].textureid);
+
+        gl.drawArrays(gl.TRIANGLES, 0, buffers.modelBuffers[i].indexcount);
+    }
+}
+
+function drawScene(gl, programInfo, buffers, viewCameraMatrices, shadowMapCameraMatrices, shadowMapTexture, ssaoTexture, glowMapTexture, reflectionTexture, lightPosition, lightStrength, camera) {
 
     gl.useProgram(programInfo.program);
 
@@ -24736,6 +24844,11 @@ function drawScene(gl, programInfo, buffers, viewCameraMatrices, shadowMapCamera
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, glowMapTexture);
     gl.uniform1i(programInfo.uniformLocations.glowMapTextureUniformLocation, 2);
+
+    //reflection texture
+    gl.activeTexture(gl.TEXTURE3);
+    gl.bindTexture(gl.TEXTURE_2D, reflectionTexture);
+    gl.uniform1i(programInfo.uniformLocations.reflectionTextureUniformLocation, 3);
 
     //light position
     gl.uniform3fv(programInfo.uniformLocations.lightPositionUniformLocation, lightPosition);
@@ -24883,7 +24996,7 @@ var _simple_vertex_shader = __webpack_require__(19);
 
 var _simple_vertex_shader2 = _interopRequireDefault(_simple_vertex_shader);
 
-var _little_cubes_fragment_shader = __webpack_require__(128);
+var _little_cubes_fragment_shader = __webpack_require__(129);
 
 var _little_cubes_fragment_shader2 = _interopRequireDefault(_little_cubes_fragment_shader);
 
@@ -24899,7 +25012,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Little Cubes.";
+    var description = "This is my favourite shader that I've created so far. It's rendered " + " using simple raytracing techniques.";
     return description;
 }
 
@@ -24963,27 +25076,27 @@ var _simple_vertex_shader = __webpack_require__(19);
 
 var _simple_vertex_shader2 = _interopRequireDefault(_simple_vertex_shader);
 
-var _vignette_fragment_shader = __webpack_require__(151);
+var _vignette_fragment_shader = __webpack_require__(152);
 
 var _vignette_fragment_shader2 = _interopRequireDefault(_vignette_fragment_shader);
 
-var _particle_vertex_shader = __webpack_require__(133);
+var _particle_vertex_shader = __webpack_require__(134);
 
 var _particle_vertex_shader2 = _interopRequireDefault(_particle_vertex_shader);
 
-var _particle_fragment_shader = __webpack_require__(131);
+var _particle_fragment_shader = __webpack_require__(132);
 
 var _particle_fragment_shader2 = _interopRequireDefault(_particle_fragment_shader);
 
-var _particle_compute_vertex_shader = __webpack_require__(130);
+var _particle_compute_vertex_shader = __webpack_require__(131);
 
 var _particle_compute_vertex_shader2 = _interopRequireDefault(_particle_compute_vertex_shader);
 
-var _particle_compute_fragment_shader = __webpack_require__(129);
+var _particle_compute_fragment_shader = __webpack_require__(130);
 
 var _particle_compute_fragment_shader2 = _interopRequireDefault(_particle_compute_fragment_shader);
 
-var _particle_init_fragment_shader = __webpack_require__(132);
+var _particle_init_fragment_shader = __webpack_require__(133);
 
 var _particle_init_fragment_shader2 = _interopRequireDefault(_particle_init_fragment_shader);
 
@@ -25004,7 +25117,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Curl Particles.";
+    var description = "My first attempt at a particle shader. The particle positions and velocities " + "are computated in fragment buffers before rendering. Curl noise is used " + "for the FBM type motion.";
     return description;
 }
 
@@ -25372,15 +25485,15 @@ var _simple_vertex_shader = __webpack_require__(19);
 
 var _simple_vertex_shader2 = _interopRequireDefault(_simple_vertex_shader);
 
-var _light_tunnel_fragment_shader = __webpack_require__(127);
+var _light_tunnel_fragment_shader = __webpack_require__(128);
 
 var _light_tunnel_fragment_shader2 = _interopRequireDefault(_light_tunnel_fragment_shader);
 
-var _light_tunnel_buffer_shader = __webpack_require__(126);
+var _light_tunnel_buffer_shader = __webpack_require__(127);
 
 var _light_tunnel_buffer_shader2 = _interopRequireDefault(_light_tunnel_buffer_shader);
 
-var _light_tunnel_buffer2_shader = __webpack_require__(125);
+var _light_tunnel_buffer2_shader = __webpack_require__(126);
 
 var _light_tunnel_buffer2_shader2 = _interopRequireDefault(_light_tunnel_buffer2_shader);
 
@@ -25396,7 +25509,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Classic tunnel inspired by Beeple.";
+    var description = "WIP.";
     return description;
 }
 
@@ -25422,7 +25535,7 @@ function initGLContent(gl, mBuffExt) {
         },
         uniformLocations: {
             texture1UniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture1'),
-            texture2UniformLocation2: gl.getUniformLocation(shaderProgram, 'u_texture2'),
+            texture2UniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture2'),
             resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
             timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
         }
@@ -25506,11 +25619,11 @@ var _simple_vertex_shader = __webpack_require__(19);
 
 var _simple_vertex_shader2 = _interopRequireDefault(_simple_vertex_shader);
 
-var _voxel_bridge_fragment_shader = __webpack_require__(135);
+var _voxel_bridge_fragment_shader = __webpack_require__(136);
 
 var _voxel_bridge_fragment_shader2 = _interopRequireDefault(_voxel_bridge_fragment_shader);
 
-var _voxel_bridge_buffer_fragment_shader = __webpack_require__(134);
+var _voxel_bridge_buffer_fragment_shader = __webpack_require__(135);
 
 var _voxel_bridge_buffer_fragment_shader2 = _interopRequireDefault(_voxel_bridge_buffer_fragment_shader);
 
@@ -25528,7 +25641,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Voxel marching.";
+    var description = "Another raymarching shader. This time utilising voxel traversal. " + "It was also my first attempt at using framebuffers for off-screen renndering.";
     return description;
 }
 
@@ -25573,14 +25686,13 @@ function initGLContent(gl, mBuffExt) {
 
     var buffers = ShauRMGL.initBuffers(gl);
 
-    var renderBuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
-    var framebuffers = { renderBuffer: renderBuffer };
-
-    var bufferTexture = ShauGL.initTexture(gl, gl.canvas.width, gl.canvas.height);
-    var textureInfos = { bufferTexture: bufferTexture };
+    var renderBuffer1 = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
+    var renderBuffer2 = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
+    var framebuffers = { renderBuffer1: renderBuffer1,
+        renderBuffer2: renderBuffer2 };
 
     return { programInfos: programInfos,
-        textureInfos: textureInfos,
+        textureInfos: [],
         buffers: buffers,
         framebuffers: framebuffers };
 }
@@ -25594,19 +25706,18 @@ function loadGLContent(gl, mBuffExt, content) {
 
 function renderGLContent(gl, content, dt) {
 
-    //TODO: make buffer handling more efficient
-    //render to frame buffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.renderBuffer.framebuffer);
-    ShauRMGL.drawRMScene(gl, content.programInfos.bufferProgramInfo, content.buffers, content.textureInfos.bufferTexture, undefined, undefined, undefined, dt);
-
-    //copy data into texture for feedback
-    gl.bindTexture(gl.TEXTURE_2D, content.textureInfos.bufferTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.canvas.width, gl.canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, gl.canvas.width, gl.canvas.height, 0);
+    //render glow trail
+    gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.renderBuffer1.framebuffer);
+    ShauRMGL.drawRMScene(gl, content.programInfos.bufferProgramInfo, content.buffers, content.framebuffers.renderBuffer2.texture, undefined, undefined, undefined, dt);
 
     //render to canvas
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    ShauRMGL.drawRMScene(gl, content.programInfos.renderProgramInfo, content.buffers, content.framebuffers.renderBuffer.texture, undefined, undefined, undefined, dt);
+    ShauRMGL.drawRMScene(gl, content.programInfos.renderProgramInfo, content.buffers, content.framebuffers.renderBuffer1.texture, undefined, undefined, undefined, dt);
+
+    //swap buffers for feedback in trail
+    var tempBuffer = content.framebuffers.renderBuffer1;
+    content.framebuffers.renderBuffer1 = content.framebuffers.renderBuffer2;
+    content.framebuffers.renderBuffer2 = tempBuffer;
 }
 
 module.exports = {
@@ -25627,7 +25738,7 @@ module.exports = {
 
 function fragmentSource() {
 
-    var fsSource = '\n\n    precision mediump float;\n    \n    #define FAR 400.0\n    #define MOD3 vec3(0.1031, 0.11369, 0.13787)\n    #define SAMPLES 16\n    #define INTENSITY 1.\n    #define SCALE 2.5\n    #define BIAS 0.05\n    #define SAMPLE_RAD 0.02\n    #define MAX_DISTANCE 0.07\n\n    uniform sampler2D u_depth_colour_texture;\n    uniform sampler2D u_ssao_texture;    \n    uniform vec3 u_colour;\n    uniform float u_specular;\n    uniform float u_transparency;\n    uniform float u_reflect;\n    uniform float u_shadow;\n    uniform float u_fresnel;\n    uniform float u_tex;\n    uniform vec3 u_eye_position;\n    uniform vec3 u_light_position;\n\n    varying vec4 v_shadow_position;\n    varying vec3 v_position;\n    varying vec3 v_normal;\n    \n    //Spiral AO logic from reinder\n    //https://www.shadertoy.com/view/Ms33WB\n\n    float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n        return dot(o - ro, n) / dot(rd, n);\n    }\n\n    //IQs noise\n    float noise(vec3 rp) {\n        vec3 ip = floor(rp);\n        rp -= ip; \n        vec3 s = vec3(7, 157, 113);\n        vec4 h = vec4(0.0, s.yz, s.y + s.z) + dot(ip, s);\n        rp = rp * rp * (3.0 - 2.0 * rp); \n        h = mix(fract(sin(h) * 43758.5), fract(sin(h + s.x) * 43758.5), rp.x);\n        h.xy = mix(h.xz, h.yw, rp.y);\n        return mix(h.x, h.y, rp.z); \n    }\n\n    float decodeFloat (vec4 colour) {\n        const vec4 bitShift = vec4(1.0 / (256.0 * 256.0 * 256.0),\n                                   1.0 / (256.0 * 256.0),\n                                   1.0 / 256.0,\n                                   1.0);\n        return dot(colour, bitShift);\n    } \n\n    float hash12(vec2 p) {\n        vec3 p3  = fract(vec3(p.xyx) * MOD3);\n        p3 += dot(p3, p3.yzx + 19.19);\n        return fract((p3.x + p3.y) * p3.z);\n    }\n\n    vec2 hash22(vec2 p) {\n        vec3 p3 = fract(vec3(p.xyx) * MOD3);\n        p3 += dot(p3, p3.yzx+19.19);\n        return fract(vec2((p3.x + p3.y)*p3.z, (p3.x+p3.z)*p3.y));\n    }\n\n    vec3 getPosition(vec2 uv) {\n        float fl = 1.5; \n        float d = decodeFloat(texture2D(u_ssao_texture, uv));   \n        vec2 p = uv*2.-1.;\n        mat3 ca = mat3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, -1.0 / 1.5);\n        vec3 rd = normalize(ca * vec3(p, fl));\n        vec3 pos = rd * d;\n        return pos;\n    }\n\n    float doAmbientOcclusion(vec2 tcoord, vec2 uv, vec3 p, vec3 cnorm) {\n        vec3 diff = getPosition(tcoord + uv) - p;\n        float l = length(diff);\n        vec3 v = diff / l;\n        float d = l * SCALE;\n        float ao = max(0.0, dot(cnorm, v) - BIAS) * (1.0 / (1.0 + d));\n        ao *= smoothstep(MAX_DISTANCE,MAX_DISTANCE * 0.5, l);\n        return ao;\n    }\n\n    float spiralAO(vec2 uv, vec3 p, vec3 n, float rad) {\n        float goldenAngle = 2.4;\n        float ao = 0.0;\n        float inv = 1.0 / float(SAMPLES);\n        float radius = 0.0;\n        float rotatePhase = hash12(uv * 100.0) * 6.28;\n        float rStep = inv * rad;\n        vec2 spiralUV;\n        for (int i = 0; i < SAMPLES; i++) {\n            spiralUV.x = sin(rotatePhase);\n            spiralUV.y = cos(rotatePhase);\n            radius += rStep;\n            ao += doAmbientOcclusion(uv, spiralUV * radius, p, n);\n            rotatePhase += goldenAngle;\n        }\n        ao *= inv;\n        return ao;\n    }\n\n    float pcfFilter() {\n        \n        vec3 fragmentDepth = v_shadow_position.xyz;\n        float shadowAcneRemover = 0.007;\n        fragmentDepth.z -= shadowAcneRemover;\n\n        float texelSize = 1.0 / 2048.0;\n        float amountInLight = 0.0;\n\n        // Check whether or not the current fragment and the 8 fragments surrounding\n        // the current fragment are in the shadow. We then average out whether or not\n        // all of these fragments are in the shadow to determine the shadow contribution\n        // of the current fragment.\n        // So if 4 out of 9 fragments that we check are in the shadow then we\'ll say that\n        // this fragment is 4/9ths in the shadow so it\'ll be a little brighter than something\n        // that is 9/9ths in the shadow.\n        for (int x = -1; x <= 1; x++) {\n            for (int y = -1; y <= 1; y++) {\n                float texelDepth = decodeFloat(texture2D(u_depth_colour_texture, fragmentDepth.xy + vec2(x, y) * texelSize));\n                if (fragmentDepth.z < texelDepth) {\n                    amountInLight += 1.0;\n                }\n            }\n        }\n        amountInLight /= 9.0;\n\n        return 0.2 + amountInLight * 0.8;\n    }\n\n    void main(void) {\n\n        vec3 pc = vec3(0.0); //pixel colour\n\n        vec3 pos = v_position;\n        vec3 eye = u_eye_position;\n        vec3 ld = normalize(u_light_position - pos); //light direction        \n        float lt = length(u_light_position - pos); //distance to light\n        vec3 rd = normalize(pos - eye); //eye - hit position ray direction \n        vec3 rrd = reflect(rd, v_normal); //relected ray direction\n        vec3 e = -normalize(pos); \n        vec3 h =  normalize(ld + e);\n        float diff = max(dot(ld, v_normal), 0.3); //diffuse\n        float spec = pow(max(dot(v_normal, h), 0.0), 22.0); //specular\n        float fres = pow(max(dot(v_normal, rd) + 1.0, 0.0), 4.0); // fresnel\n        float atten = 1.0 / (1.0 + lt * lt * 0.02); //light attenuation\n\n        pc = u_colour * diff;\n        /*\n        if (u_tex == 1.0) {\n            pc *= noise(pos * 20.0);\n        }\n        */\n        pc += vec3(0.02, 0.0, 0.2) * 0.6 * clamp(-v_normal.y, 0.0, 1.0); //uplight\n        pc += vec3(0.8, 0.8, 1.0) * 0.03 * clamp(v_normal.y, 0.0, 1.0); //downlight\n        pc *= atten;\n        pc += vec3(0.8, 0.8, 1.0) * spec * u_specular;\n        //pc += vec3(0.8, 0.8, 1.0) * fres * u_fresnel;\n        \n        //reflections from ceiling\n        if (u_reflect > 0.0) {\n            vec3 rpc = vec3(0.0);\n            float rt = 0.0; //light attenuation\n            vec3 co = vec3(0.0, 10.0, 0.0);\n            vec3 cn = vec3(0.0, -1.0, 0.0);\n            float ct = planeIntersection(pos, rrd, cn, co);\n            if (ct > 0.0 && ct < FAR) {\n                vec3 rrp = pos + rrd * ct;\n                float mz = mod(rrp.z, 16.0) - 8.0;\n                rpc = mz > 0.0 ? vec3(1.0) : vec3(0.0);\n                rt = 1.0 / (1.0 + ct * ct * 0.05);  \n                rpc *= rt * clamp(v_normal.y, 0.0, 1.0);          \n            }\n            pc += rpc * u_reflect;\n        }\n\n        float alpha = 1.0;\n        //transparency\n        if (u_transparency > 0.0) {\n            alpha = 0.5;\n        }\n\n        //shadows\n        if (u_shadow > 0.0) {\n            float amountInLight = pcfFilter();\n            pc *= amountInLight;\n        }\n\n        //ssao\n        vec2 iResolution = vec2(640.0, 480.0);\n        vec2 uv = gl_FragCoord.xy / iResolution.xy;\n        vec3 p = getPosition(uv);\n        vec3 n = normalize(v_normal);\n        float ao = 0.0;\n        float rad = SAMPLE_RAD / p.z;\n        ao = spiralAO(uv, p, n, rad);\n        ao = 1.0 - ao * INTENSITY;\n        //gl_FragColor = vec4(ao, ao, ao, 1.0);\n        pc *= ao;\n\n        gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), alpha);          \n    }\n    \n    ';
+    var fsSource = '\n\n    precision mediump float;\n    \n    #define FAR 400.0\n    #define EPS 0.005\n    #define MOD3 vec3(0.1031, 0.11369, 0.13787)\n    #define SAMPLES 16\n    #define INTENSITY 1.\n    #define SCALE 2.5\n    #define BIAS 0.05\n    #define SAMPLE_RAD 0.02\n    #define MAX_DISTANCE 0.07\n\n    uniform sampler2D u_depth_colour_texture;\n    uniform sampler2D u_ssao_texture;    \n    uniform vec3 u_colour;\n    uniform float u_specular;\n    uniform float u_transparency;\n    uniform float u_reflect;\n    uniform float u_shadow;\n    uniform float u_fresnel;\n    uniform float u_tex;\n    uniform vec3 u_eye_position;\n    uniform vec3 u_light_position;\n\n    varying vec4 v_shadow_position;\n    varying vec3 v_position;\n    varying vec3 v_normal;\n    varying vec3 v_w_position;\n    varying vec3 v_w_normal;\n    \n    //Spiral AO logic from reinder\n    //https://www.shadertoy.com/view/Ms33WB\n\n    float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n        return dot(o - ro, n) / dot(rd, n);\n    }\n\n    //IQs noise\n    float noise(vec3 rp) {\n        vec3 ip = floor(rp);\n        rp -= ip; \n        vec3 s = vec3(7, 157, 113);\n        vec4 h = vec4(0.0, s.yz, s.y + s.z) + dot(ip, s);\n        rp = rp * rp * (3.0 - 2.0 * rp); \n        h = mix(fract(sin(h) * 43758.5), fract(sin(h + s.x) * 43758.5), rp.x);\n        h.xy = mix(h.xz, h.yw, rp.y);\n        return mix(h.x, h.y, rp.z); \n    }\n\n    float decodeFloat (vec4 colour) {\n        const vec4 bitShift = vec4(1.0 / (256.0 * 256.0 * 256.0),\n                                   1.0 / (256.0 * 256.0),\n                                   1.0 / 256.0,\n                                   1.0);\n        return dot(colour, bitShift);\n    } \n\n    float hash12(vec2 p) {\n        vec3 p3  = fract(vec3(p.xyx) * MOD3);\n        p3 += dot(p3, p3.yzx + 19.19);\n        return fract((p3.x + p3.y) * p3.z);\n    }\n\n    vec2 hash22(vec2 p) {\n        vec3 p3 = fract(vec3(p.xyx) * MOD3);\n        p3 += dot(p3, p3.yzx+19.19);\n        return fract(vec2((p3.x + p3.y)*p3.z, (p3.x+p3.z)*p3.y));\n    }\n\n    vec3 getPosition(vec2 uv) {\n        float fl = 1.5; \n        float d = decodeFloat(texture2D(u_ssao_texture, uv));   \n        vec2 p = uv*2.-1.;\n        mat3 ca = mat3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, -1.0 / 1.5);\n        vec3 rd = normalize(ca * vec3(p, fl));\n        vec3 pos = rd * d;\n        return pos;\n    }\n\n    float doAmbientOcclusion(vec2 tcoord, vec2 uv, vec3 p, vec3 cnorm) {\n        vec3 diff = getPosition(tcoord + uv) - p;\n        float l = length(diff);\n        vec3 v = diff / l;\n        float d = l * SCALE;\n        float ao = max(0.0, dot(cnorm, v) - BIAS) * (1.0 / (1.0 + d));\n        ao *= smoothstep(MAX_DISTANCE,MAX_DISTANCE * 0.5, l);\n        return ao;\n    }\n\n    float spiralAO(vec2 uv, vec3 p, vec3 n, float rad) {\n        float goldenAngle = 2.4;\n        float ao = 0.0;\n        float inv = 1.0 / float(SAMPLES);\n        float radius = 0.0;\n        float rotatePhase = hash12(uv * 100.0) * 6.28;\n        float rStep = inv * rad;\n        vec2 spiralUV;\n        for (int i = 0; i < SAMPLES; i++) {\n            spiralUV.x = sin(rotatePhase);\n            spiralUV.y = cos(rotatePhase);\n            radius += rStep;\n            ao += doAmbientOcclusion(uv, spiralUV * radius, p, n);\n            rotatePhase += goldenAngle;\n        }\n        ao *= inv;\n        return ao;\n    }\n\n    float pcfFilter() {\n        \n        vec3 fragmentDepth = v_shadow_position.xyz;\n        float shadowAcneRemover = 0.007;\n        fragmentDepth.z -= shadowAcneRemover;\n\n        float texelSize = 1.0 / 2048.0;\n        float amountInLight = 0.0;\n\n        // Check whether or not the current fragment and the 8 fragments surrounding\n        // the current fragment are in the shadow. We then average out whether or not\n        // all of these fragments are in the shadow to determine the shadow contribution\n        // of the current fragment.\n        // So if 4 out of 9 fragments that we check are in the shadow then we\'ll say that\n        // this fragment is 4/9ths in the shadow so it\'ll be a little brighter than something\n        // that is 9/9ths in the shadow.\n        for (int x = -1; x <= 1; x++) {\n            for (int y = -1; y <= 1; y++) {\n                float texelDepth = decodeFloat(texture2D(u_depth_colour_texture, fragmentDepth.xy + vec2(x, y) * texelSize));\n                if (fragmentDepth.z < texelDepth) {\n                    amountInLight += 1.0;\n                }\n            }\n        }\n        amountInLight /= 9.0;\n\n        return amountInLight;\n    }\n\n    vec3 bump(vec3 rp, vec3 n, float ds) {\n        vec2 e = vec2(EPS, 0.0);\n        float n0 = noise(rp);\n        vec3 d = vec3(noise(rp + e.xyy) - n0, noise(rp + e.yxy) - n0, noise(rp + e.yyx) - n0) / e.x;\n        n = normalize(n - d * 2.5 / sqrt(ds));\n        return n;\n    }\n\n    void main(void) {\n\n        vec3 pc = vec3(0.0); //pixel colour\n\n        vec2 iResolution = vec2(640.0, 480.0);\n        vec2 uv = gl_FragCoord.xy / iResolution.xy;\n\n        vec3 pos = v_w_position;\n        vec3 eye = u_eye_position;\n        vec3 n = v_w_normal;\n        vec3 ld = normalize(u_light_position - pos); //light direction        \n        float lt = length(u_light_position - pos); //distance to light\n        vec3 rd = normalize(pos - eye); //eye - hit position ray direction \n        float dt = length(pos - eye); //distance from eye to surface\n\n        if (u_tex == 1.0) {\n            //floor\n            n = bump(pos * 20.0, n, dt);\n        }\n\n        vec3 rrd = reflect(rd, n); //relected ray direction\n        float diff = max(dot(ld, n), 0.05); //diffuse\n        float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 32.0); //specular\n        float fres = pow(clamp(dot(n, rd) + 1.0, 0.0, 1.0), 4.0); // fresnel\n        float atten = 1.0 / (1.0 + lt * lt * 0.02); //light attenuation\n\n        pc = u_colour * diff;\n\n        pc += vec3(0.0, 0.2, 0.02) * 0.4 * clamp(-n.y, 0.0, 1.0) * u_specular; //uplight\n        pc *= atten;\n        pc += vec3(0.4, 1.0, 0.8) * spec * u_specular;\n        //TODO: not getting this right for back faces\n        //pc += vec3(0.8, 0.8, 1.0) * fres * u_fresnel;\n        \n        //reflections from ceiling\n        //TODO: not quite right\n        if (u_reflect > 0.0) {\n            vec3 rpc = vec3(0.0);\n            float rt = 0.0; //light attenuation\n            vec3 co = vec3(0.0, 10.0, 0.0);\n            vec3 cn = vec3(0.0, -1.0, 0.0);\n            float ct = planeIntersection(pos, rrd, cn, co);\n            if (ct > 0.0 && ct < FAR) {\n                vec3 rrp = pos + rrd * ct;\n                float mz = mod(rrp.z, 16.0) - 6.0;\n                rpc = (mz > 0.0) ? vec3(0.0, 1.0, 0.8) : vec3(0.0);\n                rt = 1.0 / (1.0 + ct * ct * 0.05);  \n                rpc *= rt * clamp(n.y, 0.4, 1.0);          \n                pc = mix(pc, pc + rpc, u_reflect * clamp(length(rpc), 0.4, 1.0));\n            }\n        }\n        //*/\n\n        float alpha = 1.0;\n        //transparency\n        if (u_transparency > 0.0) {\n            alpha = 0.7;\n        }\n\n        //shadows\n        if (u_shadow > 0.0) {\n            float amountInLight = pcfFilter();\n            amountInLight = (1.0 - u_shadow) + amountInLight * u_shadow;\n            pc *= amountInLight;\n        }\n\n        //ssao\n        vec3 p = getPosition(uv);\n        float ao = 0.0;\n        float rad = SAMPLE_RAD / p.z;\n        ao = spiralAO(uv, p, v_normal, rad);\n        ao = 1.0 - ao * INTENSITY;\n        //gl_FragColor = vec4(ao, ao, ao, 1.0);\n        pc *= ao;\n\n        gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), alpha);          \n    }\n    \n    ';
 
     return fsSource;
 };
@@ -25645,7 +25756,7 @@ module.exports = {
 
 function fragmentSource() {
 
-    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define EPS 0.005\n        #define FAR 30.0 \n        #define PI 3.14159265359\n        #define T u_time * 0.5\n        #define ROWS 3\n        #define COLS 7\n\n        struct Scene {\n            vec3 rp;\n            vec3 pc;\n            float id;\n            vec3 bc;\n            vec3 n;\n            float t;\n        };\n\n        struct Hit {\n            float tN;\n            float tF;\n            vec3 nN;\n        };        \n\n        vec3 lp = vec3(4.0, 5.0, -2.0); //light position\n        vec3 boxes[24];\n        vec4 sphere1 = vec4(0.0);\n        vec4 sphere2 = vec4(0.0);\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        void setup() {\n\n            sphere1 = vec4(0.7, -2.3, 0.0, 0.2);\n            sphere2 = vec4(-0.7, -2.3, 0.0, 0.2);            \n            sphere1.xz *= rot(T); \n            sphere2.xz *= rot(T); \n            sphere1.xyz += vec3(0.0, 0.0, -3.0);\n            sphere2.xyz += vec3(0.0, 0.0, -3.0);\n\n            for (int y = 0; y < ROWS; y++) {\n                for (int x = 0; x < COLS; x++) {\n                    float index = float(y * COLS + x);\n                    vec3 box = vec3(3.5 - float(x), float(y), sin(T + index) * 0.2);\n                    boxes[y * COLS + x] = box;\n                }\n            }\n        }\n\n        // slightly modified version of IQs box function examples\n        // http://www.iquilezles.org/www/articles/boxfunctions/boxfunctions.htm\n        Hit boxIntersection(vec3 ro, vec3 rd, vec3 boxSize) {\n            \n            Hit box = Hit(0.0, 0.0, vec3(0.0)); //miss\n\n            vec3 m = 1.0 / rd;\n            vec3 n = m * ro;\n            vec3 k = abs(m) * boxSize;\n\n            vec3 t1 = -n - k;\n            vec3 t2 = -n + k;\n\n            float tN = max(max(t1.x, t1.y), t1.z); //distance to near face\n            float tF = min(min(t2.x, t2.y), t2.z); //distance to far face\n\n            if (tN > tF || tF < 0.0) return box;\n\n            vec3 nN = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz); //near face normal\n            \n            return Hit(tN, tF, nN);\n        }\n\n        // Slightly modified version of IQs sphere functions\n        // Gathers distance and normal values from front and back face of intersection\n        // http://www.iquilezles.org/www/articles/spherefunctions/spherefunctions.htm\n        Hit sphIntersect(vec3 ro, vec3 rd, vec4 sph) {\n            vec3 oc = ro - sph.xyz;\n            float b = dot(oc, rd);\n            float c = dot(oc, oc) - sph.w * sph.w;\n            float h = b * b - c;\n            if (h < 0.0) return Hit(0.0, 0.0, vec3(0.0)); //miss;\n            h = sqrt(h);\n            float tN = -b - h;\n            float tF = -b + h;\n            vec3 nN = normalize((ro + rd * tN) - sph.xyz);\n            return Hit(tN, tF, nN);\n        }\n\n        float sphSoftShadow(vec3 ro, vec3 rd, vec4 sph, float k) {\n            vec3 oc = ro - sph.xyz;\n            float r = sph.w*sph.w;\n            float b = dot( oc, rd );\n            float c = dot( oc, oc ) - r;\n            float h = b*b - c;\n            float d = -sph.w + sqrt(max(0.0, r - h));\n            float t = -b     - sqrt(max(0.0, h));\n            return (t < 0.0) ? 1.0 : smoothstep(0.0, 1.0, k * d / t);\n        }\n\n        float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n            return dot(o - ro, n) / dot(rd, n);\n        }\n\n        Hit drawBoxes(vec3 ro, vec3 rd, inout vec3 bc) {\n\n            float tN = FAR;\n            float tF = FAR;\n            vec3 n = vec3(0.0);\n            bc = vec3(-1.0);\n\n            float r1 = rand(vec2(T)) * float(ROWS * COLS);\n\n            for (int y = 0; y < ROWS; y++) {\n                for (int x = 0; x < COLS; x++) {\n                    float index = float(y * COLS + x);\n                    vec3 box = boxes[y * COLS + x];\n                    Hit bh = boxIntersection(ro + box, rd, vec3(0.48));\n                    if (bh.tN > 0.0 && bh.tN < tN) {\n                        tN = bh.tN;\n                        tF = bh.tF;\n                        n = bh.nN;\n                        if (r1 > index && r1 < index + 1.0) {\n                            bc = box;\n                        } else {\n                            bc = vec3(-1.0);\n                        }\n                    }\n                }\n            }\n\n            return Hit(tN, tF, n);\n        }\n\n        vec4 drawSpheres(vec3 ro, vec3 rd) {\n\n            float t = FAR;\n            vec3 n = vec3(0.0);\n            \n            Hit hit1 = sphIntersect(ro, rd, sphere1);\n            if (hit1.tN > 0.0 && hit1.tN < t) {\n                t = hit1.tN;\n                n = hit1.nN;\n            }\n\n            Hit hit2 = sphIntersect(ro, rd, sphere2);\n            if (hit2.tN > 0.0 && hit2.tN < t) {\n                t = hit2.tN;\n                n = hit2.nN;\n            }\n\n            return vec4(n, t);\n        }\n\n        float sdBox(vec3 rp, vec3 b) {\n            vec3 d = abs(rp) - b;\n            return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0));\n        }\n\n        //distance function returns distance to nearest surface in scene\n        float map(vec3 rp) {\n\n            float t = FAR;\n\n            for (int y = 0; y < ROWS; y++) {\n                for (int x = 0; x < COLS; x++) {\n                    vec3 box = boxes[y * COLS + x];\n                    float ns = sdBox(rp + box, vec3(0.48));\n                    if (ns < t) t = ns;\n                }\n            }\n\n            return t;\n        }\n\n        vec3 march(vec3 ro, vec3 rd, vec3 bc, float maxt) {\n\n            vec3 pc = vec3(0.0);\n            float t = 0.0;\n\n            for (int i = 0; i < 20; i++) {\n                vec3 rp = ro + rd * t;\n                float ns = map(rp);\n                if (ns < EPS || t > maxt) break;\n                float lt = length(rp + bc);\n\n                pc += vec3(0.0, 1.0, 0.0) * exp(lt * -lt * 4.0) * 0.05;\n\n                t += ns;\n            }\n\n            return pc;\n        }\n\n        vec3 vMarch(vec3 ro, vec3 rd, vec3 bc, float maxt) {\n\n            vec3 pc = vec3(0.0);\n            float t = 0.0;\n\n            for (int i = 0; i < 30; i++) {\n                vec3 rp = ro + rd * t;\n                if (t > maxt) break;\n                float lt = length(rp + bc);\n                pc += vec3(0.0, 1.0, 0.0) * 1.0 / (1.0 + lt * lt * 10.0) * 0.05;\n                t += 0.05;\n            }\n            \n            return pc;\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            vec3 lookAt = vec3(0.0, -2.0, 0.0);\n            ro = lookAt + vec3(sin(T * 0.2) * 3.0, 1.0, -6.0);\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        Scene drawScene(vec3 ro, vec3 rd) {\n\n            vec3 rp = vec3(0.0);\n            vec3 n = vec3(0.0);\n            float id = 0.0;\n            float mint = FAR;\n            vec3 pc = vec3(0.0);\n            vec3 bc = vec3(0.0);\n\n            vec3 fo = vec3(0.0, -2.5, 0.0);\n            vec3 fn = vec3(0.0, 1.0, 0.0);\n\n            float ft = planeIntersection(ro, rd, fn, fo);\n\n            if (ft > 0.0 && ft < FAR) {\n                \n                //floor\n                mint = ft;\n                id = 1.0;\n                n = fn;\n\n                rp = ro + rd * ft;\n                vec3 ld = normalize(lp - rp);\n                float lt = length(lp - rp);\n                float diff = max(dot(ld, fn), 0.05);\n                float spec = pow(max(dot(reflect(-ld, fn), -rd), 0.0), 16.0);\n                float atten = 1.0 / (1.0 + lt * lt * 0.08); //light attenuation\n\n                //shadows from balls\n                float sh1 = sphSoftShadow(ro + rd * (ft - EPS), ld, sphere1, 16.0);\n                float sh2 = sphSoftShadow(ro + rd * (ft - EPS), ld, sphere2, 16.0);\n    \n                pc = vec3(1.0) * diff * atten;\n                pc += vec3(1.0) * spec;\n\n                pc *= sh1 * sh2;\n            }\n\n            vec3 gbc = vec3(-1.0);\n            Hit box = drawBoxes(ro, rd, gbc);\n            if (box.tN > 0.0 && box.tN < mint) {\n                \n                //boxes\n                mint = box.tN;\n                id = 2.0;\n                n = box.nN;\n\n                rp = ro + rd * box.tN;\n                vec3 ld = normalize(lp - rp);\n                float lt = length(lp - rp);\n                float diff = max(dot(ld, box.nN), 0.05);\n                float spec = pow(max(dot(reflect(-ld, box.nN), -rd), 0.0), 16.0);\n                float atten = 1.0 / (1.0 + lt * lt * 0.08); //light attenuation\n\n                pc = vec3(0.0, 0.1, 0.0) * diff * atten;\n                pc += vec3(1.0) * spec;\n\n                if (gbc != vec3(-1.0)) {\n                    //lit  cube\n                    pc += vMarch(rp, rd, gbc, box.tF - box.tN) * 1.2;\n                    bc = gbc;\n                }\n            }\n\n            vec4 balls = drawSpheres(ro, rd);\n            if (balls.w < mint) {\n\n                //balls\n                mint = balls.w;\n                id = 3.0;\n                n = balls.xyz;\n\n                rp = ro + rd * balls.w;\n                vec3 ld = normalize(lp - rp);\n                float lt = length(lp - rp);\n                float diff = max(dot(ld, balls.xyz), 0.05);\n                float spec = pow(max(dot(reflect(-ld, balls.xyz), -rd), 0.0), 16.0);\n                float atten = 1.0 / (1.0 + lt * lt * 0.08); //light attenuation\n\n                pc = vec3(0.0, 0.1, 0.0) * diff * atten;\n                pc += vec3(1.0) * spec;\n            }\n\n            return Scene(rp, pc, id, bc, n, mint);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n\n            setup();\n\n            vec3 ro, rd;\n            setupCamera(ro, rd);\n\n            Scene scene = drawScene(ro, rd);\n\n            if (scene.t > 0.0 && scene.t < FAR) {\n\n                pc = scene.pc;\n                \n                vec3 ld = normalize(lp - scene.rp);\n                float lt = length(lp - scene.rp);\n    \n                //reflections\n                vec3 rrd = reflect(rd, scene.n);\n                Scene reflScene = drawScene(ro + rd * (scene.t - EPS), rrd);\n    \n                float atten = 0.0;\n                float sh3 = 1.0;\n                if (scene.id == 1.0) {\n    \n                    //floor\n                    atten = 1.0 / (1.0 + reflScene.t * reflScene.t * 4.0); //reflect attenuation\n                    if (reflScene.id == 3.0) {\n                        atten = 1.0 / (1.0 + reflScene.t * reflScene.t * 32.0); //reflect attenuation\n                    }\n\n                    //shadows from boxes\n                    Scene shadScene = drawScene(ro + rd * (scene.t - EPS), ld);\n                    if (shadScene.t < lt) {\n                        sh3 = shadScene.t / lt;\n                    }\n    \n                } else if (scene.id == 2.0) { \n                    \n                    //wall\n                    atten = clamp(1.0 / (1.0 + reflScene.t * reflScene.t * 10.0), 0.0, 0.2); //reflect attenuation\n                \n                } else if (scene.id == 3.0) {\n                \n                    //balls \n                    atten = 1.0 / (1.0 + reflScene.t * reflScene.t * 0.05); //reflect attenuation\n                }\n    \n    \n                pc = mix(pc, reflScene.pc, atten);\n                pc *= sh3;                \n            }\n\n            float r1 = rand(vec2(T)) * float(ROWS * COLS);\n            float y = floor(r1 / float(COLS));            \n            float x = floor(r1) - y * float(COLS);\n            vec3 box = vec3(3.5 - x, y, sin(T + floor(r1)) * 0.2);\n            pc += march(ro, rd, box, scene.t);\n            \n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);\n        }\n    ';
+    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define T u_time * 0.5\n        #define EPS 0.005\n        #define FAR 30.0 \n        #define PI 3.14159265359\n        #define ROWS 3\n        #define COLS 6\n        #define FLOOR 1.0\n        #define BOX 2.0\n        #define SPHERE1 3.0\n        #define SPHERE2 4.0\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 lp = vec3(4.0, 5.0, -2.0);\n        vec3 boxes[24];\n        vec4 sphere1 = vec4(0.0);\n        vec4 sphere2 = vec4(0.0);\n        float r1 = 0.0;\n        \n        //IQ Box, Sphere and DE functions\n        vec2 boxIntersection(vec3 ro, vec3 rd, vec3 boxSize, out vec3 outNormal) {\n            vec3 m = 1.0 / rd;\n            vec3 n = m * ro;\n            vec3 k = abs(m) * boxSize;\n            vec3 t1 = -n - k;\n            vec3 t2 = -n + k;\n            float tN = max(max(t1.x, t1.y), t1.z);\n            float tF = min(min(t2.x, t2.y), t2.z);\n            if( tN > tF || tF < 0.0) return vec2(-1.0); // no intersection\n            outNormal = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz);\n            return vec2(tN, tF);\n        }\n\n        float hitWall(vec3 ro, vec3 rd) {\n            vec3 n = vec3(0.0);\n            vec2 box = boxIntersection(ro + vec3(0.5, 1.0, 0.0), rd, vec3(3.0, 1.5, 1.0), n);\n            return box.x > 0.0 ? 1.0 : 0.0;\n        }\n        \n        float sphIntersect(vec3 ro, vec3 rd, vec4 sph) {\n            vec3 oc = ro - sph.xyz;\n            float b = dot(oc, rd);\n            float c = dot(oc, oc) - sph.w * sph.w;\n            float h = b * b - c;\n            if (h < 0.0) return -1.0;\n            h = sqrt(h);\n            return -b - h;\n        }\n        \n        vec3 sphNormal(in vec3 pos, in vec4 sph) {\n            return normalize(pos - sph.xyz);\n        }\n        \n        float sphSoftShadow(vec3 ro, vec3 rd, vec4 sph, float k) {\n            vec3 oc = ro - sph.xyz;\n            float r = sph.w * sph.w;\n            float b = dot(oc, rd);\n            float c = dot(oc, oc) - r;\n            float h = b * b - c;\n            float d = -sph.w + sqrt(max(0.0, r - h));\n            float t = -b - sqrt(max(0.0, h));\n            return (t < 0.0) ? 1.0 : smoothstep(0.0, 1.0, k * d / t);\n        }\n        \n        float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n            return dot(o - ro, n) / dot(rd, n);\n        }\n        \n        float sdBox(vec3 p, vec3 b) {\n            vec3 d = abs(p) - b;\n            return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0));\n        }\n\n        //distance function returns distance to nearest surface in scene\n        float map(vec3 rp) {\n        \n            float t = FAR;\n        \n            for (int y = 0; y < ROWS; y++) {\n                for (int x = 0; x < COLS; x++) {\n                    vec3 box = boxes[y * COLS + x];\n                    float ns = sdBox(rp + box, vec3(0.48));\n                    if (ns < t) t = ns;\n                }\n            }\n        \n            return t;\n        }\n        \n        struct Scene {\n            float t; //distance to hit point on surface\n            vec3 n; //normal for floor and box\n            float id; //object id\n            float tf; //distance to box back face\n            float bi; //box index\n            float ra; //reflect amount\n        };\n\n        void setupScene() {\n            \n            r1 = rand(vec2(T)) * float(ROWS * COLS);\n            \n            sphere1 = vec4(0.7, -2.3, 0.0, 0.2);\n            sphere2 = vec4(-0.7, -2.3, 0.0, 0.2);            \n            sphere1.xz *= rot(T); \n            sphere2.xz *= rot(T); \n            sphere1.xyz += vec3(0.0, 0.0, -3.0);\n            sphere2.xyz += vec3(0.0, 0.0, -3.0);\n        \n            for (int y = 0; y < ROWS; y++) {\n                for (int x = 0; x < COLS; x++) {\n                    float index = float(y * COLS + x);\n                    vec3 box = vec3(3.0 - float(x), float(y), sin(T + index) * 0.2);\n                    boxes[y * COLS + x] = box;\n                }\n            }        \n        }\n            \n        vec3 glowBoxCenter() {\n            float y = floor(r1 / float(COLS));            \n            float x = floor(r1) - y * float(COLS);\n            return vec3(3.0 - x, y, sin(T + floor(r1)) * 0.2);\n        }\n            \n        vec3 sceneNormal(Scene scene, vec3 rp) {\n            vec3 n = scene.n;\n            if (scene.id == SPHERE1 || scene.id == SPHERE2) {\n                n = sphNormal(rp, scene.id == SPHERE1 ? sphere1 : sphere2);\n            }    \n            return n;\n        }\n              \n        Scene drawScene(vec3 ro, vec3 rd) {\n            \n            float mint = FAR;\n            vec3 minn = vec3(0.0);\n            float id = 0.0;\n            float ra = 0.0;\n            \n            //box stuff\n            float tf = 0.0; //distance to backface of box\n            float bi = -1.0;\n            \n            //floor\n            vec3 fo = vec3(0.0, -2.5, 0.0);\n            vec3 fn = vec3(0.0, 1.0, 0.0);\n            float ft = planeIntersection(ro, rd, fn, fo);\n            if (ft > 0.0 && ft < FAR) {\n                mint = ft;\n                minn = fn;\n                id = FLOOR;\n                ra = 0.3;\n            }\n            \n            //boxes\n            if (hitWall(ro, rd) > 0.0) {\n                for (int y = 0; y < ROWS; y++) {\n                    for (int x = 0; x < COLS; x++) {\n                        vec3 box = boxes[y * COLS + x];\n                        vec3 bn = vec3(0.0);\n                        vec2 bin = boxIntersection(ro + box, rd, vec3(0.48), bn);\n                        if (bin.x > 0.0 && bin.x < mint) {\n                            mint = bin.x;\n                            tf = bin.y;\n                            minn = bn;\n                            bi = float(y * COLS + x);\n                            id = BOX;\n                            ra = 0.3;\n                        }\n                    }\n                }\n            }\n                        \n            //spheres\n            float st = sphIntersect(ro, rd, sphere1);\n            if (st > 0.0 && st < mint) {\n                mint = st;\n                id = SPHERE1;\n                ra = 0.8;\n            }\n            st = sphIntersect(ro, rd, sphere2);\n            if (st > 0.0 && st < mint) {\n                mint = st;\n                id = SPHERE2;\n                ra = 0.8;\n            }\n                \n            return Scene(mint, minn, id, tf, bi, ra);\n        }\n\n        //box interior glow\n        vec3 vMarch1(vec3 ro, vec3 rd, vec3 bc, float maxt) {\n        \n            vec3 pc = vec3(0.0);\n            float t = 0.0;\n        \n            for (int i = 0; i < 30; i++) {\n                vec3 rp = ro + rd * t;\n                if (t > FAR) break;\n                float lt = length(rp + bc);\n                pc +=  vec3(0.0, 1.0, 0.0) / (1.0 + lt * lt * 10.0) * 0.05;\n                t += 0.05;\n            }\n        \n            return pc;\n        }\n        \n        //external box glow \n        vec3 vMarch2(vec3 ro, vec3 rd, vec3 bc, float maxt) {\n        \n            vec3 pc = vec3(0.0);\n            float t = 0.0;\n        \n            for (int i = 0; i < 20; i++) {\n                vec3 rp = ro + rd * t;\n                float ns = map(rp);\n                if (ns < EPS || t > maxt) break;\n                float lt = length(rp + bc);\n        \n                pc += vec3(0.0, 1.0, 0.0) * exp(-lt * 3.5) * 0.08;\n        \n                t += ns;\n            }\n        \n            return pc;\n        }\n        \n        vec3 colourObject(vec3 rp, vec3 n, vec3 rd, Scene scene) {\n            \n            vec3 pc = vec3(0.0);\n            \n            vec3 ld = normalize(lp - rp);\n            float lt = length(lp - rp);\n            float atten = 1.0 / (1.0 + lt * lt * 0.08);\n            float diff = max(dot(ld, n), 0.05);\n            float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 16.0);\n            \n            if (scene.id == FLOOR) {\n                    \n                pc = vec3(1.0, 1.0, 1.0) * diff;\n                pc += vec3(1.0) * spec;\n                pc *= atten;\n                //shadows from spheres\n                float sh1 = sphSoftShadow(rp - rd * EPS, ld, sphere1, 16.0);\n                float sh2 = sphSoftShadow(rp - rd * EPS, ld, sphere2, 16.0);    \n                pc *= sh1 * sh2;\n        \n            } else if (scene.id == BOX) {\n                \n                pc = vec3(0.0, 0.2, 0.0) * diff;\n                pc += vec3(1.0) * spec;\n                pc *= atten;\n                if (r1 >= scene.bi && r1 < scene.bi + 1.0) {\n                    //glow box interior\n                    vec3 gbc = glowBoxCenter();\n                    pc += vMarch1(rp, rd, gbc, scene.tf - scene.t);\n                }\n        \n            } else if (scene.id == SPHERE1 || scene.id == SPHERE2) {\n                \n                pc = vec3(0.0, 0.1, 0.0) * diff;\n                pc += vec3(1.0) * spec;\n                pc *= atten;\n            }\n            \n            return pc;\n        }\n            \n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            vec3 lookAt = vec3(0.0, -2.0, 0.0);\n            ro = lookAt + vec3(sin(T * 0.2) * 3.0, 1.0, -6.0);\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n\n            setupScene();\n\n            vec3 ro, rd;\n            setupCamera(ro, rd);\n\n            Scene scene = drawScene(ro, rd);\n            if (scene.t > 0.0 && scene.t < FAR) {\n                \n                vec3 rp = ro + rd * scene.t;\n                vec3 n = sceneNormal(scene, rp);\n                vec3 rrd = reflect(rd, n);\n                \n                vec3 oc = colourObject(rp, n, rd, scene);\n                vec3 rc = vec3(0.0); //reflection colour\n        \n                //single pass reflections\n                Scene reflectedScene = drawScene(rp - rd * EPS, rrd);\n                if (reflectedScene.t > 0.0 && reflectedScene.t < FAR) {\n                    \n                    vec3 rrp = rp + rrd * reflectedScene.t;\n                    vec3 rn = sceneNormal(reflectedScene, rrp);\n                    float raa = 0.0;\n\n                    rc = colourObject(rrp, rn, rrd, reflectedScene);\n                    \n                    if (scene.id == FLOOR) {\n                        raa = 1.0 / (1.0 + reflectedScene.t * reflectedScene.t * 0.2);;\n                    } else if (scene.id == BOX) {\n                        raa = clamp(1.0 / (1.0 + reflectedScene.t * reflectedScene.t * 0.1), 0.0, 0.2);;\n                    } else if (scene.id == SPHERE1 || scene.id == SPHERE2) {\n                        raa = 1.0 / (1.0 + reflectedScene.t * reflectedScene.t * 0.05);\n                    }\n                    \n                    rc *= raa;\n                }\n                \n                pc = mix(oc, rc, scene.ra); \n\n                if (scene.id == FLOOR) {\n                    //box shadows\n                    float lt = length(lp - rp);\n                    Scene shadScene = drawScene(ro + rd * (scene.t - EPS), normalize(lp - rp));\n                    if (shadScene.t < lt) {\n                        pc *= shadScene.t / lt;\n                    }\n                } else if (scene.id == SPHERE1 || scene.id == SPHERE2) {\n                    vec3 ld = normalize(lp - rp);\n                    float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 16.0);\n                    pc += vec3(1.0) * spec;\n                }\n            }\n\n            vec3 gbc = glowBoxCenter();\n            pc += vMarch2(ro, rd, gbc, scene.t);\n        \n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);\n        }\n    ';
 
     return fsSource;
 };
@@ -25681,7 +25792,7 @@ module.exports = {
 
 function fragmentSource() {
 
-    var fsSource = '\n\n    precision mediump float;\n    \n    #define FAR 400.0\n    #define MOD3 vec3(0.1031, 0.11369, 0.13787)\n    #define SAMPLES 16\n    #define INTENSITY 1.\n    #define SCALE 2.5\n    #define BIAS 0.05\n    #define SAMPLE_RAD 0.02\n    #define MAX_DISTANCE 0.07\n\n    uniform sampler2D u_depth_colour_texture;\n    uniform sampler2D u_ssao_texture;  \n    uniform sampler2D u_glow_map_texture;  \n    uniform float u_light_strength;\n    uniform vec3 u_colour;\n    uniform float u_specular;\n    uniform float u_transparency;\n    uniform float u_reflect;\n    uniform float u_shadow;\n    uniform float u_fresnel;\n    uniform float u_tex;\n    uniform vec3 u_eye_position;\n    uniform vec3 u_light_position;\n\n    varying vec4 v_shadow_position;\n    varying vec3 v_position;\n    varying vec3 v_normal;\n    \n    //Spiral AO logic from reinder\n    //https://www.shadertoy.com/view/Ms33WB\n\n    float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n        return dot(o - ro, n) / dot(rd, n);\n    }\n\n    //IQs noise\n    float noise(vec3 rp) {\n        vec3 ip = floor(rp);\n        rp -= ip; \n        vec3 s = vec3(7, 157, 113);\n        vec4 h = vec4(0.0, s.yz, s.y + s.z) + dot(ip, s);\n        rp = rp * rp * (3.0 - 2.0 * rp); \n        h = mix(fract(sin(h) * 43758.5), fract(sin(h + s.x) * 43758.5), rp.x);\n        h.xy = mix(h.xz, h.yw, rp.y);\n        return mix(h.x, h.y, rp.z); \n    }\n\n    float decodeFloat (vec4 colour) {\n        const vec4 bitShift = vec4(1.0 / (256.0 * 256.0 * 256.0),\n                                   1.0 / (256.0 * 256.0),\n                                   1.0 / 256.0,\n                                   1.0);\n        return dot(colour, bitShift);\n    } \n\n    float hash12(vec2 p) {\n        vec3 p3  = fract(vec3(p.xyx) * MOD3);\n        p3 += dot(p3, p3.yzx + 19.19);\n        return fract((p3.x + p3.y) * p3.z);\n    }\n\n    vec2 hash22(vec2 p) {\n        vec3 p3 = fract(vec3(p.xyx) * MOD3);\n        p3 += dot(p3, p3.yzx+19.19);\n        return fract(vec2((p3.x + p3.y)*p3.z, (p3.x+p3.z)*p3.y));\n    }\n\n    vec3 getPosition(vec2 uv) {\n        float fl = 1.5; \n        float d = decodeFloat(texture2D(u_ssao_texture, uv));   \n        vec2 p = uv*2.-1.;\n        mat3 ca = mat3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, -1.0 / 1.5);\n        vec3 rd = normalize(ca * vec3(p, fl));\n        vec3 pos = rd * d;\n        return pos;\n    }\n\n    float doAmbientOcclusion(vec2 tcoord, vec2 uv, vec3 p, vec3 cnorm) {\n        vec3 diff = getPosition(tcoord + uv) - p;\n        float l = length(diff);\n        vec3 v = diff / l;\n        float d = l * SCALE;\n        float ao = max(0.0, dot(cnorm, v) - BIAS) * (1.0 / (1.0 + d));\n        ao *= smoothstep(MAX_DISTANCE,MAX_DISTANCE * 0.5, l);\n        return ao;\n    }\n\n    float spiralAO(vec2 uv, vec3 p, vec3 n, float rad) {\n        float goldenAngle = 2.4;\n        float ao = 0.0;\n        float inv = 1.0 / float(SAMPLES);\n        float radius = 0.0;\n        float rotatePhase = hash12(uv * 100.0) * 6.28;\n        float rStep = inv * rad;\n        vec2 spiralUV;\n        for (int i = 0; i < SAMPLES; i++) {\n            spiralUV.x = sin(rotatePhase);\n            spiralUV.y = cos(rotatePhase);\n            radius += rStep;\n            ao += doAmbientOcclusion(uv, spiralUV * radius, p, n);\n            rotatePhase += goldenAngle;\n        }\n        ao *= inv;\n        return ao;\n    }\n\n    float pcfFilter() {\n        \n        vec3 fragmentDepth = v_shadow_position.xyz;\n        float shadowAcneRemover = 0.007;\n        fragmentDepth.z -= shadowAcneRemover;\n\n        float texelSize = 1.0 / 2048.0;\n        float amountInLight = 0.0;\n\n        // Check whether or not the current fragment and the 8 fragments surrounding\n        // the current fragment are in the shadow. We then average out whether or not\n        // all of these fragments are in the shadow to determine the shadow contribution\n        // of the current fragment.\n        // So if 4 out of 9 fragments that we check are in the shadow then we\'ll say that\n        // this fragment is 4/9ths in the shadow so it\'ll be a little brighter than something\n        // that is 9/9ths in the shadow.\n        for (int x = -1; x <= 1; x++) {\n            for (int y = -1; y <= 1; y++) {\n                float texelDepth = decodeFloat(texture2D(u_depth_colour_texture, fragmentDepth.xy + vec2(x, y) * texelSize));\n                if (fragmentDepth.z < texelDepth) {\n                    amountInLight += 1.0;\n                }\n            }\n        }\n        amountInLight /= 9.0;\n\n        return 0.2 + amountInLight * 0.8;\n    }\n\n    void main(void) {\n\n        vec3 pc = vec3(0.0); //pixel colour\n\n        vec3 pos = v_position;\n        vec3 eye = u_eye_position;\n        vec3 ld = normalize(u_light_position - pos); //light direction        \n        float lt = length(u_light_position - pos); //distance to light\n        vec3 rd = normalize(pos - eye); //eye - hit position ray direction \n        vec3 rrd = reflect(rd, v_normal); //relected ray direction\n        vec3 e = -normalize(pos); \n        vec3 h =  normalize(ld + e);\n        float diff = max(dot(ld, v_normal), 0.3); //diffuse\n        float spec = pow(max(dot(v_normal, h), 0.0), 22.0); //specular\n        float fres = 0.0;\n        if (length(v_normal) > 0.0) {\n            fres = pow(clamp(dot(v_normal, rd) + 1.0, 0.0, 1.0), 4.0); // fresnel\n        }\n        float atten = 1.0 / (1.0 + lt * lt * 0.02); //light attenuation\n\n        pc = u_colour * diff;\n        /*\n        if (u_tex == 1.0) {\n            pc *= noise(pos * 20.0);\n        }\n        */\n        pc += vec3(0.02, 0.0, 0.2) * 0.6 * clamp(-v_normal.y, 0.0, 1.0); //uplight\n        pc += vec3(0.8, 0.8, 1.0) * 0.03 * clamp(v_normal.y, 0.0, 1.0); //downlight\n        pc *= atten;\n        pc += vec3(0.8, 0.8, 1.0) * spec * u_specular;\n        pc += vec3(0.8, 0.8, 1.0) * fres * u_fresnel;\n        \n        //reflections from ceiling\n        if (u_reflect > 0.0) {\n            vec3 rpc = vec3(0.0);\n            float rt = 0.0; //light attenuation\n            vec3 co = vec3(0.0, 18.0, 0.0);\n            vec3 cn = vec3(0.0, -1.0, 0.0);\n            float ct = planeIntersection(pos, rrd, cn, co);\n            if (ct > 0.0 && ct < FAR) {\n                vec3 rrp = pos + rrd * ct;\n                float mz = mod(rrp.z, 16.0) - 8.0;\n                rpc = mz > 0.0 ? vec3(1.0) : vec3(0.0);\n                rt = 1.0 / (1.0 + ct * ct * 0.05);  \n                rpc *= rt * clamp(v_normal.y, 0.0, 1.0);          \n            }\n            pc += rpc * u_reflect;\n        }\n\n        float alpha = 1.0;\n        //transparency\n        if (u_transparency > 0.0) {\n            alpha = 0.5;\n        }\n\n        //shadows\n        if (u_shadow > 0.0) {\n            float amountInLight = pcfFilter();\n            pc *= amountInLight;\n        }\n\n        //ssao\n        vec2 iResolution = vec2(640.0, 480.0);\n        vec2 uv = gl_FragCoord.xy / iResolution.xy;\n        vec3 p = getPosition(uv);\n        vec3 n = normalize(v_normal);\n        float ao = 0.0;\n        float rad = SAMPLE_RAD / p.z;\n        ao = spiralAO(uv, p, n, rad);\n        ao = 1.0 - ao * INTENSITY;\n        //gl_FragColor = vec4(ao, ao, ao, 1.0);\n        pc *= ao;\n\n        pc *= clamp(u_light_strength, 0.1, 1.0);\n\n        vec4 sceneColour = vec4(sqrt(clamp(pc, 0.0, 1.0)), alpha);          \n        vec4 glowColour = texture2D(u_glow_map_texture, uv);\n        glowColour *= 0.8;\n\n        gl_FragColor = clamp((glowColour + sceneColour) - (glowColour * sceneColour), 0.0, 1.0);\n    }\n    \n    ';
+    var fsSource = '\n\n    precision mediump float;\n    \n    #define FAR 400.0\n    #define EPS 0.005\n    #define MOD3 vec3(0.1031, 0.11369, 0.13787)\n    #define SAMPLES 16\n    #define INTENSITY 1.\n    #define SCALE 2.5\n    #define BIAS 0.05\n    #define SAMPLE_RAD 0.02\n    #define MAX_DISTANCE 0.07\n\n    uniform sampler2D u_depth_colour_texture;\n    uniform sampler2D u_ssao_texture;  \n    uniform sampler2D u_glow_map_texture;  \n    uniform sampler2D u_reflection_texture;\n    uniform float u_light_strength;\n    uniform vec3 u_colour;\n    uniform float u_specular;\n    uniform float u_transparency;\n    uniform float u_reflect;\n    uniform float u_shadow;\n    uniform float u_fresnel;\n    uniform float u_tex;\n    uniform vec3 u_eye_position;\n    uniform vec3 u_light_position;\n\n    varying vec4 v_shadow_position;\n    varying vec3 v_position;\n    varying vec3 v_normal;\n    varying vec3 v_w_position;\n    varying vec3 v_w_normal;\n    varying float v_discard;\n\n    //Spiral AO logic from reinder\n    //https://www.shadertoy.com/view/Ms33WB\n\n    float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n        return dot(o - ro, n) / dot(rd, n);\n    }\n\n    //IQs noise\n    float noise(vec3 rp) {\n        vec3 ip = floor(rp);\n        rp -= ip; \n        vec3 s = vec3(7, 157, 113);\n        vec4 h = vec4(0.0, s.yz, s.y + s.z) + dot(ip, s);\n        rp = rp * rp * (3.0 - 2.0 * rp); \n        h = mix(fract(sin(h) * 43758.5), fract(sin(h + s.x) * 43758.5), rp.x);\n        h.xy = mix(h.xz, h.yw, rp.y);\n        return mix(h.x, h.y, rp.z); \n    }\n\n    float decodeFloat (vec4 colour) {\n        const vec4 bitShift = vec4(1.0 / (256.0 * 256.0 * 256.0),\n                                   1.0 / (256.0 * 256.0),\n                                   1.0 / 256.0,\n                                   1.0);\n        return dot(colour, bitShift);\n    } \n\n    float hash12(vec2 p) {\n        vec3 p3  = fract(vec3(p.xyx) * MOD3);\n        p3 += dot(p3, p3.yzx + 19.19);\n        return fract((p3.x + p3.y) * p3.z);\n    }\n\n    vec2 hash22(vec2 p) {\n        vec3 p3 = fract(vec3(p.xyx) * MOD3);\n        p3 += dot(p3, p3.yzx+19.19);\n        return fract(vec2((p3.x + p3.y)*p3.z, (p3.x+p3.z)*p3.y));\n    }\n\n    vec3 getPosition(vec2 uv) {\n        float fl = 1.5; \n        float d = decodeFloat(texture2D(u_ssao_texture, uv));   \n        vec2 p = uv*2.-1.;\n        mat3 ca = mat3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, -1.0 / 1.5);\n        vec3 rd = normalize(ca * vec3(p, fl));\n        vec3 pos = rd * d;\n        return pos;\n    }\n\n    float doAmbientOcclusion(vec2 tcoord, vec2 uv, vec3 p, vec3 cnorm) {\n        vec3 diff = getPosition(tcoord + uv) - p;\n        float l = length(diff);\n        vec3 v = diff / l;\n        float d = l * SCALE;\n        float ao = max(0.0, dot(cnorm, v) - BIAS) * (1.0 / (1.0 + d));\n        ao *= smoothstep(MAX_DISTANCE,MAX_DISTANCE * 0.5, l);\n        return ao;\n    }\n\n    float spiralAO(vec2 uv, vec3 p, vec3 n, float rad) {\n        float goldenAngle = 2.4;\n        float ao = 0.0;\n        float inv = 1.0 / float(SAMPLES);\n        float radius = 0.0;\n        float rotatePhase = hash12(uv * 100.0) * 6.28;\n        float rStep = inv * rad;\n        vec2 spiralUV;\n        for (int i = 0; i < SAMPLES; i++) {\n            spiralUV.x = sin(rotatePhase);\n            spiralUV.y = cos(rotatePhase);\n            radius += rStep;\n            ao += doAmbientOcclusion(uv, spiralUV * radius, p, n);\n            rotatePhase += goldenAngle;\n        }\n        ao *= inv;\n        return ao;\n    }\n\n    float pcfFilter() {\n        \n        vec3 fragmentDepth = v_shadow_position.xyz;\n        float shadowAcneRemover = 0.007;\n        fragmentDepth.z -= shadowAcneRemover;\n\n        float texelSize = 1.0 / 2048.0;\n        float amountInLight = 0.0;\n\n        // Check whether or not the current fragment and the 8 fragments surrounding\n        // the current fragment are in the shadow. We then average out whether or not\n        // all of these fragments are in the shadow to determine the shadow contribution\n        // of the current fragment.\n        // So if 4 out of 9 fragments that we check are in the shadow then we\'ll say that\n        // this fragment is 4/9ths in the shadow so it\'ll be a little brighter than something\n        // that is 9/9ths in the shadow.\n        for (int x = -1; x <= 1; x++) {\n            for (int y = -1; y <= 1; y++) {\n                float texelDepth = decodeFloat(texture2D(u_depth_colour_texture, fragmentDepth.xy + vec2(x, y) * texelSize));\n                if (fragmentDepth.z < texelDepth) {\n                    amountInLight += 1.0;\n                }\n            }\n        }\n        amountInLight /= 9.0;\n\n        return 0.3 + amountInLight * 0.7;\n    }\n\n    vec3 bump(vec3 rp, vec3 n, float ds) {\n        vec2 e = vec2(EPS, 0.0);\n        float n0 = noise(rp);\n        vec3 d = vec3(noise(rp + e.xyy) - n0, noise(rp + e.yxy) - n0, noise(rp + e.yyx) - n0) / e.x;\n        n = normalize(n - d * 0.5 / sqrt(ds));\n        return n;\n    }\n\n    void main(void) {\n\n        vec3 pc = vec3(0.0); //pixel colour\n\n        vec2 iResolution = vec2(640.0, 480.0);\n        vec2 uv = gl_FragCoord.xy / iResolution.xy;\n\n        vec3 colour = u_colour;\n        vec3 pos = v_w_position;\n        vec3 eye = u_eye_position;\n        vec3 n = v_w_normal;\n        vec3 ld = normalize(u_light_position - pos); //light direction     \n        float lt = length(u_light_position - pos); //distance to light\n        vec3 rd = normalize(pos - eye); //eye - hit position ray direction \n        float dt = length(pos - eye); //distance from eye to surface\n\n        vec4 reflection = texture2D(u_reflection_texture, uv);\n\n        if (u_tex == 1.0) {\n            //floor\n            n = bump(pos * 10.0, n, dt);\n            //reflection\n            //reflection.xyz /= 1.0 + reflection.w * 0.4;\n            colour = mix(colour, reflection.xyz, 1.0 / (1.0 + reflection.w * 0.5));\n        }\n\n        float diff = max(dot(ld, n), 0.05); //diffuse\n        float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 32.0); //specular\n        float fres = pow(clamp(dot(n, rd) + 1.0, 0.0, 1.0), 64.0); // fresnel\n        float atten = 1.0 / (1.0 + lt * lt * 0.01); //light attenuation\n\n        pc = colour * diff;\n\n        pc += vec3(0.0, 0.2, 0.02) * 0.4 * clamp(-n.y, 0.0, 1.0) * u_specular; //uplight\n        pc += vec3(1.0) * spec * u_specular;\n        pc = mix(pc, vec3(0.9, 0.7, 1.0) * fres * 0.3, u_fresnel * 0.5);\n        pc *= atten;\n        \n        //shadows\n        if (u_shadow > 0.0) {\n            float amountInLight = pcfFilter();\n            pc *= amountInLight;\n        }\n\n        //ssao\n        vec3 p = getPosition(uv);\n        float ao = 0.0;\n        float rad = SAMPLE_RAD / p.z;\n        ao = spiralAO(uv, p, v_normal, rad);\n        ao = 1.0 - ao * INTENSITY;\n        //gl_FragColor = vec4(ao, ao, ao, 1.0);\n        pc *= ao;\n\n        vec4 glowColour = texture2D(u_glow_map_texture, uv);\n        glowColour *= 0.8;    \n\n        pc *= clamp(u_light_strength, 0.3, 1.0);\n\n        vec4 sceneColour = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);          \n\n        gl_FragColor = clamp((glowColour + sceneColour) - (glowColour * sceneColour), 0.0, 1.0);\n    }\n    \n    ';
 
     return fsSource;
 };
@@ -25699,7 +25810,7 @@ module.exports = {
 
 function fragmentSource() {
 
-    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define EPS 0.005\n        #define FAR 40.0 \n        #define PI 3.14159265359\n        #define T u_time\n\n        vec3 lp = vec3(0.0, 0.0, 4.0); //light position\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 path(float t) {\n              float a = sin(t * 3.14159265/ 16.0 + 1.5707963 * 1.0);\n              float b = cos(t * 3.14159265 / 16.0);\n              return vec3(a * 2.0, b * a, t);    \n        }\n\n        vec3 map(vec3 rp) {\n\n            rp.xy -= path(rp.z).xy;\n            rp.xy *= rot(T);            \n            float tun = 1.3 - length(rp.xy);\n            \n            //polar coordinates\n            float a = atan(rp.y, rp.x) / 6.2831853;\n            \n            float zid = floor(rp.z + 0.5);\n\n            return vec3(tun, zid, a);\n        }\n\n        //finds gradients across small deltas on each axis\n        vec3 normal(vec3 rp) {\n            vec2 e = vec2(EPS, 0);\n            float d1 = map(rp + e.xyy).x, d2 = map(rp - e.xyy).x;\n            float d3 = map(rp + e.yxy).x, d4 = map(rp - e.yxy).x;\n            float d5 = map(rp + e.yyx).x, d6 = map(rp - e.yyx).x;\n            return normalize(vec3(d1 - d2, d3 - d4, d5 - d6));\n        }\n\n        vec3 march(vec3 ro, vec3 rd) {\n\n            float t = 0.0;\n            float zid = 0.0;\n            float pid = 0.0;\n\n            for (int i = 0; i < 80; i++) {\n                vec3 rp = ro + rd * t;\n                vec3 ns = map(rp);\n                if (ns.x < EPS || t > FAR) {\n                    zid = ns.y;\n                    pid = ns.z;\n                    break;\n                }\n                \n                t += ns.x;\n            }\n\n            return vec3(t, zid, pid);\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            float ct = T * 6.0;\n\n            vec3 lookAt = vec3(0.0, 0.0, ct);\n            lp = lookAt + vec3(0.0, 0.0, -3.0);\n            ro = lookAt + vec3(0.0, 0.0, -5.0);\n            \n            lookAt.xy += path(lookAt.z).xy;\n            ro.xy += path(ro.z).xy;\n            lp.xy += path(lp.z).xy;\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR;\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            vec3 t = march(ro, rd);\n            if (t.x > 0.0 && t.x < FAR) {\n\n                vec3 rp = ro + rd * t.x;\n                vec3 n = normal(rp);\n                vec3 ld = normalize(lp - rp);\n                float diff = max(dot(ld, n), 0.05);\n\n                float mz = mod(rp.z - sin(T * 0.5) * 20.0, 40.0);\n                if (mz > 39.0 && mz < 39.4 || mz > 39.6) {\n                    if (mod(t.z, 0.05) > 0.025) {\n                        pc = vec3(0.0, 1.0, 0.0);\n                        mint = t.x;\n                    }\n                }\n            }\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), mint / FAR);\n        }\n    ';
+    var fsSource = '\n\n    precision mediump float;\n    \n    #define FAR 400.0\n    #define EPS 0.005\n\n    uniform float u_light_strength;\n    uniform vec3 u_colour;\n    uniform float u_specular;\n    uniform float u_transparency;\n    uniform float u_reflect;\n    uniform float u_shadow;\n    uniform float u_fresnel;\n    uniform float u_tex;\n    uniform vec3 u_eye_position;\n    uniform vec3 u_light_position;\n\n    varying vec4 v_shadow_position;\n    varying vec3 v_position;\n    varying vec3 v_normal;\n    varying vec3 v_w_position;\n    varying vec3 v_w_normal;\n    varying float v_discard;\n\n    //Spiral AO logic from reinder\n    //https://www.shadertoy.com/view/Ms33WB\n\n    //IQs noise\n    float noise(vec3 rp) {\n        vec3 ip = floor(rp);\n        rp -= ip; \n        vec3 s = vec3(7, 157, 113);\n        vec4 h = vec4(0.0, s.yz, s.y + s.z) + dot(ip, s);\n        rp = rp * rp * (3.0 - 2.0 * rp); \n        h = mix(fract(sin(h) * 43758.5), fract(sin(h + s.x) * 43758.5), rp.x);\n        h.xy = mix(h.xz, h.yw, rp.y);\n        return mix(h.x, h.y, rp.z); \n    }\n\n    vec3 bump(vec3 rp, vec3 n, float ds) {\n        vec2 e = vec2(EPS, 0.0);\n        float n0 = noise(rp);\n        vec3 d = vec3(noise(rp + e.xyy) - n0, noise(rp + e.yxy) - n0, noise(rp + e.yyx) - n0) / e.x;\n        n = normalize(n - d * 2.5 / sqrt(ds));\n        return n;\n    }\n\n    void main(void) {\n\n        vec3 pc = vec3(0.0); //pixel colour\n\n        vec2 iResolution = vec2(640.0, 480.0);\n        vec2 uv = gl_FragCoord.xy / iResolution.xy;\n\n        vec3 pos = v_w_position;\n        vec3 eye = u_eye_position;\n        vec3 n = v_w_normal;\n        vec3 ld = normalize(u_light_position - pos); //light direction     \n        float lt = length(u_light_position - pos); //distance to light\n        vec3 rd = normalize(pos - eye); //eye - hit position ray direction \n        float dt = length(pos - eye); //distance from eye to surface\n\n        if (u_tex == 1.0) {\n            //floor\n            n = bump(pos * 10.0, n, dt);\n        }\n\n        float diff = max(dot(ld, n), 0.05); //diffuse\n        float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 32.0); //specular\n        float fres = pow(clamp(dot(n, rd) + 1.0, 0.0, 1.0), 64.0); // fresnel\n        float atten = 1.0 / (1.0 + lt * lt * 0.02); //light attenuation\n\n        pc = u_colour * diff;\n\n        pc += vec3(0.0, 0.2, 0.02) * 0.4 * clamp(-n.y, 0.0, 1.0) * u_specular; //uplight\n        pc += vec3(1.0) * spec * u_specular;\n        pc = mix(pc, vec3(0.9, 0.7, 1.0) * fres * 0.3, u_fresnel * 0.5);\n        pc *= atten;\n        \n        pc *= clamp(u_light_strength, 0.1, 1.0);\n\n        gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), abs(pos.y));          \n    }\n    \n    ';
 
     return fsSource;
 };
@@ -25717,7 +25828,7 @@ module.exports = {
 
 function fragmentSource() {
 
-    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define EPS 0.005\n        #define FAR 40.0 \n        #define PI 3.14159265359\n        #define T u_time\n\n        vec3 lp = vec3(0.0, 0.0, 4.0); //light position\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 path(float t) {\n              float a = sin(t * 3.14159265/ 16.0 + 1.5707963 * 1.0);\n              float b = cos(t * 3.14159265 / 16.0);\n              return vec3(a * 2.0, b * a, t);    \n        }\n\n        vec3 map(vec3 rp) {\n\n            rp.xy -= path(rp.z).xy;\n            rp.xy *= rot(-T);            \n            float tun = 1.5 - length(rp.xy);\n            \n            //polar coordinates\n            float a = atan(rp.y, rp.x) / 6.2831853;\n            \n            float zid = floor(rp.z + 0.5);\n\n            return vec3(tun, zid, a);\n        }\n\n        //finds gradients across small deltas on each axis\n        vec3 normal(vec3 rp) {\n            vec2 e = vec2(EPS, 0);\n            float d1 = map(rp + e.xyy).x, d2 = map(rp - e.xyy).x;\n            float d3 = map(rp + e.yxy).x, d4 = map(rp - e.yxy).x;\n            float d5 = map(rp + e.yyx).x, d6 = map(rp - e.yyx).x;\n            return normalize(vec3(d1 - d2, d3 - d4, d5 - d6));\n        }\n\n        vec3 march(vec3 ro, vec3 rd) {\n\n            float t = 0.0;\n            float zid = 0.0;\n            float pid = 0.0;\n\n            for (int i = 0; i < 80; i++) {\n                vec3 rp = ro + rd * t;\n                vec3 ns = map(rp);\n                if (ns.x < EPS || t > FAR) {\n                    zid = ns.y;\n                    pid = ns.z;\n                    break;\n                }\n                \n                t += ns.x;\n            }\n\n            return vec3(t, zid, pid);\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            float ct = T * 6.0;\n\n            vec3 lookAt = vec3(0.0, 0.0, ct);\n            lp = lookAt + vec3(0.0, 0.0, -3.0);\n            ro = lookAt + vec3(0.0, 0.0, -5.0);\n            \n            lookAt.xy += path(lookAt.z).xy;\n            ro.xy += path(ro.z).xy;\n            lp.xy += path(lp.z).xy;\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR;\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            vec3 t = march(ro, rd);\n            if (t.x > 0.0 && t.x < FAR) {\n\n                vec3 rp = ro + rd * t.x;\n                vec3 n = normal(rp);\n                vec3 ld = normalize(lp - rp);\n                float diff = max(dot(ld, n), 0.05);\n\n                vec2 tileid = vec2(t.y, floor((t.z + 0.5) * 18.0));\n                \n                vec2 mx1 = mod(tileid, 4.0) - 2.0;\n                if (mx1.x * mx1.y >= 0.0) {\n                    if (rand(tileid) > 0.5) {\n                        if (mod(t.z + 0.5, 0.01) > 0.009) {\n                            pc = vec3(0.4, 0.0, 0.0) * diff;\n                            float fogAmount = 1.0 - exp(-t.x * 0.2);\n                            pc = mix(pc, vec3(0.0), fogAmount);\n                            mint = t.x;\n                        }\n                    }\n                }\n            }\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), mint / FAR);\n        }\n    ';
+    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define EPS 0.005\n        #define FAR 40.0 \n        #define PI 3.14159265359\n        #define T u_time\n        #define NTILES 16.0\n\n        vec3 lp = vec3(0.0, 0.0, 4.0); //light position\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 path(float t) {\n              float a = sin(t * 3.14159265/ 16.0 + 1.5707963 * 1.0);\n              float b = cos(t * 3.14159265 / 16.0);\n              return vec3(a * 2.0, b * a, t);    \n        }\n\n        vec3 map(vec3 rp) {\n\n            rp.xy -= path(rp.z).xy;\n            rp.xy *= rot(T);            \n            float tun = 1.4 - length(rp.xy);\n            \n            //polar coordinates\n            float a = atan(rp.y, rp.x) / 6.2831853;\n            \n            float zid = floor(rp.z + 0.5);\n\n            return vec3(tun, zid, a);\n        }\n\n        //finds gradients across small deltas on each axis\n        vec3 normal(vec3 rp) {\n            vec2 e = vec2(EPS, 0);\n            float d1 = map(rp + e.xyy).x, d2 = map(rp - e.xyy).x;\n            float d3 = map(rp + e.yxy).x, d4 = map(rp - e.yxy).x;\n            float d5 = map(rp + e.yyx).x, d6 = map(rp - e.yyx).x;\n            return normalize(vec3(d1 - d2, d3 - d4, d5 - d6));\n        }\n\n        vec3 march(vec3 ro, vec3 rd) {\n\n            float t = 0.0;\n            float zid = 0.0;\n            float pid = 0.0;\n\n            for (int i = 0; i < 80; i++) {\n                vec3 rp = ro + rd * t;\n                vec3 ns = map(rp);\n                if (ns.x < EPS || t > FAR) {\n                    zid = ns.y;\n                    pid = ns.z;\n                    break;\n                }\n                \n                t += ns.x;\n            }\n\n            return vec3(t, zid, pid);\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            float ct = T * 6.0;\n\n            vec3 lookAt = vec3(0.0, 0.0, ct);\n            lp = lookAt + vec3(0.0, 0.0, -3.0);\n            ro = lookAt + vec3(0.0, 0.0, -5.0);\n            \n            lookAt.xy += path(lookAt.z).xy;\n            ro.xy += path(ro.z).xy;\n            lp.xy += path(lp.z).xy;\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR;\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            vec3 t = march(ro, rd);\n            if (t.x > 0.0 && t.x < FAR) {\n\n                vec3 rp = ro + rd * t.x;\n                vec3 n = normal(rp);\n                vec3 ld = normalize(lp - rp);\n                float diff = max(dot(ld, n), 0.05);\n\n                float aa = floor((t.z + 0.5) * NTILES);\n                vec2 tileid = vec2(t.y, aa);\n                vec2 mx1 = mod(tileid, 2.0) - 1.0;\n                if (mx1.x * mx1.y > 0.0) {\n                    if (mod(t.z, 0.01) > 0.008) {\n                        pc = vec3(1.0, 1.0, 0.0) * diff * 0.2;\n                        mint = t.x;\n                    }\n                }\n\n                float mz = mod(rp.z - sin(T * 0.5) * 20.0, 40.0);\n                if (mz > 39.0 && mz < 39.4 || mz > 39.6) {\n                    if (mod(t.z, 0.05) > 0.025) {\n                        pc = vec3(1.0, 1.0, 0.0) * diff * 0.5;\n                        mint = t.x;\n                    }\n                }\n            }\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), mint / FAR);\n        }\n    ';
 
     return fsSource;
 };
@@ -25735,7 +25846,7 @@ module.exports = {
 
 function fragmentSource() {
 
-    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        uniform sampler2D u_texture1;                \n        uniform sampler2D u_texture2;                \n        \n        #define EPS 0.005\n        #define FAR 40.0 \n        #define PI 3.14159265359\n        #define T u_time\n\n        struct Tunnel {\n            float t;\n            float id;\n            float sideLight;\n            float ringLight;\n            float tl1;\n            float tl2;\n            float tl3;\n            float tl4;\n            float tl5;\n            vec2 walluv;\n            vec2 cellid;\n            float edge;\n        };\n\n        struct Scene {\n            float t;\n            float id;\n            float li;\n            vec2 walluv;\n            vec2 cellid;\n            float edge;\n        };\n\n        vec3 lp = vec3(0.0, 0.0, 4.0); //light position\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 path(float t) {\n              float a = sin(t * PI / 16.0 + 1.5707963 * 1.0);\n              float b = cos(t * PI / 16.0);\n              return vec3(a * 2.0, b * a, t);    \n        }\n        \n        //glyph wall texture\n        vec3 walltex(vec2 uv) {\n            vec3 pc = vec3(0.0);\n            uv *= 15.0;\n            float ct = T * 4.0;\n            float a = mod(uv.y + floor(ct), 7.0);\n            vec2 fa = floor(uv); \n            float r = clamp(step(rand(floor(vec2(uv.x, uv.y + floor(ct)))), 0.5), 0.0, 1.0);\n            vec2 b = fract(uv);\n            pc += smoothstep(0.3, 0.28, length(b - vec2(0.5))) * 0.01; //grey dot\n            pc += 2.0 * vec3(0.0, 1.0, 0.0) * smoothstep(0.3, 0.0, length(b - vec2(0.5))) * step(a, 4.0) * r * 1.1; //glyph\n            pc *= step(3.0, abs(uv.x)); //horizontal bands\n            pc *= step(abs(uv.x), 6.0); //horizontal bands\n            return pc;\n        }\n\n        vec2 nearest(vec2 a, vec2 b){ \n            float s = step(a.x, b.x);\n            return s * a + (1. - s) * b;\n        }\n\n        Tunnel map(vec3 rp) {\n\n            rp.xy -= path(rp.z).xy;\n            vec3 rrp = rp;\n            rrp.xy *= rot(T);\n            \n            float tun = 1.7 - length(rp.xy);\n            float edge = 0.0;\n\n            vec3 q = rp; \n            vec3 q2 = rp;    \n            vec3 rq = rrp; \n            vec3 rq2 = rrp;    \n \n            //polar coordinates\n            float a = atan(q.y, q.x) / 6.2831853;\n            float ia2 = (floor(a * 18.0) + .5)/ 18.0 * 6.2831853;\n            float ra = atan(rq.y, rq.x) / 6.2831853;\n            float ria = (floor(ra * 6.0) + .5) / 6.0 * 6.2831853;\n\n            vec2 cellid = vec2(floor(q.z + 0.5), a);\n            \n            //panels\n            q = rp;\n            q.xy *= rot(ia2);\n            q.z = mod(q.z, .5) - .25;\n            q = abs(q);\n            edge = -min(q.y - 0.02, q.z - 0.02);\n            //tun = min(tun, max(panelDetail, tun - 0.1));  \n            \n            //side walls\n            q = rp;\n            float walls = max(1.3 - abs(q.x), abs(q.y) - 0.5);\n            q = abs(q);\n            float cut = q.y - 0.14;\n\n            //side lights\n            q = rp;\n            float slLights = length(q.xy - vec2(1.4, 0.0)) - 0.07;\n            slLights = min(slLights, length(q.xy - vec2(-1.4, 0.0)) - 0.07);\n\n            //ring lights\n            rq = abs(rq);\n            rq.z = abs(mod(rrp.z, 8.0) - 4.0);\n            float rlFrame = rq.z - 0.2;\n            rlFrame = max(rlFrame, tun - 0.5);\n            float rlCutout = rq.z - 0.1;\n            rlCutout = max(rlCutout, tun - 0.6);\n            float rlLight = rq.z - 0.05;\n            rlLight = max(rlLight, tun - 0.48);\n            rq = rrp;\n            rq.xy *= rot(ria);\n            rq = abs(rq);\n            rq2 = rrp;\n            rq2.xy *= rot(ria);\n            rq2 = abs(rq2);\n            float frameCutoutDetail = min(rq.y - .1, max(rq2.y - .1, rrp.y));\n            float lightCutoutDetail = min(rq.y - .15, max(rq2.y - .15, rrp.y));\n            rlCutout = max(rlCutout, -frameCutoutDetail);\n            rlLight = max(rlLight, -lightCutoutDetail);\n            rlFrame = max(rlFrame, -rlCutout);\n\n            //doors\n            q = rp;\n            q.z = abs(mod(rp.z, 32.0) - 16.0);\n            float frame = q.z - 0.2;\n            frame = max(frame, tun - 0.4);\n            float doors = q.z - 0.1;\n            doors = max(doors, tun - 0.6);\n            doors = min(doors, max(length(q.xy) - 0.3, q.z - 0.1));\n            doors = max(doors,  0.2 - length(q.xy));\n            doors = min(doors, frame);\n            float ct = T * 0.1;\n            vec2 tq1 = vec2(length(q.xy) - 1.4 + mod(ct, 1.1), q.z);\n            float tl1 = length(tq1) - 0.01;\n            vec2 tq2 = vec2(length(q.xy) - 1.4 + mod(ct + 0.275, 1.1), q.z);\n            float tl2 = length(tq2) - 0.01;\n            vec2 tq3 = vec2(length(q.xy) - 1.4 + mod(ct + 0.55, 1.1), q.z);\n            float tl3 = length(tq3) - 0.01;\n            vec2 tq4 = vec2(length(q.xy) - 1.4 + mod(ct + 0.825, 1.1), q.z);\n            float tl4 = length(tq4) - 0.01;\n            vec2 tq5 = vec2(length(q.xy) - 0.2, q.z);\n            float tl5 = length(tq5) - 0.01;\n            \n            //identify the objects\n            vec2 ns = nearest(vec2(tun, 1.0), vec2(walls, 2.0));\n            ns.x = max(ns.x, -cut);\n            ns = nearest(ns, vec2(rlLight, 3.0));\n            ns = nearest(ns, vec2(rlFrame, 4.0));\n            ns = nearest(ns, vec2(slLights, 5.0));            \n            ns = nearest(ns, vec2(doors, 6.0));\n            ns = nearest(ns, vec2(tl1, 7.0));\n            ns = nearest(ns, vec2(tl2, 8.0));\n            ns = nearest(ns, vec2(tl3, 9.0));\n            ns = nearest(ns, vec2(tl4, 10.0));\n            ns = nearest(ns, vec2(tl5, 11.0));\n            \n            return Tunnel(ns.x, \n                          ns.y, \n                          slLights, \n                          rlLight, \n                          tl1, \n                          tl2, \n                          tl3, \n                          tl4, \n                          tl5, \n                          rp.yz, \n                          cellid,\n                          edge);\n        }\n\n        //finds gradients across small deltas on each axis\n        vec3 normal(vec3 rp) {\n            vec2 e = vec2(EPS, 0);\n            float d1 = map(rp + e.xyy).t, d2 = map(rp - e.xyy).t;\n            float d3 = map(rp + e.yxy).t, d4 = map(rp - e.yxy).t;\n            float d5 = map(rp + e.yyx).t, d6 = map(rp - e.yyx).t;\n            float d = map(rp).t * 2.0;\n            return normalize(vec3(d1 - d2, d3 - d4, d5 - d6));\n        }\n\n        // Based on original by IQ.\n        // http://www.iquilezles.org/www/articles/raymarchingdf/raymarchingdf.htm\n        float AO(vec3 rp, vec3 n) {\n        \n            float r = 0.0;\n            float w = 1.0;\n            float d = 0.0;\n            \n            for (float i = 1.0; i < 5.0; i += 1.0){\n                d = i / 5.0;\n                r += w * (d - map(rp + n * d).t);\n                w *= 0.5;\n            }\n            \n            return 1.0 - clamp(r, 0.0, 1.0);\n        }\n\n        Scene march(vec3 ro, vec3 rd) {\n\n            float t = 0.0;\n            float id = 0.0;\n            float li = 0.0;\n            vec2 walluv = vec2(0.0);\n            vec2 cellid = vec2(0.0);\n            float edge = 0.0;\n\n            for (int i = 0; i < 100; i++) {\n                vec3 rp = ro + rd * t;\n                Tunnel ns = map(rp);\n                if (ns.t < EPS || t > FAR) {\n                    id = ns.id;\n                    walluv = ns.walluv;\n                    cellid = ns.cellid;\n                    edge = ns.edge;\n                    break;\n                }\n\n                li += 0.05 * exp(-ns.sideLight * 20.0);\n                li += 0.05 * exp(-ns.ringLight * 30.0);\n                li += 0.05 * exp(-ns.tl1 * 30.0);\n                li += 0.05 * exp(-ns.tl2 * 30.0);\n                li += 0.05 * exp(-ns.tl3 * 30.0);\n                li += 0.05 * exp(-ns.tl4 * 30.0);\n                li += 0.05 * exp(-ns.tl5 * 20.0);\n\n                t += ns.t;\n            }\n\n            return Scene(t, id, li, walluv, cellid, edge);\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            float ct = T * 6.0;\n\n            vec3 lookAt = vec3(0.0, 0.0, ct);\n            lp = lookAt + vec3(0.0, 0.0, 3.0);\n            ro = lookAt + vec3(0.0, 0.0, -5.0);\n            \n            lookAt.xy += path(lookAt.z).xy;\n            ro.xy += path(ro.z).xy;\n            lp.xy += path(lp.z).xy;\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        vec3 colourScene(vec3 ro, vec3 rd, Scene t) {\n\n            vec3 pc = vec3(0.0);\n\n            if (t.t > 0.0 && t.t < FAR) {\n                                \n                vec3 rp = ro + rd * t.t;\n                vec3 n = normal(rp);\n                vec3 ld = normalize(lp - rp);\n                float lt = length(lp - rp);\n                //float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 64.0);                \n                //float fre = pow(clamp(dot(n, rd) + 1.0, 0.0, 1.0), 16.0);        \n                //float atten = 1.0 / (1.0 + lt * lt * 1.0); //light attenuation\n                float ao = AO(rp, n);\n                float fogAmount = 1.0 - exp(-t.t * 0.1);\n                \n                if (t.id == 3.0 || t.id == 5.0 || t.id == 7.0 || t.id == 8.0 || \n                    t.id == 9.0 || t.id == 10.0 || t.id == 11.0) {\n                    \n                    //lights\n                    float diff = max(dot(ld, n), 0.6);\n                    pc = vec3(0.7, 1.0, 0.7) * diff * ao;\n               \n                } else if (t.id == 1.0) {\n                    \n                    //tunnel walls\n                    vec2 tileid = vec2(t.cellid.x, floor((t.cellid.y + 0.5) * 18.0));\n                    float diff = max(dot(ld, n), 0.2);\n                    float atten = 1.0 / (1.0 + lt * lt * 1.0); //light attenuation\n                    \n                    float r1 = rand(tileid);\n                    float r2 = rand(tileid.yx + floor(T));\n\n                    vec2 mx1 = mod(tileid, 4.0) - 2.0;\n                    if (mx1.x * mx1.y >= 0.0) {\n                        if (r1 > 0.5) {   \n                            pc = vec3(1.0, 0.0, 0.0) * diff * atten;\n                        }\n                    }    \n                    \n                    pc += vec3(1.0) * t.edge * 1.0 * diff;\n                    float dots = mod(rp.z + T, 6.0) > 5.8 ? 1.0 : 0.0;\n                    pc += vec3(0.0, 1.0, 0.0) * t.edge * dots * 10.0;\n\n                    if (tileid.y > min(r1 * 18.0, r2 * 18.0) && \n                        tileid.y < max(r1 * 18.0, r2 * 18.0)) {\n                        pc = mix(pc, vec3(0.0, 0.2, 0.0), r2 * 0.2) * diff;\n                    }\n\n                } else if (t.id == 2.0) {\n\n                    //side walls \n                    float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 64.0);                \n                    float fres = pow(clamp(dot(n, rd) + 1.0, 0.0, 1.0), 32.0);        \n                    pc = mix(walltex(t.walluv), pc, fogAmount);\n                    pc += vec3(1.0) * spec * 0.4;\n                    pc += vec3(1.0) * fres * 0.6;\n                    pc *= ao;\n\n                } else if (t.id == 4.0) {\n                    \n                    //rings\n                    float diff = max(dot(ld, n), 0.2);\n                    float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 64.0);                \n                    pc += vec3(0.01) * diff * ao;\n                    pc += vec3(1.0) * spec * 0.4;\n                    \n                } else if (t.id == 6.0) {\n                    \n                    //doors\n                    float diff = max(dot(ld, n), 0.2);\n                    //pc = vec3(0.0, 0.2, 0.0) * diff * ao * 0.2;\n                    float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 64.0);                \n                    pc += vec3(1.0) * spec * 0.4;\n                    \n                } else {\n\n                    //float diff = max(dot(ld, n), 0.2);\n                    //pc = vec3(0.0, 0.2, 0.0) * diff * ao * 0.2;\n                    //pc += vec3(0.7, 1.0, 0.7) * spec;\n                    //pc *= atten;\n                }\n            }\n                \n            return pc;\n        }\n\n        vec3 target(vec3 ro, vec3 rd) {\n            \n            vec3 pc = vec3(0.0);\n\n            float t = dot(vec3(0.0, 0.0, ro.z + 5.0 + sin(T * 0.4) * 1.4) - ro, vec3(0.0, 0.0, 1.0)) / dot(rd, vec3(0.0, 0.0, 1.0));\n\n            if (t > 0.0 && t < FAR) {\n                \n                vec3 rp = ro + rd * t;\n                vec3 rrp = rp;\n                rp.xy -= path(rp.z).xy;\n                float dx = rp.x - rrp.x;\n                float dy = rp.y - rrp.y;\n                float a = atan(rp.y, rp.x) / 6.2831853;\n                rrp = rp;\n                rrp.xy *= rot(dx * 0.4);\n                float ra = atan(rrp.y, rrp.x) / 6.2831853;\n                //rings\n                vec3 r1 = vec3(1.0) * step(0.98, length(rp.xy)) * step(length(rp.xy), 1.0);\n                vec3 r2 = vec3(0.0, 2.0, 0.0) * step(0.92, length(rp.xy)) * step(length(rp.xy), 0.95);\n                r2 *= step(0.0 - dx * 0.1, a);\n                //r2 *= mod(a, 0.05) > 0.01 ? 1.0 : 0.0;\n                vec3 r3 = vec3(2.0, 0.0, 0.0) * step(0.86, length(rp.xy)) * step(length(rp.xy), 0.89);\n                r3 *= step(a, 0.0 + dx * 0.1);\n                //r3 *= mod(a, 0.05) > 0.01 ? 1.0 : 0.0;\n                vec3 r7 = vec3(1.0) * step(0.59, length(rp.xy)) * step(length(rp.xy), 0.6);\n                //cross hair\n                vec3 c1 = vec3(0.0, 2.0, 0.0) * step(abs(rp.x), 0.1) * step(abs(rp.y), 0.4);\n                c1 += vec3(0.0, 2.0, 0.0) * step(abs(rp.y), 0.1) * step(abs(rp.x), 0.4);\n                c1 *= step(0.06, abs(rp.x)) * step(0.06, abs(rp.y));\n                //glyph\n                vec2 uv = rp.xy * 20.0;\n                vec2 cid = floor(uv);\n                vec2 cfa = fract(uv);\n                float tcut = step(9.0, uv.x) * step(uv.x, 21.0);\n                tcut *= step(9.0, uv.y) * step(uv.y, 14.0);\n                vec3 t1 = vec3(8.0, 0.0, 0.0) * smoothstep(0.3, 0.28, length(cfa - vec2(0.5)));\n                t1 *= step(rand(cid + floor(rp.z)), 0.5);\n                t1 *= step(10.0, uv.x) * step(uv.x, 14.0) + \n                      step(16.0, uv.x) * step(uv.x, 20.0);\n                t1 *= step(10.0, uv.y) * step(uv.y, 13.0);\n                pc = (r1 + r2 + r3 + r7 + c1) * (1.0 - tcut) + t1;\n                //pc *= sin(uv.y * 300. + T) * 0.8 + 1.;\n                //pc *= sin(uv.x * 300. + T) * 0.8 + 1.;\n            }\n            float mt = mod(T, 4.0) > 2.0 ? 1.0 : 0.0;\n            return pc * mt; \n        }\n\n        vec3 hud(vec3 ro) {\n            vec3 pc = vec3(0.0);\n            //Coordinate system\n            vec2 uv = 2.2 * (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n            float a = atan(uv.y, uv.x) / 6.2831853;\n            vec3 dro = ro;\n            dro.xy -= path(dro.z).xy;\n            float dx = dro.x - ro.x;\n            float dy = dro.y - ro.y;\n            vec3 r1 = vec3(0.0, 1.0, 0.0) * step(0.99, length(uv.xy)) * step(length(uv.xy), 1.0);\n            vec3 r2 = vec3(0.0, 1.0, 0.0) * step(0.95, length(uv.xy)) * step(length(uv.xy), 0.97);\n            r2 *= step(0.0 - dx * 0.1, a);\n            r2 *= mod(a, 0.05) > 0.01 ? 1.0 : 0.0;\n            vec3 r3 = vec3(0.0, 1.0, 0.0) * step(0.92, length(uv.xy)) * step(length(uv.xy), 0.94);\n            r3 *= step(a, 0.0 + dx * 0.1);\n            r3 *= mod(a, 0.05) > 0.01 ? 1.0 : 0.0;\n            vec3 r4 = vec3(0.0, 1.0, 0.0) * step(0.89, length(uv.xy)) * step(length(uv.xy), 0.90);\n            //glyph\n            vec2 uvg = uv.xy * 20.0;\n            vec2 cid = floor(uvg);\n            vec2 cfa = fract(uvg);\n            vec3 t1 = vec3(0.0, 8.0, 0.0) * smoothstep(0.3, 0.28, length(cfa - vec2(0.5)));\n            t1 *= step(rand(cid + floor(ro.z)), 0.5);\n            t1 *= step(rand(cid + floor(ro.z)), 0.5);            \n            t1 *= step(18.0, uvg.x) * step(uvg.x, 22.0) + \n                    step(24.0, uvg.x) * step(uvg.x, 28.0);\n            t1 *= step(16.0, uvg.y) * step(uvg.y, 19.0);\n            vec3 s1 = vec3(0.0, 1.0, 0.0) * step(uv.x, -1.2) * step(-1.3, uv.x);\n            s1 *= step(0.0, abs(uv.y)) * step(abs(uv.y), 0.8 + dy * 0.4);\n            s1 *= mod(uv.y, 0.05) > 0.02 ? 1.0 : 0.0;\n            pc = r1 + r2 + r3 + r4 + t1 + s1;\n            pc *= sin(uv.y * 600. + T) * 0.8 + 1.;\n            pc *= sin(uv.x * 600. + T) * 0.8 + 1.;\n            return pc;\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR;\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            Scene scene = march(ro, rd);\n\n            pc = colourScene(ro, rd, scene);\n            \n            pc += vec3(0.0, 1.0, 0.0) * scene.li;\n\n            vec4 sleeve = texture2D(u_texture1, gl_FragCoord.xy / u_resolution);\n            if (sleeve.w * FAR < scene.t) {\n                pc = sleeve.xyz;\n            }\n\n            vec4 sleeve2 = texture2D(u_texture2, gl_FragCoord.xy / u_resolution);\n            if (sleeve2.w * FAR < scene.t) {\n                pc = mix(pc, sleeve2.xyz, 0.1);\n            }\n\n            pc = mix(pc, hud(ro), 0.1);\n\n            pc += target(ro, rd) * 0.4;\n\n            //pc *= sin(gl_FragCoord.y * 350. + T) * 0.8 + 1.;//Scanlines\n            //pc *= sin(gl_FragCoord.x * 350. + T) * 0.8 + 1.;\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);\n        }\n    ';
+    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define EPS 0.005\n        #define FAR 40.0 \n        #define PI 3.14159265359\n        #define T u_time\n        #define NTILES 12.0\n\n        vec3 lp = vec3(0.0, 0.0, 4.0); //light position\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 path(float t) {\n              float a = sin(t * 3.14159265/ 16.0 + 1.5707963 * 1.0);\n              float b = cos(t * 3.14159265 / 16.0);\n              return vec3(a * 2.0, b * a, t);    \n        }\n\n        // Repeat around the origin by a fixed angle.\n        // For easier use, num of repetitions is use to specify the angle.\n        float pModPolar(inout vec2 p, float repetitions) {\n            float angle = 2.0 * PI / repetitions;\n            float a = atan(p.y, p.x) + angle / 2.0;\n            float r = length(p);\n            float c = floor(a / angle);\n            a = mod(a, angle) - angle / 2.0;\n            p = vec2(cos(a), sin(a)) * r;\n            // For an odd number of repetitions, fix cell index of the cell in -x direction\n            // (cell index would be e.g. -5 and 5 in the two halves of the cell):\n            if (abs(c) >= (repetitions / 2.0)) c = abs(c);\n            return c;\n        }\n\n        float map(vec3 rp) {\n            \n            rp.xy -= path(rp.z).xy;      \n\n            vec3 q1 = rp;\n            float a = atan(q1.y, q1.x) / 6.2831853;\n            float ia = floor(a * NTILES) / NTILES * 6.2831853;\n            q1.xy *= rot(ia);\n            q1.z = mod(q1.z, 1.0) - .5;\n            q1 = abs(q1);\n\n            vec2 cellid = vec2(floor(q1.z + 0.5), floor(a * NTILES));\n\n            vec3 q2 = rp;\n            pModPolar(q2.xy, 12.0);\n            vec2 c = vec2(1.6, 0.0);\n            float sl = length(q2.xy - c) - 0.005;\n            q2.z = mod(q2.z, 140.0) - 39.0;\n            q2.z = abs(q2.z);\n            sl = max(sl, -(q2.z - 0.5));\n            \n            vec3 q3 = rp;\n            q3.z = mod(q3.z, 100.0) - 39.0;\n            q3.z = abs(q3.z);\n            sl = max(sl, -(q3.z - 0.5));\n\n            vec3 q4 = rp;\n            q4.z = mod(q4.z, 80.0) - 24.0;\n            q4.z = abs(q4.z);\n            sl = max(sl, -(q4.z - 0.5));\n\n            vec3 q5 = rp;\n            q5.z = mod(q5.z, 60.0) - 59.0;\n            q5.z = abs(q5.z);\n            sl = max(sl, -(q5.z - 0.5));\n\n            /*\n            vec3 q6 = rp;\n            q6.z = mod(q6.z, 140.0) - 39.0;\n            q6.z = abs(q6.z);\n            vec2 tor = vec2(length(q6.xy) - 1.6, q6.z);\n            float rt = length(tor) - 0.01;\n            */\n\n            //sl = max(sl, -(q3.z - 0.5));\n            //sl = max(sl, -(q3.z - 1.0));\n            \n    \n            //if (cellid.y == 1.0 || cellid.y == 4.0 || cellid.y == -4.0) {\n            //rt = max(rt, -(q1.y - 1.0));\n            //}\n\n            return sl;\n\n            /*\n            vec3 q = rp;\n            q.x = abs(q.x);\n            vec2 c = vec2(1.5, 0.0);\n            float sl = length(q.xy - c) - 0.02;\n            c *= rot(PI * 2.0 / NTILES);\n            sl = min(sl, length(q.xy - c) - 0.02);\n            c *= rot(PI * -4.0 / NTILES);\n            sl = min(sl, length(q.xy - c) - 0.02);\n\n            vec3 q2 = rp;\n            q2.y = abs(q2.y);\n            c = vec2(0.0, 1.5);\n            float sl2 = length(q2.xy - c) - 0.02;\n            c *= rot(PI * 2.0 / NTILES);\n            sl2 = min(sl2, length(q2.xy - c) - 0.02);\n            c *= rot(PI * -4.0 / NTILES);\n            sl2 = min(sl2, length(q2.xy - c) - 0.02);\n\n            vec3 q3 = rp;\n            q3.z = mod(q3.z, 1.0) - 0.5;\n            vec2 tor = vec2(length(q3.xy) - 1.5, q3.z);\n            float rt = length(tor) - 0.02;\n            \n            return min(rt, min(sl, sl2));\n            */\n        }\n\n        //finds gradients across small deltas on each axis\n        vec3 normal(vec3 rp) {\n            vec2 e = vec2(EPS, 0);\n            float d1 = map(rp + e.xyy), d2 = map(rp - e.xyy);\n            float d3 = map(rp + e.yxy), d4 = map(rp - e.yxy);\n            float d5 = map(rp + e.yyx), d6 = map(rp - e.yyx);\n            float d = map(rp) * 2.0;\n            return normalize(vec3(d1 - d2, d3 - d4, d5 - d6));\n        }\n\n        float march(vec3 ro, vec3 rd) {\n            \n            float t = 0.0;\n\n            for (int i = 0; i < 96; i++) {\n                vec3 rp = ro + rd * t;\n                float ns = map(rp);\n                if (ns < EPS * (t * 0.25 + 1.0) || t > FAR) break;\n                t += ns;\n            }\n\n            return t;\n        }\n\n        float relaxedMarch(vec3 ro, vec3 rd) {\n\n            float omega = 1.3;\n            float t = EPS;\n            float candidate_error = FAR;\n            float candidate_t = EPS;\n            float previousRadius = 0.0;\n            float stepLength = 0.0;\n            float pixelRadius = EPS;\n            float functionSign = map(ro) < 0.0 ? -1.0 : 1.0;\n\n            for (int i = 0; i < 100; ++i) {\n                float signedRadius = functionSign * map(ro + rd * t);\n                float radius = abs(signedRadius);\n                bool sorFail = omega > 1.0 && (radius + previousRadius) < stepLength;\n                if (sorFail) {\n                    stepLength -= omega * stepLength;\n                    omega = 1.0;\n                } else {\n                    stepLength = signedRadius * omega;\n                }\n                previousRadius = radius;\n                float error = radius / t;\n                if (!sorFail && error < candidate_error) {\n                    candidate_t = t;\n                    candidate_error = error;\n                }\n                if (!sorFail && error < pixelRadius || t > FAR) break;\n                t += stepLength;\n            }\n\n            if (t > FAR || candidate_error > pixelRadius) candidate_t = FAR;\n\n            return candidate_t;\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            float ct = T * 6.0;\n\n            vec3 lookAt = vec3(0.0, 0.0, ct);\n            lp = lookAt + vec3(0.0, 0.0, -3.0);\n            ro = lookAt + vec3(0.0, 0.0, -5.0);\n            \n            lookAt.xy += path(lookAt.z).xy;\n            ro.xy += path(ro.z).xy;\n            lp.xy += path(lp.z).xy;\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR;\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            //float t = march(ro, rd);\n            \n            float t = relaxedMarch(ro, rd);\n            \n            if (t > 0.0 && t < FAR) {\n                //vec3 rp = ro + rd * t;\n                //vec3 n = normal(rp);\n                //vec3 ld = normalize(lp - rp);\n                //float diff = max(dot(ld, n), 0.05);\n\n                pc = vec3(0.0, 1.0, 0.0);\n                mint = t;\n            }\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), mint / FAR);\n        }\n    ';
 
     return fsSource;
 };
@@ -25753,7 +25864,7 @@ module.exports = {
 
 function fragmentSource() {
 
-    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define EPS 0.005\n        #define FAR 200.0 \n        #define PI 3.14159265359\n        #define T u_time * 2.0\n\n        vec3 lp = vec3(4.0, 5.0, -2.0); //light position\n\n        struct Box {\n            float tN;\n            float tF;\n            vec3 nN;\n            vec3 nF;\n            float wN;\n            float wF;\n        };\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n\n        //IQs noise\n        float noise(vec3 rp) {\n            vec3 ip = floor(rp);\n            rp -= ip; \n            vec3 s = vec3(7, 157, 113);\n            vec4 h = vec4(0.0, s.yz, s.y + s.z) + dot(ip, s);\n            rp = rp * rp * (3.0 - 2.0 * rp); \n            h = mix(fract(sin(h) * 43758.5), fract(sin(h + s.x) * 43758.5), rp.x);\n            h.xy = mix(h.xz, h.yw, rp.y);\n            return mix(h.x, h.y, rp.z); \n        }\n\n        //wireframe edges\n        float tex(vec3 rp) {\n            float bs = 0.9;\n            if (abs(rp.x) < bs && abs(rp.y) < bs) return 0.0;\n            return 1.0;   \n        }        \n\n        // Cube mapping routine from Fizzer\n        // I\'m not sure where I got this from\n        float fizz(vec3 rp) {\n            vec3 f = abs(rp);\n            f = step(f.zxy, f) * step(f.yzx, f); \n            f.xy = f.x > .5 ? rp.yz / rp.x : f.y > .5 ? rp.xz / rp.y : rp.xy / rp.z; \n            return tex(f);\n        }\n\n        // slightly modified version of IQs box function examples\n        // http://www.iquilezles.org/www/articles/boxfunctions/boxfunctions.htm\n        Box boxIntersection(vec3 ro, vec3 rd, vec3 boxSize) {\n            \n            Box box = Box(0.0, 0.0, vec3(0.0), vec3(0.0), 0.0, 0.0); //miss\n\n            vec3 m = 1.0 / rd;\n            vec3 n = m * ro;\n            vec3 k = abs(m) * boxSize;\n\n            vec3 t1 = -n - k;\n            vec3 t2 = -n + k;\n\n            float tN = max(max(t1.x, t1.y), t1.z); //distance to near face\n            float tF = min(min(t2.x, t2.y), t2.z); //distance to far face\n\n            if (tN > tF || tF < 0.0) return box;\n\n            float fzN = fizz(ro + rd * tN); //wireframe near face\n            float fzF = fizz(ro + rd * tF); //wireframe far face\n            \n            vec3 nN = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz); //near face normal\n            vec3 nF = -sign(rd) * step(t2.xyz, t2.yzx) * step(t2.xyz, t2.zxy); //far face normal\n            \n            return Box(tN, tF, nN, nF, fzN, fzF);\n        }\n\n        Box translateBox(vec3 ro, vec3 rd, float i) {\n\n            vec3 bc = vec3(-i * (1.4 - i * 0.06), sin(T * 0.5 + i) * 1.4, 0.0); //box center\n            vec3 boxSize = vec3(1.0 - i * 0.1);\n\n            ro += bc; //offset box to it\'s center\n\n            //rotations of box\n            ro.xz *= rot(T + i * 0.25);\n            rd.xz *= rot(T + i * 0.25);\n            ro.xy *= rot(-T - i * 0.5);\n            rd.xy *= rot(-T - i * 0.5);\n            \n            Box box = boxIntersection(ro, rd, boxSize);\n\n            //unwind rotation of normals\n            box.nN.xy *= rot(T + i * 0.5);\n            box.nF.xy *= rot(T + i * 0.5);\n            box.nN.xz *= rot(-T - i * 0.25);\n            box.nF.xz *= rot(-T - i * 0.25);\n\n            return box;\n        }\n\n        float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n            return dot(o - ro, n) / dot(rd, n);\n        }\n\n        //checkerboard\n        float floorTex(vec3 rp) {\n            rp.x += T * -2.0;\n            vec2 m = mod(rp.xz, 4.0) - 2.0;\n            if (m.x * m.y > 0.0) {\n                return 0.8 + noise(rp * 4.0) * 0.16;\n            }\n            return 0.2 + noise((rp + 0.3) * 3.0) * 0.1;\n        }\n\n        struct Scene {\n            float t;\n            vec3 nN;\n            vec3 pc;\n            float edge;\n            float k;            \n        };\n\n        Scene drawBoxes(vec3 ro, vec3 rd, vec3 pc) {\n            \n            vec3 sc = vec3(0.0);\n            float edge = 0.0;\n            float k = 0.0;\n\n            Box nearest = Box(FAR, FAR, vec3(0.0), vec3(0.0), 0.0, 0.0); //nearest box\n            float index = 0.0; //index of nearest box\n\n            //find nearest cube\n            for (int i = 0; i < 8; i++) {\n                float fi = float(i);\n                Box box = translateBox(ro, rd, fi);\n                if (box.tN > 0.0) {\n                    //hit box\n                    if (box.wN > 0.0) edge = 1.0;\n                    if (box.wF > 0.0) edge = 1.0;\n                    if (box.tN < nearest.tN) {\n                        //nearest box\n                        nearest = box;\n                        index = fi;\n                    }\n                }\n            }\n\n            //colour wireframe\n            if (edge > 0.0) {\n                sc = vec3(0.0, 1.0, 0.0);\n            } else {\n                sc = pc;\n            }\n\n            if (nearest.tN < FAR) {\n                \n                //colour surface of nearest cube surface\n                k = clamp(index * 0.06, 0.0, 1.0);\n\n                //front face\n                vec3 rp = ro + rd * nearest.tN;\n                vec3 ld = normalize(lp - rp);\n                float lt = length(lp - rp);\n                float diff = max(dot(nearest.nN, ld), 0.05);\n                float spec = pow(max(dot(reflect(-ld, nearest.nN), -rd), 0.0), 16.0);\n                float atten = 1. / (1.0 + lt * lt * .05); //light attenuation\n                vec3 fsc = vec3(0.0, 1.0, 0.0) * diff * atten;\n                fsc += vec3(0.05, 0.0, 0.4) * nearest.nN.y * -0.04; //uplight\n                fsc += vec3(1.0) * spec;\n                \n                //back face\n                rp = ro + rd * nearest.tF;\n                ld = normalize(lp - rp);\n                spec = pow(max(dot(reflect(-ld, nearest.nF), -rd), 0.0), 16.0);\n                fsc += vec3(1.0) * spec * 0.5 * k;\n\n                sc = mix(fsc, sc, k);\n            }\n\n            return  Scene(nearest.tN, nearest.nN, sc, edge, k);\n        }\n\n        float shadow(vec3 rp) {\n\n            float sh = 1.0; //not in shadow\n\n            vec3 ld = normalize(lp - rp); //light direction\n            float lt = length(lp - rp); //distance to light\n\n            Scene boxes = drawBoxes(rp, ld, vec3(0.0)); //distance to boxes\n            if (boxes.t > 0.0 && boxes.t < lt) {\n                //in shadow\n                sh = 0.14 + (boxes.k * (1.0 - boxes.edge) * 0.86);\n                sh *= boxes.t;\n            }\n\n            return clamp(sh, 0.1, 1.0);\n        }\n                        \n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            vec3 lookAt = vec3(0.0, 0.0, 0.0);\n            ro = lookAt + vec3(0.0, 0.5 + (sin(T * 0.2) + 1.0) * 0.3, -12.0 - (sin(T * 0.3) + 1.0));\n        \n            ro.xz *= rot(T * 0.2);\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR; //nearest surface\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            vec3 fo = vec3(0.0, -3.0, 0.0); //floor\n            vec3 fn = vec3(0.0, 1.0, 0.0); //floor normal\n\n            float ft = planeIntersection(ro, rd, fn, fo);\n            if (ft > 0.0 && ft < FAR) {\n\n                //ray hit floor\n                mint = ft;\n                \n                vec3 rrd = reflect(rd, fn); //reflected ray direction\n                vec3 rp = ro + rd * ft; //ray floor intersection point\n                vec3 ld = normalize(lp - rp); //light direction\n                float lt = length(lp - rp); //distance to light\n                float diff = max(dot(fn, ld), 0.05); //diffuse\n                float spec = pow(max(dot(reflect(-ld, fn), -rd), 0.0), 8.0); //specular\n                float shad = shadow(rp); //shadow\n                float atten = 1. / (1.0 + lt * lt * .03); //light attenuation\n\n                vec3 sc = vec3(0.4, 1.0, 0.4) * floorTex(rp); //tile colour\n\n                //reflections \n                Scene boxes = drawBoxes(rp, rrd, vec3(0.0));\n                if (boxes.t > 0.0 && boxes.t < FAR) {\n                    sc += boxes.pc * exp(boxes.t * -boxes.t * 0.0005);\n                }\n\n                sc += vec3(1.0) * spec; //specular\n                pc = sc * diff * atten; \n                pc *= shad;\n            }\n\n            //paint boxes\n            Scene boxes = drawBoxes(ro, rd, pc);\n            if (boxes.t < mint) {\n\n                pc = boxes.pc;\n\n                //floor reflections\n                vec3 rrd = reflect(rd, boxes.nN);\n                vec3 rro = ro + rd * (boxes.t - EPS);\n                float rft = planeIntersection(rro, rrd, fn, fo);\n                if (rft > 0.0 && rft < FAR) {\n                    vec3 frp = rro + rrd * rft;\n                    vec3 rld = normalize(lp - frp);\n                    float rlt = length(lp - frp);\n                    float rdiff = max(dot(fn, rld), 0.05); //diffuse\n                    float ratten = 1. / (1.0 + rlt * rlt * .03);\n                    vec3 rsc = vec3(0.4, 1.0, 0.4) * floorTex(frp); //tile colour\n                    rsc *= rdiff * ratten;\n                    pc += rsc * exp(rft * -rft * 2.5) * 0.3;\n                }\n            }\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);\n        }\n    ';
+    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        uniform sampler2D u_texture1;                \n        uniform sampler2D u_texture2;                \n        \n        #define EPS 0.005\n        #define FAR 40.0 \n        #define PI 3.14159265359\n        #define T u_time\n        #define NTILES 12.0\n\n        struct Scene {\n            float t;\n            vec2 walluv;\n            vec2 cellid;\n            float edge1;\n        };\n\n        vec3 lp = vec3(0.0, 0.0, 4.0); //light position\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        //random generator between 0 and 1\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 path(float t) {\n              float a = sin(t * PI / 16.0 + 1.5707963 * 1.0);\n              float b = cos(t * PI / 16.0);\n              return vec3(a * 2.0, b * a, t);    \n        }\n\n        /* TEXTURES START */\n\n        //glyph panels\n        float glyphpanel(float uvz, float uva, float endtype) {\n            vec2 cuv = vec2(uvz, uva) * 15.0 - 7.5;\n            vec2 cmx = mod(cuv, 1.0) - 0.5;\n            float lc = length(cmx);\n            float glyph = smoothstep(0.4, 0.3, lc); \n            float r1 = rand(floor(vec2(cuv.x + floor(T * 8.0), cuv.y))) > 0.5 ? 1.0 : 0.0;\n            glyph *= step(cuv.y, 2.0) * step(-3.0, cuv.y) * r1;\n            float gy = mod(cuv.x + floor(T * 8.0), 15.0);\n            glyph *= step(1.0, gy) * step(gy, 7.0) + step(9.0, gy) * step(gy, 14.0);\n            float l1 = step(3.0, cuv.y) * step(cuv.y, 3.5);\n            float l2 = step(cuv.y, -4.0) * step(-4.5, cuv.y);\n            float l3 = 0.0;\n            float fuvz = 15.0 * mod(uvz, 1.0);\n            if (endtype == 2.0) {\n                glyph *= step(3.0, fuvz);\n                l1 *= step(1.0, fuvz);\n                l2 *= step(1.0, fuvz);\n                l3 = step(fuvz, 1.5) * step(1.0, fuvz) * step(uva, 0.7) * step(0.2, uva);\n            } else if (endtype == 0.0) {\n                glyph *= step(fuvz, 12.0);\n                l1 *= step(fuvz, 14.0);\n                l2 *= step(fuvz, 14.0);\n                l3 = step(13.5, fuvz) * step(fuvz, 14.0) * step(uva, 0.7) * step(0.2, uva);\n            }\n            return glyph + l1 + l2 + l3;\n        }\n\n        //draw random ticking dots in cell\n        float glyphcell(float uvz, float uva, vec2 cellid) {\n            vec2 cuv = vec2(uvz, uva) * 10.0 - 5.0;\n            vec2 cmx = mod(cuv, 1.0) - 0.5;\n            float lc = length(cmx);\n            float r1 = rand(floor(vec2(cuv.x + cellid.y, cuv.y + cellid.x + floor(T)))) > 0.7 ? 1.0 : 0.0;\n            float pc = smoothstep(0.4, 0.3, lc) * r1; \n            pc *= step(cuv.x, 4.0) * step(-4.0, cuv.x);\n            pc *= step(cuv.y, 4.0) * step(-4.0, cuv.y);\n            return pc;\n        }\n        \n        float metercell(float uvz, float uva) {\n            float st1 = clamp(sin(T * 8.0) * 0.5 + 0.5, 0.2, 1.0);\n            float st2 = clamp(sin((T + 0.3) * 9.0) * 0.5 + 0.5, 0.2, 1.0);\n            float st3 = clamp(sin((T + 1.2) * 8.5) * 0.5 + 0.5, 0.2, 1.0);\n            float mz = mod(uvz, 0.08) > 0.03 ? 1.0 : 0.0;\n            mz *= step(0.1, uvz) * step(uvz, 0.9);\n            mz *= clamp(step(0.7, uvz), 0.3, 1.0);\n            float m1 = mz * step(0.1, uva) * step(uva, 0.3) * step(uvz, st1);\n            float m2 = mz * step(0.4, uva) * step(uva, 0.6) * step(uvz, st2);\n            float m3 = mz * step(0.7, uva) * step(uva, 0.9) * step(uvz, st3);\n            return m1 + m2 + m3;\n        }\n\n        float slidercell(float uvz, float uva) {\n            float tm = clamp(sin(T * 0.5), 0.3, 0.9);\n            float bm = 1.0 - tm;\n            float z = mod(uvz, 0.1);\n            float tz = z > 0.07 && z < 0.09 ? 1.0 : 0.0;\n            float t = step(tm - 0.3, uva) * step(uva, tm) * step(0.1, uvz) * step(uvz, 0.9) * tz;\n            float bz = z > 0.01 && z < 0.03 ? 1.0 : 0.0;\n            float b = step(bm, uva) * step(uva, bm + 0.3) * step(0.1, uvz) * step(uvz, 0.9) * bz;\n            float y = mod(uva, 0.1);\n            float my = y > 0.05 ? 1.0 : 0.0;    \n            return (t + b) * my;\n        }\n\n        float gridcell(float uvz, float uva) {\n            vec2 cuv = vec2(uvz, uva) * 15.0;\n            float mz = mod(cuv.y, 1.0);\n            float mzg =  mz > 0.4 && mz < 0.6 ? 1.0 : 0.0; \n            return step(1.0, cuv.x) * step(cuv.x, 14.0) * step(1.0, cuv.y) * step(cuv.y, 14.0) * mzg;\n        }\n\n        float cellborder(float uvz, float uva) {\n            float border = step(0.05, uvz) * step(uvz, 0.07) * step(0.05, uva) * step(uva, 0.95);\n            border += step(0.93, uvz) * step(uvz, 0.95) * step(0.05, uva) * step(uva, 0.95);\n            border += step(0.05, uva) * step(uva, 0.07) * step(0.05, uvz) * step(uvz, 0.95);\n            border += step(0.93, uva) * step(uva, 0.95) * step(0.05, uvz) * step(uvz, 0.95);\n            return border;\n        }\n\n        float ringedge(float uvz, float uva) {\n            return step(uvz, 0.06) + step(0.94, uvz);\n        }\n\n        float ringcore(float uvz, float uva) {\n            float mz = mod(uva, 0.125) > 0.06 ? 1.0 : 0.0;\n            float core = step(sin(T) * 7.5, uva) * mz;\n            core *= step(0.2, uvz) * step(uvz, 0.3) + step(0.7, uvz) * step(uvz, 0.8);\n            float corea = step(sin(T) * -7.5, uva) * mz;\n            corea *= step(0.4, uvz) * step(uvz, 0.6);\n            return core + corea;\n        }\n\n        /* TEXTURES END */\n\n        Scene map(vec3 rp) {\n\n            rp.xy -= path(rp.z).xy;      \n\n            float tun = 1.7 - length(rp.xy);\n            float edge1 = 0.0;\n\n            vec3 q1 = rp; \n            vec3 q2 = rp;\n            vec3 q3 = rp;\n            \n            //polar coordinates\n            float a = atan(q1.y, q1.x) / 6.2831853;\n            float ia1 = floor(a * NTILES) / NTILES * 6.2831853;\n\n            vec2 cellid = vec2(floor(q1.z + 0.5), a);\n\n            q1.xy *= rot(ia1);\n            q1.z = mod(q1.z, 1.0) - .5;\n            q1 = abs(q1);\n\n            /*\n            q2.z = mod(q2.z, 140.0) - 39.0;\n            q2.z = abs(q2.z);\n            float rlFrame = q2.z - 0.5;\n            rlFrame = max(rlFrame, tun - 0.5);\n            float rlCutout = q2.z - 0.4;\n            rlCutout = max(rlCutout, tun - 0.6);\n            rlFrame = max(rlFrame, -rlCutout);\n\n            //tun = min(tun, rlFrame);\n            */\n\n\n\n            edge1 = -min(q1.y - 0.03, q1.z - 0.03);\n\n            return Scene(tun, rp.yz, cellid, edge1);\n        }\n\n        //finds gradients across small deltas on each axis\n        vec3 normal(vec3 rp) {\n            vec2 e = vec2(EPS, 0);\n            float d1 = map(rp + e.xyy).t, d2 = map(rp - e.xyy).t;\n            float d3 = map(rp + e.yxy).t, d4 = map(rp - e.yxy).t;\n            float d5 = map(rp + e.yyx).t, d6 = map(rp - e.yyx).t;\n            float d = map(rp).t * 2.0;\n            return normalize(vec3(d1 - d2, d3 - d4, d5 - d6));\n        }\n\n        Scene march(vec3 ro, vec3 rd) {\n            \n            float t = 0.0;\n            vec2 walluv = vec2(0.0);\n            vec2 cellid = vec2(0.0);\n            float edge1 = 0.0;\n\n            for (int i = 0; i < 96; i++) {\n                vec3 rp = ro + rd * t;\n                Scene ns = map(rp);\n                if (ns.t < EPS  * (t * 0.25 + 1.0) || t > FAR) {\n                    walluv = ns.walluv;\n                    cellid = ns.cellid;\n                    edge1 = ns.edge1;\n                    break;\n                }\n\n                t += ns.t;\n            }\n\n            return Scene(t, walluv, cellid, edge1);\n        }\n\n        Scene relaxedMarch(vec3 ro, vec3 rd) {\n            \n            float omega = 1.3;\n            float t = EPS;\n            float candidate_error = FAR;\n            float candidate_t = EPS;\n            float previousRadius = 0.0;\n            float stepLength = 0.0;\n            float pixelRadius = EPS;\n            float functionSign = map(ro).t < 0.0 ? -1.0 : 1.0;\n\n            vec2 walluv = vec2(0.0);\n            vec2 cellid = vec2(0.0);\n            float edge1 = 0.0;\n\n            for (int i = 0; i < 100; ++i) {\n                Scene scene = map(ro + rd * t);\n                float signedRadius = functionSign * scene.t;\n                float radius = abs(signedRadius);\n                \n                bool sorFail = omega > 1.0 && (radius + previousRadius) < stepLength;\n                if (sorFail) {\n                    stepLength -= omega * stepLength;\n                    omega = 1.0;\n                } else {\n                    stepLength = signedRadius * omega;\n                }\n                previousRadius = radius;\n                float error = radius / t;\n                if (!sorFail && error < candidate_error) {\n                    candidate_t = t;\n                    candidate_error = error;\n                }\n                \n                if (!sorFail && error < pixelRadius || t > FAR) {\n                    walluv = scene.walluv;\n                    cellid = scene.cellid;\n                    edge1 = scene.edge1;\n                    break;\n                }\n\n                t += stepLength;\n            }\n\n            if (t > FAR || candidate_error > pixelRadius) candidate_t = FAR;\n\n            return Scene(candidate_t, walluv, cellid, edge1);\n        }\n\n\n        vec3 colour(Scene scene) {\n\n            vec3 pc = vec3(0.0);\n\n            vec2 tileid = vec2(scene.cellid.x, floor((scene.cellid.y) * NTILES));\n            float r = rand(tileid);\n            float r2 = rand(vec2(tileid.y, tileid.x));\n            r2 = r2 > 0.5 && r2 < 0.6 ? 1.0 : 0.0;\n            vec3 bc = rand(vec2(r, r2)) > 0.5 ? vec3(1.0) : vec3(0.0, 1.0, 0.0);\n            \n            //edges\n            pc = max(scene.edge1, 0.0) * vec3(0.0, 1.0, 0.0);\n            \n            //cells\n            if (r > 0.2 && r < 0.3) {\n                pc += glyphcell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES), tileid) * vec3(0.0, 1.0, 0.0);\n            } else if (r > 0.4 && r < 0.5) {\n                pc += slidercell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * bc;\n            } else if (r > 0.7 && r < 0.75) {\n                pc += gridcell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * vec3(1.0, 1.0, 1.0);\n            } else if (r > 0.6 && r < 0.65) {\n                pc += glyphcell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES), tileid) * vec3(0.0, 1.0, 0.0);\n            }                \n            //*/\n\n            //cell borders\n            pc += cellborder(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * bc * r2;\n            \n            if (mod(tileid.x, 11.0) >= 10.0) {\n                if (r > 0.3 && r < 0.4) {\n                    pc = metercell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * vec3(1.0, 1.0, 1.0);\n                }\n            }\n\n            //glyph panels\n            float gs = 0.0;\n            if (tileid.y == 1.0) {\n                float gpm = mod(scene.walluv.y - 0.5, 18.0);\n                if (gpm < 1.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm < 2.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                } else if (gpm > 7.0 && gpm < 8.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 8.0 && gpm < 9.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 9.0 && gpm < 10.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 10.0 && gpm < 11.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                }\n                pc = vec3(1.0) * gs;\n            }\n            if (tileid.y == 4.0) {\n                float gpm = mod(scene.walluv.y - 0.5, 25.0);\n                if (gpm > 3.0 && gpm < 4.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 4.0 && gpm < 5.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 5.0 && gpm < 6.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                } else if (gpm > 11.0 && gpm < 12.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 12.0 && gpm < 13.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 13.0 && gpm < 14.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 14.0 && gpm < 15.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 15.0 && gpm < 16.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                }\n                pc = vec3(1.0) * gs;\n            }\n            if (tileid.y == -4.0) {\n                float gpm = mod(scene.walluv.y - 0.5, 40.0);\n                if (gpm > 7.0 && gpm < 8.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 8.0 && gpm < 9.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 9.0 && gpm < 10.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                } else if (gpm > 20.0 && gpm < 21.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 21.0 && gpm < 22.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                } else if (gpm > 31.0 && gpm < 32.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 32.0 && gpm < 33.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 33.0 && gpm < 34.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 34.0 && gpm < 35.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 35.0 && gpm < 36.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                }\n                pc = vec3(1.0) * gs;\n            } \n            //*/\n\n            //rings\n            if (mod(tileid.x, 60.0) >= 59.0) {\n                pc = ringedge(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(1.0);\n                pc += ringcore(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(0.0, 1.0, 0.0);\n            } \n            if (mod(tileid.x - 25.0, 80.0) >= 79.0) {\n                pc = ringedge(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(1.0);\n                pc += glyphcell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES), tileid) * vec3(0.0, 1.0, 0.0);\n            } \n            if (mod(tileid.x -40.0, 100.0) >= 99.0) {\n                pc = ringedge(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(1.0);\n                pc += slidercell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * vec3(0.0, 1.0, 0.0);\n            } \n            if (mod(tileid.x -40.0, 140.0) >= 139.0) {\n                pc = ringedge(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(1.0);\n                pc += metercell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * vec3(1.0);\n            } \n            //*/\n\n            return pc;\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            float ct = T * 6.0;\n\n            vec3 lookAt = vec3(0.0, 0.0, ct);\n            lp = lookAt + vec3(0.0, 0.0, 3.0);\n            ro = lookAt + vec3(0.0, 0.0, -5.0);\n            \n            lookAt.xy += path(lookAt.z).xy;\n            ro.xy += path(ro.z).xy;\n            lp.xy += path(lp.z).xy;\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR;\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            \n            \n            //Scene scene = march(ro, rd);\n            Scene scene = relaxedMarch(ro, rd);\n            \n            if (scene.t > 0.0 && scene.t < FAR) {\n\n               // vec3 rp = ro + rd * scene.t;\n                //vec3 n = normal(rp);\n                //vec3 ld = normalize(lp - rp);\n                //float diff = max(dot(ld, n), 0.2);\n\n                pc = colour(scene);\n\n            }\n            //*/\n\n            vec4 sleeve = texture2D(u_texture1, gl_FragCoord.xy / u_resolution);\n            \n            \n            if (sleeve.w > 0.0) {\n                if (sleeve.w * FAR < scene.t) {\n                    pc = sleeve.xyz;\n                } else {\n                    pc = mix(pc, sleeve.xyz, (1.0 - sleeve.w) * 0.3);\n                }\n            }\n            //*/\n\n            //pc = sleeve.xyz;\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);\n        }\n    ';
 
     return fsSource;
 };
@@ -25771,7 +25882,7 @@ module.exports = {
 
 function fragmentSource() {
 
-    var fsSource = '\n\n        #extension GL_EXT_draw_buffers : require\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n            precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n        uniform float u_delta;\n        uniform vec3 u_input_position;\n        uniform float u_force;\n        uniform sampler2D u_texture0;\n        uniform sampler2D u_texture1;\n        uniform sampler2D u_texture2;\n\n        // Buffering optimisations learnt and understood from excellent article by Nop Jiarathanakul\n        // http://nopjia.blogspot.com/2014/06/webgl-gpu-particles.html\n        // Curl noise taken verbatim from The Spirit by Edan Kwan\n        // http://www.edankwan.com/experiments/the-spirit/\n\n        vec4 mod289(vec4 x) {\n            return x - floor(x * (1.0 / 289.0)) * 289.0;\n        }\n        \n        float mod289(float x) {\n            return x - floor(x * (1.0 / 289.0)) * 289.0;\n        }\n        \n        vec4 permute(vec4 x) {\n            return mod289(((x * 34.0) + 1.0) * x);\n        }\n        \n        float permute(float x) {\n            return mod289(((x * 34.0) + 1.0) * x);\n        }\n        \n        vec4 taylorInvSqrt(vec4 r) {\n            return 1.79284291400159 - 0.85373472095314 * r;\n        }\n        \n        float taylorInvSqrt(float r) {\n            return 1.79284291400159 - 0.85373472095314 * r;\n        }\n        \n        vec4 grad4(float j, vec4 ip) {\n            const vec4 ones = vec4(1.0, 1.0, 1.0, -1.0);\n            vec4 p,s;\n        \n            p.xyz = floor( fract (vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0;\n            p.w = 1.5 - dot(abs(p.xyz), ones.xyz);\n            s = vec4(lessThan(p, vec4(0.0)));\n            p.xyz = p.xyz + (s.xyz * 2.0 - 1.0) * s.www;\n        \n            return p;\n        }\n        \n        #define F4 0.309016994374947451\n        \n        vec4 simplexNoiseDerivatives (vec4 v) {\n\n            const vec4  C = vec4( 0.138196601125011,0.276393202250021,0.414589803375032,-0.447213595499958);\n        \n            vec4 i  = floor(v + dot(v, vec4(F4)));\n            vec4 x0 = v - i + dot(i, C.xxxx);\n        \n            vec4 i0;\n            vec3 isX = step(x0.yzw, x0.xxx);\n            vec3 isYZ = step(x0.zww, x0.yyz);\n            i0.x = isX.x + isX.y + isX.z;\n            i0.yzw = 1.0 - isX;\n            i0.y += isYZ.x + isYZ.y;\n            i0.zw += 1.0 - isYZ.xy;\n            i0.z += isYZ.z;\n            i0.w += 1.0 - isYZ.z;\n        \n            vec4 i3 = clamp(i0, 0.0, 1.0);\n            vec4 i2 = clamp(i0 - 1.0, 0.0, 1.0);\n            vec4 i1 = clamp(i0 - 2.0, 0.0, 1.0);\n        \n            vec4 x1 = x0 - i1 + C.xxxx;\n            vec4 x2 = x0 - i2 + C.yyyy;\n            vec4 x3 = x0 - i3 + C.zzzz;\n            vec4 x4 = x0 + C.wwww;\n        \n            i = mod289(i);\n            float j0 = permute(permute(permute(permute(i.w) + i.z) + i.y) + i.x);\n            vec4 j1 = permute(permute(permute(permute(\n                     i.w + vec4(i1.w, i2.w, i3.w, 1.0))\n                   + i.z + vec4(i1.z, i2.z, i3.z, 1.0))\n                   + i.y + vec4(i1.y, i2.y, i3.y, 1.0))\n                   + i.x + vec4(i1.x, i2.x, i3.x, 1.0));\n        \n            vec4 ip = vec4(1.0/294.0, 1.0/49.0, 1.0/7.0, 0.0) ;\n        \n            vec4 p0 = grad4(j0,   ip);\n            vec4 p1 = grad4(j1.x, ip);\n            vec4 p2 = grad4(j1.y, ip);\n            vec4 p3 = grad4(j1.z, ip);\n            vec4 p4 = grad4(j1.w, ip);\n        \n            vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n            p0 *= norm.x;\n            p1 *= norm.y;\n            p2 *= norm.z;\n            p3 *= norm.w;\n            p4 *= taylorInvSqrt(dot(p4,p4));\n        \n            vec3 values0 = vec3(dot(p0, x0), dot(p1, x1), dot(p2, x2)); //value of contributions from each corner at point\n            vec2 values1 = vec2(dot(p3, x3), dot(p4, x4));\n        \n            vec3 m0 = max(0.5 - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), 0.0); //(0.5 - x^2) where x is the distance\n            vec2 m1 = max(0.5 - vec2(dot(x3,x3), dot(x4,x4)), 0.0);\n        \n            vec3 temp0 = -6.0 * m0 * m0 * values0;\n            vec2 temp1 = -6.0 * m1 * m1 * values1;\n        \n            vec3 mmm0 = m0 * m0 * m0;\n            vec2 mmm1 = m1 * m1 * m1;\n        \n            float dx = temp0[0] * x0.x + temp0[1] * x1.x + temp0[2] * x2.x + temp1[0] * x3.x + temp1[1] * x4.x + mmm0[0] * p0.x + mmm0[1] * p1.x + mmm0[2] * p2.x + mmm1[0] * p3.x + mmm1[1] * p4.x;\n            float dy = temp0[0] * x0.y + temp0[1] * x1.y + temp0[2] * x2.y + temp1[0] * x3.y + temp1[1] * x4.y + mmm0[0] * p0.y + mmm0[1] * p1.y + mmm0[2] * p2.y + mmm1[0] * p3.y + mmm1[1] * p4.y;\n            float dz = temp0[0] * x0.z + temp0[1] * x1.z + temp0[2] * x2.z + temp1[0] * x3.z + temp1[1] * x4.z + mmm0[0] * p0.z + mmm0[1] * p1.z + mmm0[2] * p2.z + mmm1[0] * p3.z + mmm1[1] * p4.z;\n            float dw = temp0[0] * x0.w + temp0[1] * x1.w + temp0[2] * x2.w + temp1[0] * x3.w + temp1[1] * x4.w + mmm0[0] * p0.w + mmm0[1] * p1.w + mmm0[2] * p2.w + mmm1[0] * p3.w + mmm1[1] * p4.w;\n        \n            return vec4(dx, dy, dz, dw) * 49.0;\n        }\n        \n        vec3 curl(vec3 p, float noiseTime, float persistence) {\n            \n            vec4 xNoisePotentialDerivatives = vec4(0.0);\n            vec4 yNoisePotentialDerivatives = vec4(0.0);\n            vec4 zNoisePotentialDerivatives = vec4(0.0);\n            \n            for (int i = 0; i < 3; ++i) {\n        \n                float twoPowI = pow(2.0, float(i));\n                float scale = 0.5 * twoPowI * pow(persistence, float(i));\n        \n                xNoisePotentialDerivatives += simplexNoiseDerivatives(vec4(p * twoPowI, noiseTime)) * scale;\n                yNoisePotentialDerivatives += simplexNoiseDerivatives(vec4((p + vec3(123.4, 129845.6, -1239.1)) * twoPowI, noiseTime)) * scale;\n                zNoisePotentialDerivatives += simplexNoiseDerivatives(vec4((p + vec3(-9519.0, 9051.0, -123.0)) * twoPowI, noiseTime)) * scale;\n            }\n        \n            return vec3(\n                zNoisePotentialDerivatives[1] - yNoisePotentialDerivatives[2],\n                xNoisePotentialDerivatives[2] - zNoisePotentialDerivatives[0],\n                yNoisePotentialDerivatives[0] - xNoisePotentialDerivatives[1]\n            );\n        }\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n\n        vec4 dfScene(vec3 rp) {\n\n            rp.xy *= rot(u_time * 0.3);\n            rp.yz *= rot(u_time * 1.0);\n\n            float br = 0.1;\n            float r = 3.4;\n\n            vec3 ball = vec3(0.0, r, 0.0);\n            float msd = length(ball - rp) - br;\n            vec3 gd = normalize(ball - rp);\n\n            ball = vec3(r, 0.0, 0.0);\n            float gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            ball = vec3(0.0, -r, 0.0);\n            gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            ball = vec3(-r, 0.0, 0.0);\n            gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            ball = vec3(0.0, 0.0, r);\n            gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            ball = vec3(0.0, 0.0, -r);\n            gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            return vec4(gd, msd);\n        }\n\n        void main() {\n\n            //handle particle updates\n            vec2 uv = gl_FragCoord.xy / u_resolution.xy;\n\n            vec3 position = texture2D(u_texture0, uv).rgb;\n            vec3 velocity = texture2D(u_texture1, uv).rgb;\n            vec3 colour = texture2D(u_texture2, uv).rgb;\n\n            //TODO: mouse interactions\n\n            position += velocity * u_delta;\n            velocity = 0.99 * velocity;\n\n            vec4 grav = dfScene(position);\n            velocity += grav.xyz / (1.0 + grav.w * grav.w * 4.0) * 0.08;\n\n            vec3 finalPosition = position + curl(position * 10.0, u_time, 0.5) * 0.01;\n            \n            colour = vec3(0.0, 1.0, 0.0) * exp(-grav.w * 0.5);\n            colour += vec3(0.4, 1.0, 0.6) * length(velocity) * 2.0;\n            \n            // write out data\n            gl_FragData[0] = vec4(finalPosition, 1.0);\n            gl_FragData[1] = vec4(velocity, 1.0);\n            gl_FragData[2] = vec4(colour, 1.0);\n        }\n    ';
+    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define EPS 0.005\n        #define FAR 200.0 \n        #define PI 3.14159265359\n        #define T u_time * 2.0\n\n        vec3 lp = vec3(4.0, 5.0, -2.0); //light position\n\n        struct Box {\n            float tN;\n            float tF;\n            vec3 nN;\n            vec3 nF;\n            float wN;\n            float wF;\n        };\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n\n        //IQs noise\n        float noise(vec3 rp) {\n            vec3 ip = floor(rp);\n            rp -= ip; \n            vec3 s = vec3(7, 157, 113);\n            vec4 h = vec4(0.0, s.yz, s.y + s.z) + dot(ip, s);\n            rp = rp * rp * (3.0 - 2.0 * rp); \n            h = mix(fract(sin(h) * 43758.5), fract(sin(h + s.x) * 43758.5), rp.x);\n            h.xy = mix(h.xz, h.yw, rp.y);\n            return mix(h.x, h.y, rp.z); \n        }\n\n        //wireframe edges\n        float tex(vec3 rp) {\n            float bs = 0.9;\n            if (abs(rp.x) < bs && abs(rp.y) < bs) return 0.0;\n            return 1.0;   \n        }        \n\n        // Cube mapping routine from Fizzer\n        // I\'m not sure where I got this from\n        float fizz(vec3 rp) {\n            vec3 f = abs(rp);\n            f = step(f.zxy, f) * step(f.yzx, f); \n            f.xy = f.x > .5 ? rp.yz / rp.x : f.y > .5 ? rp.xz / rp.y : rp.xy / rp.z; \n            return tex(f);\n        }\n\n        // slightly modified version of IQs box function examples\n        // http://www.iquilezles.org/www/articles/boxfunctions/boxfunctions.htm\n        Box boxIntersection(vec3 ro, vec3 rd, vec3 boxSize) {\n            \n            Box box = Box(0.0, 0.0, vec3(0.0), vec3(0.0), 0.0, 0.0); //miss\n\n            vec3 m = 1.0 / rd;\n            vec3 n = m * ro;\n            vec3 k = abs(m) * boxSize;\n\n            vec3 t1 = -n - k;\n            vec3 t2 = -n + k;\n\n            float tN = max(max(t1.x, t1.y), t1.z); //distance to near face\n            float tF = min(min(t2.x, t2.y), t2.z); //distance to far face\n\n            if (tN > tF || tF < 0.0) return box;\n\n            float fzN = fizz(ro + rd * tN); //wireframe near face\n            float fzF = fizz(ro + rd * tF); //wireframe far face\n            \n            vec3 nN = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz); //near face normal\n            vec3 nF = -sign(rd) * step(t2.xyz, t2.yzx) * step(t2.xyz, t2.zxy); //far face normal\n            \n            return Box(tN, tF, nN, nF, fzN, fzF);\n        }\n\n        Box translateBox(vec3 ro, vec3 rd, float i) {\n\n            vec3 bc = vec3(-i * (1.4 - i * 0.06), sin(T * 0.5 + i) * 1.4, 0.0); //box center\n            vec3 boxSize = vec3(1.0 - i * 0.1);\n\n            ro += bc; //offset box to it\'s center\n\n            //rotations of box\n            ro.xz *= rot(T + i * 0.25);\n            rd.xz *= rot(T + i * 0.25);\n            ro.xy *= rot(-T - i * 0.5);\n            rd.xy *= rot(-T - i * 0.5);\n            \n            Box box = boxIntersection(ro, rd, boxSize);\n\n            //unwind rotation of normals\n            box.nN.xy *= rot(T + i * 0.5);\n            box.nF.xy *= rot(T + i * 0.5);\n            box.nN.xz *= rot(-T - i * 0.25);\n            box.nF.xz *= rot(-T - i * 0.25);\n\n            return box;\n        }\n\n        float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n            return dot(o - ro, n) / dot(rd, n);\n        }\n\n        //checkerboard\n        float floorTex(vec3 rp) {\n            rp.x += T * -2.0;\n            vec2 m = mod(rp.xz, 4.0) - 2.0;\n            if (m.x * m.y > 0.0) {\n                return 0.8 + noise(rp * 4.0) * 0.16;\n            }\n            return 0.2 + noise((rp + 0.3) * 3.0) * 0.1;\n        }\n\n        struct Scene {\n            float t;\n            vec3 nN;\n            vec3 pc;\n            float edge;\n            float k;            \n        };\n\n        Scene drawBoxes(vec3 ro, vec3 rd, vec3 pc) {\n            \n            vec3 sc = vec3(0.0);\n            float edge = 0.0;\n            float k = 0.0;\n\n            Box nearest = Box(FAR, FAR, vec3(0.0), vec3(0.0), 0.0, 0.0); //nearest box\n            float index = 0.0; //index of nearest box\n\n            //find nearest cube\n            for (int i = 0; i < 8; i++) {\n                float fi = float(i);\n                Box box = translateBox(ro, rd, fi);\n                if (box.tN > 0.0) {\n                    //hit box\n                    if (box.wN > 0.0) edge = 1.0;\n                    if (box.wF > 0.0) edge = 1.0;\n                    if (box.tN < nearest.tN) {\n                        //nearest box\n                        nearest = box;\n                        index = fi;\n                    }\n                }\n            }\n\n            //colour wireframe\n            if (edge > 0.0) {\n                sc = vec3(0.0, 1.0, 0.0);\n            } else {\n                sc = pc;\n            }\n\n            if (nearest.tN < FAR) {\n                \n                //colour surface of nearest cube surface\n                k = clamp(index * 0.06, 0.0, 1.0);\n\n                //front face\n                vec3 rp = ro + rd * nearest.tN;\n                vec3 ld = normalize(lp - rp);\n                float lt = length(lp - rp);\n                float diff = max(dot(nearest.nN, ld), 0.05);\n                float spec = pow(max(dot(reflect(-ld, nearest.nN), -rd), 0.0), 16.0);\n                float atten = 1. / (1.0 + lt * lt * .05); //light attenuation\n                vec3 fsc = vec3(0.0, 1.0, 0.0) * diff * atten;\n                fsc += vec3(0.05, 0.0, 0.4) * nearest.nN.y * -0.04; //uplight\n                fsc += vec3(1.0) * spec;\n                \n                //back face\n                rp = ro + rd * nearest.tF;\n                ld = normalize(lp - rp);\n                spec = pow(max(dot(reflect(-ld, nearest.nF), -rd), 0.0), 16.0);\n                fsc += vec3(1.0) * spec * 0.5 * k;\n\n                sc = mix(fsc, sc, k);\n            }\n\n            return  Scene(nearest.tN, nearest.nN, sc, edge, k);\n        }\n\n        float shadow(vec3 rp) {\n\n            float sh = 1.0; //not in shadow\n\n            vec3 ld = normalize(lp - rp); //light direction\n            float lt = length(lp - rp); //distance to light\n\n            Scene boxes = drawBoxes(rp, ld, vec3(0.0)); //distance to boxes\n            if (boxes.t > 0.0 && boxes.t < lt) {\n                //in shadow\n                sh = 0.14 + (boxes.k * (1.0 - boxes.edge) * 0.86);\n                sh *= boxes.t;\n            }\n\n            return clamp(sh, 0.1, 1.0);\n        }\n                        \n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            vec3 lookAt = vec3(0.0, 0.0, 0.0);\n            ro = lookAt + vec3(0.0, 0.5 + (sin(T * 0.2) + 1.0) * 0.3, -12.0 - (sin(T * 0.3) + 1.0));\n        \n            ro.xz *= rot(T * 0.2);\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR; //nearest surface\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            vec3 fo = vec3(0.0, -3.0, 0.0); //floor\n            vec3 fn = vec3(0.0, 1.0, 0.0); //floor normal\n\n            float ft = planeIntersection(ro, rd, fn, fo);\n            if (ft > 0.0 && ft < FAR) {\n\n                //ray hit floor\n                mint = ft;\n                \n                vec3 rrd = reflect(rd, fn); //reflected ray direction\n                vec3 rp = ro + rd * ft; //ray floor intersection point\n                vec3 ld = normalize(lp - rp); //light direction\n                float lt = length(lp - rp); //distance to light\n                float diff = max(dot(fn, ld), 0.05); //diffuse\n                float spec = pow(max(dot(reflect(-ld, fn), -rd), 0.0), 8.0); //specular\n                float shad = shadow(rp); //shadow\n                float atten = 1. / (1.0 + lt * lt * .03); //light attenuation\n\n                vec3 sc = vec3(0.4, 1.0, 0.4) * floorTex(rp); //tile colour\n\n                //reflections \n                Scene boxes = drawBoxes(rp, rrd, vec3(0.0));\n                if (boxes.t > 0.0 && boxes.t < FAR) {\n                    sc += boxes.pc * exp(boxes.t * -boxes.t * 0.0005);\n                }\n\n                sc += vec3(1.0) * spec; //specular\n                pc = sc * diff * atten; \n                pc *= shad;\n            }\n\n            //paint boxes\n            Scene boxes = drawBoxes(ro, rd, pc);\n            if (boxes.t < mint) {\n\n                pc = boxes.pc;\n\n                //floor reflections\n                vec3 rrd = reflect(rd, boxes.nN);\n                vec3 rro = ro + rd * (boxes.t - EPS);\n                float rft = planeIntersection(rro, rrd, fn, fo);\n                if (rft > 0.0 && rft < FAR) {\n                    vec3 frp = rro + rrd * rft;\n                    vec3 rld = normalize(lp - frp);\n                    float rlt = length(lp - frp);\n                    float rdiff = max(dot(fn, rld), 0.05); //diffuse\n                    float ratten = 1. / (1.0 + rlt * rlt * .03);\n                    vec3 rsc = vec3(0.4, 1.0, 0.4) * floorTex(frp); //tile colour\n                    rsc *= rdiff * ratten;\n                    pc += rsc * exp(rft * -rft * 2.5) * 0.3;\n                }\n            }\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);\n        }\n    ';
 
     return fsSource;
 };
@@ -25782,6 +25893,24 @@ module.exports = {
 
 /***/ }),
 /* 130 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function fragmentSource() {
+
+    var fsSource = '\n\n        #extension GL_EXT_draw_buffers : require\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n            precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n        uniform float u_delta;\n        uniform vec3 u_input_position;\n        uniform float u_force;\n        uniform sampler2D u_texture0;\n        uniform sampler2D u_texture1;\n        uniform sampler2D u_texture2;\n\n        // Buffering optimisations learnt and understood from excellent article by Nop Jiarathanakul\n        // http://nopjia.blogspot.com/2014/06/webgl-gpu-particles.html\n        // Curl noise taken verbatim from The Spirit by Edan Kwan\n        // http://www.edankwan.com/experiments/the-spirit/\n\n        vec4 mod289(vec4 x) {\n            return x - floor(x * (1.0 / 289.0)) * 289.0;\n        }\n        \n        float mod289(float x) {\n            return x - floor(x * (1.0 / 289.0)) * 289.0;\n        }\n        \n        vec4 permute(vec4 x) {\n            return mod289(((x * 34.0) + 1.0) * x);\n        }\n        \n        float permute(float x) {\n            return mod289(((x * 34.0) + 1.0) * x);\n        }\n        \n        vec4 taylorInvSqrt(vec4 r) {\n            return 1.79284291400159 - 0.85373472095314 * r;\n        }\n        \n        float taylorInvSqrt(float r) {\n            return 1.79284291400159 - 0.85373472095314 * r;\n        }\n        \n        vec4 grad4(float j, vec4 ip) {\n            const vec4 ones = vec4(1.0, 1.0, 1.0, -1.0);\n            vec4 p,s;\n        \n            p.xyz = floor( fract (vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0;\n            p.w = 1.5 - dot(abs(p.xyz), ones.xyz);\n            s = vec4(lessThan(p, vec4(0.0)));\n            p.xyz = p.xyz + (s.xyz * 2.0 - 1.0) * s.www;\n        \n            return p;\n        }\n        \n        #define F4 0.309016994374947451\n        \n        vec4 simplexNoiseDerivatives (vec4 v) {\n\n            const vec4  C = vec4( 0.138196601125011,0.276393202250021,0.414589803375032,-0.447213595499958);\n        \n            vec4 i  = floor(v + dot(v, vec4(F4)));\n            vec4 x0 = v - i + dot(i, C.xxxx);\n        \n            vec4 i0;\n            vec3 isX = step(x0.yzw, x0.xxx);\n            vec3 isYZ = step(x0.zww, x0.yyz);\n            i0.x = isX.x + isX.y + isX.z;\n            i0.yzw = 1.0 - isX;\n            i0.y += isYZ.x + isYZ.y;\n            i0.zw += 1.0 - isYZ.xy;\n            i0.z += isYZ.z;\n            i0.w += 1.0 - isYZ.z;\n        \n            vec4 i3 = clamp(i0, 0.0, 1.0);\n            vec4 i2 = clamp(i0 - 1.0, 0.0, 1.0);\n            vec4 i1 = clamp(i0 - 2.0, 0.0, 1.0);\n        \n            vec4 x1 = x0 - i1 + C.xxxx;\n            vec4 x2 = x0 - i2 + C.yyyy;\n            vec4 x3 = x0 - i3 + C.zzzz;\n            vec4 x4 = x0 + C.wwww;\n        \n            i = mod289(i);\n            float j0 = permute(permute(permute(permute(i.w) + i.z) + i.y) + i.x);\n            vec4 j1 = permute(permute(permute(permute(\n                     i.w + vec4(i1.w, i2.w, i3.w, 1.0))\n                   + i.z + vec4(i1.z, i2.z, i3.z, 1.0))\n                   + i.y + vec4(i1.y, i2.y, i3.y, 1.0))\n                   + i.x + vec4(i1.x, i2.x, i3.x, 1.0));\n        \n            vec4 ip = vec4(1.0/294.0, 1.0/49.0, 1.0/7.0, 0.0) ;\n        \n            vec4 p0 = grad4(j0,   ip);\n            vec4 p1 = grad4(j1.x, ip);\n            vec4 p2 = grad4(j1.y, ip);\n            vec4 p3 = grad4(j1.z, ip);\n            vec4 p4 = grad4(j1.w, ip);\n        \n            vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n            p0 *= norm.x;\n            p1 *= norm.y;\n            p2 *= norm.z;\n            p3 *= norm.w;\n            p4 *= taylorInvSqrt(dot(p4,p4));\n        \n            vec3 values0 = vec3(dot(p0, x0), dot(p1, x1), dot(p2, x2)); //value of contributions from each corner at point\n            vec2 values1 = vec2(dot(p3, x3), dot(p4, x4));\n        \n            vec3 m0 = max(0.5 - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), 0.0); //(0.5 - x^2) where x is the distance\n            vec2 m1 = max(0.5 - vec2(dot(x3,x3), dot(x4,x4)), 0.0);\n        \n            vec3 temp0 = -6.0 * m0 * m0 * values0;\n            vec2 temp1 = -6.0 * m1 * m1 * values1;\n        \n            vec3 mmm0 = m0 * m0 * m0;\n            vec2 mmm1 = m1 * m1 * m1;\n        \n            float dx = temp0[0] * x0.x + temp0[1] * x1.x + temp0[2] * x2.x + temp1[0] * x3.x + temp1[1] * x4.x + mmm0[0] * p0.x + mmm0[1] * p1.x + mmm0[2] * p2.x + mmm1[0] * p3.x + mmm1[1] * p4.x;\n            float dy = temp0[0] * x0.y + temp0[1] * x1.y + temp0[2] * x2.y + temp1[0] * x3.y + temp1[1] * x4.y + mmm0[0] * p0.y + mmm0[1] * p1.y + mmm0[2] * p2.y + mmm1[0] * p3.y + mmm1[1] * p4.y;\n            float dz = temp0[0] * x0.z + temp0[1] * x1.z + temp0[2] * x2.z + temp1[0] * x3.z + temp1[1] * x4.z + mmm0[0] * p0.z + mmm0[1] * p1.z + mmm0[2] * p2.z + mmm1[0] * p3.z + mmm1[1] * p4.z;\n            float dw = temp0[0] * x0.w + temp0[1] * x1.w + temp0[2] * x2.w + temp1[0] * x3.w + temp1[1] * x4.w + mmm0[0] * p0.w + mmm0[1] * p1.w + mmm0[2] * p2.w + mmm1[0] * p3.w + mmm1[1] * p4.w;\n        \n            return vec4(dx, dy, dz, dw) * 49.0;\n        }\n        \n        vec3 curl(vec3 p, float noiseTime, float persistence) {\n            \n            vec4 xNoisePotentialDerivatives = vec4(0.0);\n            vec4 yNoisePotentialDerivatives = vec4(0.0);\n            vec4 zNoisePotentialDerivatives = vec4(0.0);\n            \n            for (int i = 0; i < 3; ++i) {\n        \n                float twoPowI = pow(2.0, float(i));\n                float scale = 0.5 * twoPowI * pow(persistence, float(i));\n        \n                xNoisePotentialDerivatives += simplexNoiseDerivatives(vec4(p * twoPowI, noiseTime)) * scale;\n                yNoisePotentialDerivatives += simplexNoiseDerivatives(vec4((p + vec3(123.4, 129845.6, -1239.1)) * twoPowI, noiseTime)) * scale;\n                zNoisePotentialDerivatives += simplexNoiseDerivatives(vec4((p + vec3(-9519.0, 9051.0, -123.0)) * twoPowI, noiseTime)) * scale;\n            }\n        \n            return vec3(\n                zNoisePotentialDerivatives[1] - yNoisePotentialDerivatives[2],\n                xNoisePotentialDerivatives[2] - zNoisePotentialDerivatives[0],\n                yNoisePotentialDerivatives[0] - xNoisePotentialDerivatives[1]\n            );\n        }\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n\n        vec4 dfScene(vec3 rp) {\n\n            rp.xy *= rot(u_time * 0.3);\n            rp.yz *= rot(u_time * 1.0);\n\n            float br = 0.1;\n            float r = 3.4;\n\n            vec3 ball = vec3(0.0, r, 0.0);\n            float msd = length(ball - rp) - br;\n            vec3 gd = normalize(ball - rp);\n\n            ball = vec3(r, 0.0, 0.0);\n            float gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            ball = vec3(0.0, -r, 0.0);\n            gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            ball = vec3(-r, 0.0, 0.0);\n            gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            ball = vec3(0.0, 0.0, r);\n            gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            ball = vec3(0.0, 0.0, -r);\n            gt = length(ball - rp) - br;\n            if (gt < msd) {\n                msd = gt;\n                gd = normalize(ball - rp);\n            }\n\n            return vec4(gd, msd);\n        }\n\n        void main() {\n\n            //handle particle updates\n            vec2 uv = gl_FragCoord.xy / u_resolution.xy;\n\n            vec3 position = texture2D(u_texture0, uv).rgb;\n            vec3 velocity = texture2D(u_texture1, uv).rgb;\n            vec3 colour = texture2D(u_texture2, uv).rgb;\n\n            //TODO: mouse interactions\n\n            position += velocity * u_delta;\n            velocity = 0.99 * velocity;\n\n            vec4 grav = dfScene(position);\n            velocity += grav.xyz / (1.0 + grav.w * grav.w * 4.0) * 0.08;\n\n            vec3 finalPosition = position + curl(position * 10.0, u_time, 0.5) * 0.01;\n            \n            colour = vec3(0.0, 1.0, 0.0) * exp(-grav.w * 0.5);\n            colour += vec3(0.4, 1.0, 0.6) * length(velocity) * 2.0;\n            \n            // write out data\n            gl_FragData[0] = vec4(finalPosition, 1.0);\n            gl_FragData[1] = vec4(velocity, 1.0);\n            gl_FragData[2] = vec4(colour, 1.0);\n        }\n    ';
+
+    return fsSource;
+};
+
+module.exports = {
+    fragmentSource: fragmentSource
+};
+
+/***/ }),
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25799,7 +25928,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25817,7 +25946,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25835,7 +25964,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25853,7 +25982,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25871,7 +26000,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -25889,7 +26018,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26016,7 +26145,7 @@ var Exports = function (_React$Component) {
 exports.default = Exports;
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26081,7 +26210,7 @@ var Home = function (_React$Component) {
 exports.default = Home;
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26099,7 +26228,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26117,7 +26246,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 140 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26125,7 +26254,7 @@ module.exports = {
 
 function fragmentSource() {
 
-    var fsSource = '\n\n    precision mediump float;\n\n    uniform vec3 u_colour;\n    \n    void main(void) {\n        gl_FragColor = vec4(u_colour, 1.0);\n    }\n    \n    ';
+    var fsSource = '\n\n    precision mediump float;\n\n    uniform vec3 u_colour;\n    \n    varying vec3 v_w_position;\n    \n    void main(void) {\n\n        //TODO: this fix is specific to IronMan shader to reduce glow at rear\n        float ga = clamp(step(0.0, v_w_position.z), 0.15, 1.0);\n\n        gl_FragColor = vec4(u_colour, 1.0) * ga;\n    }\n    \n    ';
 
     return fsSource;
 };
@@ -26135,7 +26264,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 141 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26143,7 +26272,7 @@ module.exports = {
 
 function vertexSource() {
 
-    var vsSource = '\n\n    attribute vec3 a_position;\n    \n    uniform mat4 u_model_view_matrix;\n    uniform mat4 u_projection_matrix;\n    \n    void main(void) {\n        gl_Position = u_projection_matrix * u_model_view_matrix * vec4(a_position, 1.0);\n    }\n\n    ';
+    var vsSource = '\n\n    attribute vec3 a_position;\n    \n    uniform mat4 u_model_view_matrix;\n    uniform mat4 u_projection_matrix;\n\n    varying vec3 v_w_position;\n    \n    void main(void) {\n        v_w_position = a_position;\n        gl_Position = u_projection_matrix * u_model_view_matrix * vec4(a_position, 1.0);\n    }\n\n    ';
 
     return vsSource;
 }
@@ -26153,7 +26282,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 142 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26171,7 +26300,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 143 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26189,7 +26318,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 144 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26207,7 +26336,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 145 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26225,7 +26354,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 146 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26243,7 +26372,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 147 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26261,7 +26390,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 148 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26279,7 +26408,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 149 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26297,7 +26426,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 150 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26315,7 +26444,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 151 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26333,7 +26462,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 152 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26357,7 +26486,7 @@ var ReactDOM = __webpack_require__(99);
 })();
 
 /***/ }),
-/* 153 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26438,7 +26567,7 @@ var ShauLink = function (_React$Component) {
 exports.default = ShauLink;
 
 /***/ }),
-/* 154 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26454,7 +26583,7 @@ var _apiutils = __webpack_require__(57);
 
 var _apiutils2 = _interopRequireDefault(_apiutils);
 
-var _shaulink = __webpack_require__(153);
+var _shaulink = __webpack_require__(154);
 
 var _shaulink2 = _interopRequireDefault(_shaulink);
 
@@ -26570,7 +26699,7 @@ var ShauLinks = function (_React$Component) {
 exports.default = ShauLinks;
 
 /***/ }),
-/* 155 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26708,7 +26837,7 @@ var ShauNavBar = function (_React$Component) {
 exports.default = ShauNavBar;
 
 /***/ }),
-/* 156 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -26913,7 +27042,6 @@ module.exports = {
 };
 
 /***/ }),
-/* 157 */,
 /* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 

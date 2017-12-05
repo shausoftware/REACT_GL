@@ -7,6 +7,7 @@ function fragmentSource() {
     precision mediump float;
     
     #define FAR 400.0
+    #define EPS 0.005
     #define MOD3 vec3(0.1031, 0.11369, 0.13787)
     #define SAMPLES 16
     #define INTENSITY 1.
@@ -18,6 +19,7 @@ function fragmentSource() {
     uniform sampler2D u_depth_colour_texture;
     uniform sampler2D u_ssao_texture;  
     uniform sampler2D u_glow_map_texture;  
+    uniform sampler2D u_reflection_texture;
     uniform float u_light_strength;
     uniform vec3 u_colour;
     uniform float u_specular;
@@ -32,7 +34,10 @@ function fragmentSource() {
     varying vec4 v_shadow_position;
     varying vec3 v_position;
     varying vec3 v_normal;
-    
+    varying vec3 v_w_position;
+    varying vec3 v_w_normal;
+    varying float v_discard;
+
     //Spiral AO logic from reinder
     //https://www.shadertoy.com/view/Ms33WB
 
@@ -137,64 +142,55 @@ function fragmentSource() {
         }
         amountInLight /= 9.0;
 
-        return 0.2 + amountInLight * 0.8;
+        return 0.3 + amountInLight * 0.7;
+    }
+
+    vec3 bump(vec3 rp, vec3 n, float ds) {
+        vec2 e = vec2(EPS, 0.0);
+        float n0 = noise(rp);
+        vec3 d = vec3(noise(rp + e.xyy) - n0, noise(rp + e.yxy) - n0, noise(rp + e.yyx) - n0) / e.x;
+        n = normalize(n - d * 0.5 / sqrt(ds));
+        return n;
     }
 
     void main(void) {
 
         vec3 pc = vec3(0.0); //pixel colour
 
-        vec3 pos = v_position;
+        vec2 iResolution = vec2(640.0, 480.0);
+        vec2 uv = gl_FragCoord.xy / iResolution.xy;
+
+        vec3 colour = u_colour;
+        vec3 pos = v_w_position;
         vec3 eye = u_eye_position;
-        vec3 ld = normalize(u_light_position - pos); //light direction        
+        vec3 n = v_w_normal;
+        vec3 ld = normalize(u_light_position - pos); //light direction     
         float lt = length(u_light_position - pos); //distance to light
         vec3 rd = normalize(pos - eye); //eye - hit position ray direction 
-        vec3 rrd = reflect(rd, v_normal); //relected ray direction
-        vec3 e = -normalize(pos); 
-        vec3 h =  normalize(ld + e);
-        float diff = max(dot(ld, v_normal), 0.3); //diffuse
-        float spec = pow(max(dot(v_normal, h), 0.0), 22.0); //specular
-        float fres = 0.0;
-        if (length(v_normal) > 0.0) {
-            fres = pow(clamp(dot(v_normal, rd) + 1.0, 0.0, 1.0), 4.0); // fresnel
-        }
-        float atten = 1.0 / (1.0 + lt * lt * 0.02); //light attenuation
+        float dt = length(pos - eye); //distance from eye to surface
 
-        pc = u_colour * diff;
-        /*
+        vec4 reflection = texture2D(u_reflection_texture, uv);
+
         if (u_tex == 1.0) {
-            pc *= noise(pos * 20.0);
+            //floor
+            n = bump(pos * 10.0, n, dt);
+            //reflection
+            //reflection.xyz /= 1.0 + reflection.w * 0.4;
+            colour = mix(colour, reflection.xyz, 1.0 / (1.0 + reflection.w * 0.5));
         }
-        */
-        pc += vec3(0.02, 0.0, 0.2) * 0.6 * clamp(-v_normal.y, 0.0, 1.0); //uplight
-        pc += vec3(0.8, 0.8, 1.0) * 0.03 * clamp(v_normal.y, 0.0, 1.0); //downlight
+
+        float diff = max(dot(ld, n), 0.05); //diffuse
+        float spec = pow(max(dot(reflect(-ld, n), -rd), 0.0), 32.0); //specular
+        float fres = pow(clamp(dot(n, rd) + 1.0, 0.0, 1.0), 64.0); // fresnel
+        float atten = 1.0 / (1.0 + lt * lt * 0.01); //light attenuation
+
+        pc = colour * diff;
+
+        pc += vec3(0.0, 0.2, 0.02) * 0.4 * clamp(-n.y, 0.0, 1.0) * u_specular; //uplight
+        pc += vec3(1.0) * spec * u_specular;
+        pc = mix(pc, vec3(0.9, 0.7, 1.0) * fres * 0.3, u_fresnel * 0.5);
         pc *= atten;
-        pc += vec3(0.8, 0.8, 1.0) * spec * u_specular;
-        pc += vec3(0.8, 0.8, 1.0) * fres * u_fresnel;
         
-        //reflections from ceiling
-        if (u_reflect > 0.0) {
-            vec3 rpc = vec3(0.0);
-            float rt = 0.0; //light attenuation
-            vec3 co = vec3(0.0, 18.0, 0.0);
-            vec3 cn = vec3(0.0, -1.0, 0.0);
-            float ct = planeIntersection(pos, rrd, cn, co);
-            if (ct > 0.0 && ct < FAR) {
-                vec3 rrp = pos + rrd * ct;
-                float mz = mod(rrp.z, 16.0) - 8.0;
-                rpc = mz > 0.0 ? vec3(1.0) : vec3(0.0);
-                rt = 1.0 / (1.0 + ct * ct * 0.05);  
-                rpc *= rt * clamp(v_normal.y, 0.0, 1.0);          
-            }
-            pc += rpc * u_reflect;
-        }
-
-        float alpha = 1.0;
-        //transparency
-        if (u_transparency > 0.0) {
-            alpha = 0.5;
-        }
-
         //shadows
         if (u_shadow > 0.0) {
             float amountInLight = pcfFilter();
@@ -202,22 +198,20 @@ function fragmentSource() {
         }
 
         //ssao
-        vec2 iResolution = vec2(640.0, 480.0);
-        vec2 uv = gl_FragCoord.xy / iResolution.xy;
         vec3 p = getPosition(uv);
-        vec3 n = normalize(v_normal);
         float ao = 0.0;
         float rad = SAMPLE_RAD / p.z;
-        ao = spiralAO(uv, p, n, rad);
+        ao = spiralAO(uv, p, v_normal, rad);
         ao = 1.0 - ao * INTENSITY;
         //gl_FragColor = vec4(ao, ao, ao, 1.0);
         pc *= ao;
 
-        pc *= clamp(u_light_strength, 0.1, 1.0);
-
-        vec4 sceneColour = vec4(sqrt(clamp(pc, 0.0, 1.0)), alpha);          
         vec4 glowColour = texture2D(u_glow_map_texture, uv);
-        glowColour *= 0.8;
+        glowColour *= 0.8;    
+
+        pc *= clamp(u_light_strength, 0.3, 1.0);
+
+        vec4 sceneColour = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);          
 
         gl_FragColor = clamp((glowColour + sceneColour) - (glowColour * sceneColour), 0.0, 1.0);
     }

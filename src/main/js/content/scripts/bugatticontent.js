@@ -12,14 +12,19 @@ import BugattiFragmentShader from '../../content/shaders/bugatti_fragment_shader
 var glm = require('gl-matrix');
 
 var shadowDepthTextureSize = 4096;
-var lightPosition = [-3.0, 8.0, 2.0];
+var lightPosition = [-3.5, 8.0, 6.0];
 
 function getTitle() {
     return "Bugatti";
 }
 
 function getDescription() {
-    var description = "Bugatti model by Kimzauto.";
+    var description = "This is my first attempt at loading at loading and rendering " +
+                      "a reasonably complex OBJ model file. I had to create a pre-processor that " +
+                      "optimises and breaks up the geometry by material assignment " +
+                      "before parsing to JSON. " +
+                      "The excellent Bugatti model is by Kimzauto. The lighting uses screen space " +
+                      "ambient occlusion, shadow maps and opacity.";
     return description;
 }
 
@@ -54,7 +59,6 @@ function initGLContent(gl, mBuffExt) {
             fresnelUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_fresnel'),
             texUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_tex'),
             lightPositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_light_position'),
-            dofUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_dof'),
             eyePositionUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_eye_position'),
             ssaoTextureUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_ssao_texture'),
             yScaleUniformLocation: gl.getUniformLocation(bugattiShaderProgram, 'u_y_scale')
@@ -152,27 +156,27 @@ function loadGLContent(gl, mBuffExt, content) {
                 }                  
             }
 
-            var floorData = [-100.0, -0.1,  100.0,   0.0, 1.0, 0.0,
-                              100.0, -0.1,  100.0,   0.0, 1.0, 0.0,
-                              100.0, -0.1, -100.0,   0.0, 1.0, 0.0,
-                             -100.0, -0.1,  100.0,   0.0, 1.0, 0.0,
-                              100.0, -0.1, -100.0,   0.0, 1.0, 0.0,
-                             -100.0, -0.1, -100.0,   0.0, 1.0, 0.0];
+            var floorData = [-100.0, -0.15,  100.0,   0.0, 1.0, 0.0,
+                              100.0, -0.15,  100.0,   0.0, 1.0, 0.0,
+                              100.0, -0.15, -100.0,   0.0, 1.0, 0.0,
+                             -100.0, -0.15,  100.0,   0.0, 1.0, 0.0,
+                              100.0, -0.15, -100.0,   0.0, 1.0, 0.0,
+                             -100.0, -0.15, -100.0,   0.0, 1.0, 0.0];
             const floorInterleavedBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, floorInterleavedBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(floorData), gl.STATIC_DRAW);
             var floorBuffer =  {partid: 'floor',
                                 interleavedBuffer: floorInterleavedBuffer,
                                 indexcount: 6,
-                                basecolour: [0.05, 0.0, 0.3],
+                                basecolour: [0.00, 0.3, 0.05],
                                 metalcolour: [0.0, 0.0, 0.0],
                                 emission: 0.0,
-                                specular: 0.0,
+                                specular: 0.6,
                                 transparency: 0.0,
                                 reflect: 0.0,
                                 shadow: 1.0,
                                 fresnel: 0.0,
-                                textureid: 0.0};    
+                                textureid: 1.0};    
 
             content.buffers.modelBuffers = modelBuffers;
             content.buffers.glassBuffers = glassBuffers
@@ -187,7 +191,7 @@ function renderGLContent(gl, content, dt) {
 
     var cameraPosition = glm.vec3.fromValues(7.0, 3.0, 9.0);
     var target = glm.vec3.fromValues(0.0, 0.0, 0.5);
-    glm.vec3.rotateY(cameraPosition, cameraPosition, target, dt * 0.02);
+    glm.vec3.rotateY(cameraPosition, cameraPosition, target, dt * 0.04);
 
     var camera = {
         position: cameraPosition,
@@ -200,11 +204,11 @@ function renderGLContent(gl, content, dt) {
     var lightProjectionMatrix = glm.mat4.create();
     glm.mat4.ortho(lightProjectionMatrix,                   
                     -10.0,
-                    10.0,
+                     10.0,
                     -10.0,
-                    10.0,
+                     10.0,
                     -10.0, 
-                    20.0);
+                     20.0);
     var cameraProjectionMatrix = glm.mat4.create();
     glm.mat4.perspective(cameraProjectionMatrix,
                             camera.fov,
@@ -249,7 +253,7 @@ function renderGLContent(gl, content, dt) {
                 content.buffers,
                 content.framebuffers.imageFramebuffer.texture,
                 content.framebuffers.ssaoFramebuffer.texture,
-                0.1);
+                0.05);
 }
 
 function drawShadowMap(gl, programInfo, buffers, cameraMatrices, depthRez) {

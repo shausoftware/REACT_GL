@@ -8,11 +8,13 @@ const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
 import ModelVertexShader from '../../shaders/model_vertex_shader';
 import IronManFragmentShader from '../../content/shaders/iron_man_fragment_shader';
+import IronManReflectionFragmentShader from '../../content/shaders/iron_man_reflection_fragment_shader';
 
 var glm = require('gl-matrix');
 
 var shadowDepthTextureSize = 4096;
-var lightPosition = [-3.0, 15.0, 2.0];
+var lightPosition = [-3.0, 15.0, 4.0];
+var reflectionLightPosition = [-3.0, -15.0, 4.0];
 
 var blurAmount = 8; //0 - 10
 var blurScale = 0.9;
@@ -23,7 +25,10 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Iron Man model by Deadcode3.";
+    var description = "This is my second attempt at loading and rendering an OBJ model. " +
+                      "The Iron Man model is by Deadcode3. This time I tried adding " +
+                      "a glow effect to the eyes and transformer and some planar " +
+                      "reflections in the floor.";
     return description;
 }
 
@@ -62,7 +67,37 @@ function initGLContent(gl, mBuffExt) {
             eyePositionUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_eye_position'),
             ssaoTextureUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_ssao_texture'),
             glowMapTextureUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_glow_map_texture'),
+            reflectionTextureUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_reflection_texture'),
             yScaleUniformLocation: gl.getUniformLocation(ironManShaderProgram, 'u_y_scale')
+        }
+    }
+
+    //bugatti reflection program
+    const ironManReflectionFsSource = IronManReflectionFragmentShader.fragmentSource();
+    const ironManReflectionShaderProgram = ShauGL.initShaderProgram(gl, modelVsSource, ironManReflectionFsSource);
+    const ironManReflectionProgramInfo = {
+        program: ironManReflectionShaderProgram,
+        attribLocations: {
+            positionAttributeLocation: gl.getAttribLocation(ironManReflectionShaderProgram, 'a_position'),
+            normalAttributeLocation: gl.getAttribLocation(ironManReflectionShaderProgram, 'a_normal')
+        },
+        uniformLocations: {
+            modelViewMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_model_view_matrix'),
+            projectionMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_projection_matrix'),
+            smModelViewMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_sm_model_view_matrix'),
+            smProjectionMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_sm_projection_matrix'),
+            normalsMatrixUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_normals_matrix'),
+            colourUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_colour'),
+            specularUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_specular'),
+            transparencyUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_transparency'),
+            reflectUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_reflect'),
+            shadowUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_shadow'),
+            fresnelUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_fresnel'),
+            texUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_tex'),
+            lightPositionUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_light_position'),
+            lightStrengthUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_light_strength'),
+            eyePositionUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_eye_position'),
+            yScaleUniformLocation: gl.getUniformLocation(ironManReflectionShaderProgram, 'u_y_scale')
         }
     }
 
@@ -73,6 +108,7 @@ function initGLContent(gl, mBuffExt) {
     const postProcessProgramInfo = ShauGL.initPostProcessProgram(gl);
 
     var programInfos = {renderProgramInfo: ironManProgramInfo,
+                        reflectionProgramInfo: ironManReflectionProgramInfo,
                         shadowMapProgramInfo: shadowMapProgramInfo,
                         glowProgramInfo: glowProgramInfo,
                         blurProgramInfo: blurProgramInfo,
@@ -114,13 +150,15 @@ function initGLContent(gl, mBuffExt) {
     var glowMapFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
     var blurHFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
     var blurVFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
+    var reflectionFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
     var imageFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
-                            
+    
     var framebuffers = {shadowMapFramebuffer: shadowMapFramebuffer,
                         ssaoFramebuffer: ssaoFramebuffer,
                         glowMapFramebuffer: glowMapFramebuffer,
                         blurHFramebuffer: blurHFramebuffer,
                         blurVFramebuffer: blurVFramebuffer,
+                        reflectionFramebuffer: reflectionFramebuffer,
                         imageFramebuffer: imageFramebuffer};
 
     return {programInfos: programInfos,
@@ -170,26 +208,26 @@ function loadGLContent(gl, mBuffExt, content) {
             }
         
             var floorData = [-200.0, -0.1,  200.0,   0.0, 1.0, 0.0,
-                                200.0, -0.1,  200.0,   0.0, 1.0, 0.0,
-                                200.0, -0.1, -200.0,   0.0, 1.0, 0.0,
-                                -200.0, -0.1,  200.0,   0.0, 1.0, 0.0,
-                                200.0, -0.1, -200.0,   0.0, 1.0, 0.0,
-                                -200.0, -0.1, -200.0,   0.0, 1.0, 0.0];
+                              200.0, -0.1,  200.0,   0.0, 1.0, 0.0,
+                              200.0, -0.1, -200.0,   0.0, 1.0, 0.0,
+                             -200.0, -0.1,  200.0,   0.0, 1.0, 0.0,
+                              200.0, -0.1, -200.0,   0.0, 1.0, 0.0,
+                             -200.0, -0.1, -200.0,   0.0, 1.0, 0.0];
             const floorInterleavedBuffer = gl.createBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, floorInterleavedBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(floorData), gl.STATIC_DRAW);
             var floorBuffer =  {partid: 'floor',
                                 interleavedBuffer: floorInterleavedBuffer,
                                 indexcount: 6,
-                                basecolour: [0.05, 0.0, 0.3],
+                                basecolour: [0.0, 0.3, 0.05],
                                 metalcolour: [1.0, 1.0, 1.0],
                                 emission: 0.0,
-                                specular: 0.0,
+                                specular: 0.8,
                                 transparency: 0.0,
                                 reflect: 0.0,
                                 shadow: 1.0,
                                 fresnel: 0.0,
-                                textureid: 0.0};    
+                                textureid: 1.0};    
         
             content.buffers.modelBuffers = modelBuffers;
             content.buffers.glassBuffers = glassBuffers
@@ -202,8 +240,8 @@ function loadGLContent(gl, mBuffExt, content) {
 
 function renderGLContent(gl, content, dt) {
 
-    var cameraPosition = glm.vec3.fromValues(4.0, 10.0, 5.0);
-    var target = glm.vec3.fromValues(0.0, 6.0, 0.5);
+    var cameraPosition = glm.vec3.fromValues(4.0, 10.0 + Math.sin(dt * 0.2) * 2.0, 10.0 + Math.sin(dt * 0.2) * 2.0);
+    var target = glm.vec3.fromValues(0.0, 5.0 + Math.cos(dt * 0.2) * .0, 0.5);
     glm.vec3.rotateY(cameraPosition, cameraPosition, target, dt * 0.2);
 
     var camera = {
@@ -232,29 +270,33 @@ function renderGLContent(gl, content, dt) {
     var shadowMapCameraMatrices = ShauGL.setupCamera(lightPosition, camera.target, lightProjectionMatrix);
     var lightStrength = Math.sin(dt * 0.2);
 
-    // Draw to our off screen drawing buffer for shadow map
+    //shadow map
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.shadowMapFramebuffer.framebuffer);
     drawShadowMap(gl, 
                   content.programInfos.shadowMapProgramInfo, 
                   content.buffers, 
                   shadowMapCameraMatrices,  
                   shadowDepthTextureSize);
+    //*/
 
+    //ssao
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.ssaoFramebuffer.framebuffer);
     drawSSAODepthMap(gl, 
                      content.programInfos.ssaoProgramInfo, 
                      content.buffers,
                      viewCameraMatrices, 
                      camera.far);
+    //*/
 
-    //glow map to offscreen buffer
+    //glow map
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.glowMapFramebuffer.framebuffer);
     drawGlowMap(gl,
                 content.programInfos.glowProgramInfo,
                 content.buffers,
                 viewCameraMatrices);
-
-    //then box blur glow map to offscreen buffer
+    //*/
+         
+    //box blur glow map
     //horizontal pass
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.blurHFramebuffer.framebuffer);
     blur(gl, 
@@ -275,6 +317,20 @@ function renderGLContent(gl, content, dt) {
          blurScale, 
          blurStrength, 
          1);
+    //*/
+
+    //reflection     
+    gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.reflectionFramebuffer.framebuffer);
+    //gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    drawReflectedScene(gl, 
+                        content.programInfos.reflectionProgramInfo, 
+                        content.buffers, 
+                        viewCameraMatrices,
+                        shadowMapCameraMatrices,
+                        reflectionLightPosition,
+                        lightStrength,
+                        camera);
+    //*/
 
     //draw scene
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.imageFramebuffer.framebuffer);
@@ -287,10 +343,12 @@ function renderGLContent(gl, content, dt) {
               content.framebuffers.shadowMapFramebuffer.texture,
               content.framebuffers.ssaoFramebuffer.texture,
               content.framebuffers.blurVFramebuffer.texture,
+              content.framebuffers.reflectionFramebuffer.texture,
               lightPosition,
               lightStrength,
               camera);
-    
+    //*/
+
     //post processing
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     postProcess(gl,
@@ -298,7 +356,8 @@ function renderGLContent(gl, content, dt) {
                 content.buffers,
                 content.framebuffers.imageFramebuffer.texture,
                 content.framebuffers.ssaoFramebuffer.texture,
-                0.3);
+                0.05);
+    //*/            
 }
 
 function drawShadowMap(gl, programInfo, buffers, cameraMatrices, depthRez) {
@@ -430,6 +489,91 @@ function drawSSAODepthMap(gl, programInfo, buffers, viewCameraMatrices, far) {
     gl.drawArrays(gl.TRIANGLES, 0, buffers.floorBuffer.indexcount);                       
 }
      
+function drawReflectedScene(gl, 
+                            programInfo, 
+                            buffers,
+                            viewCameraMatrices,
+                            shadowMapCameraMatrices,
+                            lightPosition,
+                            lightStrength,
+                            camera) {
+
+    gl.useProgram(programInfo.program);
+
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.enable(gl.DEPTH_TEST); // Enable depth testing
+    gl.depthFunc(gl.LESS); // Near things obscure far things            
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    //camera matrices
+    gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrixUniformLocation,
+            false,
+            viewCameraMatrices.projectionMatrix);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.modelViewMatrixUniformLocation,
+            false,
+            viewCameraMatrices.modelViewMatrix);
+    //shadow map matrices
+    gl.uniformMatrix4fv(programInfo.uniformLocations.smProjectionMatrixUniformLocation,
+            false,
+            shadowMapCameraMatrices.projectionMatrix);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.smModelViewMatrixUniformLocation,
+            false,
+            shadowMapCameraMatrices.modelViewMatrix);
+    //normals matrix
+    gl.uniformMatrix4fv(programInfo.uniformLocations.normalsMatrixUniformLocation,
+            false,
+            viewCameraMatrices.normalMatrix);
+
+    //light position
+    gl.uniform3fv(programInfo.uniformLocations.lightPositionUniformLocation, lightPosition);
+    //light strength
+    gl.uniform1f(programInfo.uniformLocations.lightStrengthUniformLocation, lightStrength);
+    //eye position
+    gl.uniform3fv(programInfo.uniformLocations.eyePositionUniformLocation, camera.position);
+    //y scale
+    gl.uniform1f(programInfo.uniformLocations.yScaleUniformLocation, -1.0);
+
+    //draw model                    
+    for (var i = 0; i < buffers.modelBuffers.length; i++) {
+        //vertices
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.modelBuffers[i].interleavedBuffer);
+        gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 
+                                3, 
+                                gl.FLOAT, 
+                                gl.FALSE, 
+                                Float32Array.BYTES_PER_ELEMENT * 6, 
+                                0);
+        gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
+        //normals
+        gl.vertexAttribPointer(programInfo.attribLocations.normalAttributeLocation, 
+                                3, 
+                                gl.FLOAT, 
+                                gl.FALSE,
+                                Float32Array.BYTES_PER_ELEMENT * 6,
+                                Float32Array.BYTES_PER_ELEMENT * 3);   
+        gl.enableVertexAttribArray(programInfo.attribLocations.normalAttributeLocation);
+
+        //colour
+        gl.uniform3fv(programInfo.uniformLocations.colourUniformLocation, buffers.modelBuffers[i].basecolour);        
+        //specular
+        gl.uniform1f(programInfo.uniformLocations.specularUniformLocation, buffers.modelBuffers[i].specular);        
+        //transparency
+        gl.disable(gl.BLEND);
+        gl.uniform1f(programInfo.uniformLocations.transparencyUniformLocation, buffers.modelBuffers[i].transparency);        
+        //reflectivity
+        gl.uniform1f(programInfo.uniformLocations.reflectUniformLocation, buffers.modelBuffers[i].reflect);        
+        //shadow
+        gl.uniform1f(programInfo.uniformLocations.shadowUniformLocation, buffers.modelBuffers[i].shadow);        
+        //fresnel
+        gl.uniform1f(programInfo.uniformLocations.fresnelUniformLocation, buffers.modelBuffers[i].fresnel);
+        //texture id
+        gl.uniform1f(programInfo.uniformLocations.texUniformLocation, buffers.modelBuffers[i].textureid);
+
+        gl.drawArrays(gl.TRIANGLES, 0, buffers.modelBuffers[i].indexcount);                       
+    }  
+}
+
 function drawScene(gl, 
                     programInfo, 
                     buffers,
@@ -438,6 +582,7 @@ function drawScene(gl,
                     shadowMapTexture,
                     ssaoTexture,
                     glowMapTexture,
+                    reflectionTexture,
                     lightPosition,
                     lightStrength,
                     camera) {
@@ -483,6 +628,11 @@ function drawScene(gl,
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, glowMapTexture);
     gl.uniform1i(programInfo.uniformLocations.glowMapTextureUniformLocation, 2);
+
+    //reflection texture
+    gl.activeTexture(gl.TEXTURE3);
+    gl.bindTexture(gl.TEXTURE_2D, reflectionTexture);
+    gl.uniform1i(programInfo.uniformLocations.reflectionTextureUniformLocation, 3);
     
     //light position
     gl.uniform3fv(programInfo.uniformLocations.lightPositionUniformLocation, lightPosition);
@@ -568,7 +718,7 @@ function drawScene(gl,
         
     gl.drawArrays(gl.TRIANGLES, 0, buffers.floorBuffer.indexcount); 
 }
-    
+
 function postProcess(gl, 
                      programInfo, 
                      buffers,

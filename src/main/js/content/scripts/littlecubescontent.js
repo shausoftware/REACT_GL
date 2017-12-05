@@ -13,7 +13,8 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Little Cubes.";
+    var description = "This is my favourite shader that I've created so far. It's rendered " +
+                      " using simple raytracing techniques.";
     return description;
 }
 

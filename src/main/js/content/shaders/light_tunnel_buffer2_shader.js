@@ -17,6 +17,7 @@ function fragmentSource() {
         #define FAR 40.0 
         #define PI 3.14159265359
         #define T u_time
+        #define NTILES 16.0
 
         vec3 lp = vec3(0.0, 0.0, 4.0); //light position
 
@@ -34,7 +35,7 @@ function fragmentSource() {
 
             rp.xy -= path(rp.z).xy;
             rp.xy *= rot(T);            
-            float tun = 1.3 - length(rp.xy);
+            float tun = 1.4 - length(rp.xy);
             
             //polar coordinates
             float a = atan(rp.y, rp.x) / 6.2831853;
@@ -114,10 +115,20 @@ function fragmentSource() {
                 vec3 ld = normalize(lp - rp);
                 float diff = max(dot(ld, n), 0.05);
 
+                float aa = floor((t.z + 0.5) * NTILES);
+                vec2 tileid = vec2(t.y, aa);
+                vec2 mx1 = mod(tileid, 2.0) - 1.0;
+                if (mx1.x * mx1.y > 0.0) {
+                    if (mod(t.z, 0.01) > 0.008) {
+                        pc = vec3(1.0, 1.0, 0.0) * diff * 0.2;
+                        mint = t.x;
+                    }
+                }
+
                 float mz = mod(rp.z - sin(T * 0.5) * 20.0, 40.0);
                 if (mz > 39.0 && mz < 39.4 || mz > 39.6) {
                     if (mod(t.z, 0.05) > 0.025) {
-                        pc = vec3(0.0, 1.0, 0.0);
+                        pc = vec3(1.0, 1.0, 0.0) * diff * 0.5;
                         mint = t.x;
                     }
                 }

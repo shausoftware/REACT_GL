@@ -18,6 +18,7 @@ function vertexSource() {
     varying vec3 v_position;
     varying vec3 v_normal;    
     varying vec3 v_w_position;
+    varying vec3 v_w_normal;
     varying float v_discard;
 
     // Used to normalize our coordinates from clip space to (0 - 1)
@@ -26,8 +27,12 @@ function vertexSource() {
     
     void main(void) {
         vec4 pos = vec4(a_position, 1.0);
-        vec4 n = vec4(a_normal, 1.0);
-        v_discard = u_y_scale > 0.0 ? 0.0 : 1.0;
+        v_discard = 0.0;
+        v_w_normal = a_normal;
+        if (u_y_scale < 0.0) {
+            v_discard = 1.0;
+            v_w_normal.y *= -1.0;
+        }
         pos.y *= u_y_scale;
         v_w_position = pos.xyz;
         v_position = (u_model_view_matrix * pos).xyz;

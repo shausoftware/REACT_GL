@@ -16,7 +16,8 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Voxel marching.";
+    var description = "Another raymarching shader. This time utilising voxel traversal. " +
+                      "It was also my first attempt at using framebuffers for off-screen renndering.";
     return description;
 }
 
@@ -61,14 +62,13 @@ function initGLContent(gl, mBuffExt) {
                         
     const buffers = ShauRMGL.initBuffers(gl);
     
-    var renderBuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
-    var framebuffers = {renderBuffer: renderBuffer};
-
-    var bufferTexture = ShauGL.initTexture(gl, gl.canvas.width, gl.canvas.height);
-    var textureInfos = {bufferTexture: bufferTexture};
+    var renderBuffer1 = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
+    var renderBuffer2 = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
+    var framebuffers = {renderBuffer1: renderBuffer1,
+                        renderBuffer2: renderBuffer2};
 
     return {programInfos: programInfos,
-            textureInfos: textureInfos,
+            textureInfos: [],
             buffers: buffers,
             framebuffers: framebuffers};
 }
@@ -82,34 +82,32 @@ function loadGLContent(gl, mBuffExt, content) {
 
 function renderGLContent(gl, content, dt) {
 
-    //TODO: make buffer handling more efficient
-    //render to frame buffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.renderBuffer.framebuffer);
+    //render glow trail
+    gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.renderBuffer1.framebuffer);
     ShauRMGL.drawRMScene(gl, 
                          content.programInfos.bufferProgramInfo, 
                          content.buffers, 
-                         content.textureInfos.bufferTexture,
+                         content.framebuffers.renderBuffer2.texture,
                          undefined,
                          undefined,
                          undefined, 
                          dt);
-
-    //copy data into texture for feedback
-    gl.bindTexture(gl.TEXTURE_2D, content.textureInfos.bufferTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.canvas.width, gl.canvas.height, 0,
-                    gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.copyTexImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 0, 0, gl.canvas.width, gl.canvas.height, 0);
 
     //render to canvas
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     ShauRMGL.drawRMScene(gl, 
                          content.programInfos.renderProgramInfo, 
                          content.buffers, 
-                         content.framebuffers.renderBuffer.texture, 
+                         content.framebuffers.renderBuffer1.texture, 
                          undefined,
                          undefined,
                          undefined,
                          dt);    
+
+    //swap buffers for feedback in trail
+    var tempBuffer = content.framebuffers.renderBuffer1;
+    content.framebuffers.renderBuffer1 = content.framebuffers.renderBuffer2;
+    content.framebuffers.renderBuffer2 = tempBuffer; 
 }
 
 module.exports = {

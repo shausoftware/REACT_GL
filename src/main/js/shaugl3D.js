@@ -187,8 +187,9 @@ function initPostProcessProgram(gl) {
             positionAttributeLocation: gl.getAttribLocation(ppShaderProgram, 'a_position')
         },
         uniformLocations: {
+            dofUniformLocation: gl.getUniformLocation(ppShaderProgram, 'u_dof'),
             imageTextureUniformLocation: gl.getUniformLocation(ppShaderProgram, 'u_image_texture'),
-            ssaoTextureUniformLocation: gl.getUniformLocation(ppShaderProgram, 'u_ssao_texture')            
+            ssaoTextureUniformLocation: gl.getUniformLocation(ppShaderProgram, 'u_ssao_texture'),            
         }
     };
     return ppProgramInfo;
