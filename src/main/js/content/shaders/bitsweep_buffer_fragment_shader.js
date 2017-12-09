@@ -129,68 +129,73 @@ function fragmentSource() {
                 }        
             }
             
-            float steps = 10.0;
-            float wmin = T - steps * STEP_SIZE;
-            wmin -= mod(wmin , STEP_SIZE);
-                
-            //for (float i = 0.0; i < steps + 4.0 * STEP_SIZE; i += 1.0) {
-            for (float i = 0.0; i < 18.0; i += 1.0) {
-                float xidx = wmin + i * STEP_SIZE;
-        
-                //ROW 1
-                float r = rand(vec2(xidx, 0.0));
-                vec3 bn;
-                float bh = 1.0 - r * 1.5;
-                if (bh > 0.0) {
+            vec3 bn = vec3(0.);
+            vec3 bounds = boxIntersection(ro - vec3(T, 0.0, 1.0), rd, vec3(50.0, 1.3, 0.8), bn);
+            if (bounds.x > 0.0) {
+
+                float steps = 10.0;
+                float wmin = T - steps * STEP_SIZE;
+                wmin -= mod(wmin , STEP_SIZE);
+                    
+                //for (float i = 0.0; i < steps + 4.0 * STEP_SIZE; i += 1.0) {
+                for (float i = 0.0; i < 18.0; i += 1.0) {
+                    float xidx = wmin + i * STEP_SIZE;
+            
+                    //ROW 1
+                    float r = rand(vec2(xidx, 0.0));
+                    vec3 bn;
+                    float bh = 1.0 - r * 1.5;
+                    if (bh > 0.0) {
+                        vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 0.0), 
+                                                    rd, 
+                                                    vec3(1.95, bh, 0.45), 
+                                                    bn);
+                        if (box.x > 0.0 && box.x < mint) {
+                            mint = box.x;
+                            minn = bn;
+                            edge = box.z;
+                            id = BRICK;
+                        }  
+                    }
                     vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 0.0), 
                                                 rd, 
-                                                vec3(1.95, bh, 0.45), 
+                                                vec3(2.0, max(bh + 0.05, 0.05), 0.05), 
                                                 bn);
                     if (box.x > 0.0 && box.x < mint) {
                         mint = box.x;
                         minn = bn;
                         edge = box.z;
-                        id = BRICK;
-                    }  
-                }
-                vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 0.0), 
-                                            rd, 
-                                            vec3(2.0, max(bh + 0.05, 0.05), 0.05), 
-                                            bn);
-                if (box.x > 0.0 && box.x < mint) {
-                    mint = box.x;
-                    minn = bn;
-                    edge = box.z;
-                    id = LIGHT1;
-                }
-                
-                //ROW 2
-                r = rand(vec2(xidx, 2.0));
-                bh = 1.0 - r * 1.2;
-                if (bh > 0.0) {
-                    vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 2.0), 
+                        id = LIGHT1;
+                    }
+                    
+                    //ROW 2
+                    r = rand(vec2(xidx, 2.0));
+                    bh = 1.0 - r * 1.2;
+                    if (bh > 0.0) {
+                        vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 2.0), 
+                                                    rd, 
+                                                    vec3(1.95, bh, 0.45), 
+                                                    bn);
+                        if (box.x > 0.0 && box.x < mint) {
+                            mint = box.x;
+                            minn = bn;
+                            edge = box.z;
+                            id = BRICK;
+                        }  
+                    }
+                    box = boxIntersection(ro - vec3(xidx, 0.0, 2.0), 
                                                 rd, 
-                                                vec3(1.95, bh, 0.45), 
+                                                vec3(2.0, max(bh + 0.05, 0.05), 0.05), 
                                                 bn);
                     if (box.x > 0.0 && box.x < mint) {
                         mint = box.x;
                         minn = bn;
                         edge = box.z;
-                        id = BRICK;
-                    }  
-                }
-                box = boxIntersection(ro - vec3(xidx, 0.0, 2.0), 
-                                            rd, 
-                                            vec3(2.0, max(bh + 0.05, 0.05), 0.05), 
-                                            bn);
-                if (box.x > 0.0 && box.x < mint) {
-                    mint = box.x;
-                    minn = bn;
-                    edge = box.z;
-                    id = LIGHT2;
+                        id = LIGHT2;
+                    }
                 }
             }
-            
+                        
             return Scene(mint, id, minn, edge);
         }
 
