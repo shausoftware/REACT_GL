@@ -2,11 +2,12 @@
 
 import LittleCubesContent from './content/scripts/littlecubescontent';
 import IronManContent from './content/scripts/ironmancontent';
-import TunnelContent from './content/scripts/tunnelcontent';
+import BitsweepContent from './content/scripts/bitsweepcontent';
 import BugattiContent from './content/scripts/bugatticontent';
 import DiscoWallContent from './content/scripts/discowallcontent';
 import ParticleContent from './content/scripts/particlecontent';
 import VoxelBridgeContent from './content/scripts/voxelbridgecontent';
+import MobiusSphereContent from './content/scripts/mobiusspherecontent';
 
 const link1 = {title: 'Source Code',
                description: "The source code to this site and a few other projects I'm working on can be found in my Github repository.",
@@ -46,7 +47,7 @@ function loadContentItemsForPage(navUri) {
         contentItemsCurrentPage = 1;
         contentItems.push(LittleCubesContent);
         contentItems.push(IronManContent);
-        contentItems.push(TunnelContent);
+        contentItems.push(BitsweepContent);
     } 
     
     if ('prev' === navUri) {
@@ -57,7 +58,7 @@ function loadContentItemsForPage(navUri) {
             //page 1
             contentItems.push(LittleCubesContent);
             contentItems.push(IronManContent);
-            contentItems.push(TunnelContent);
+            contentItems.push(BitsweepContent);
         } else {
             //page 2 - only three pages at the moment
             contentItems.push(BugattiContent);
@@ -76,7 +77,8 @@ function loadContentItemsForPage(navUri) {
         }
         if (contentItemsCurrentPage === CI_PAGES) {
             //page 3
-            contentItems.push( VoxelBridgeContent);
+            contentItems.push(VoxelBridgeContent);
+            contentItems.push(MobiusSphereContent);
             pageLinks = {first: {href: 'first'},
                          prev: {href: 'prev'},
                          last: {href: 'last'}};
@@ -95,6 +97,7 @@ function loadContentItemsForPage(navUri) {
     if ('last' === navUri) {
         contentItemsCurrentPage = CI_PAGES;        
         contentItems.push(VoxelBridgeContent);
+        contentItems.push(MobiusSphereContent);
         pageLinks = {first: {href: 'first'},
                      prev: {href: 'prev'},
                      last: {href: 'last'}};

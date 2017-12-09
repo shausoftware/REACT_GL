@@ -23789,15 +23789,7 @@ module.exports = __webpack_require__.p + "images/firstattempt.png";
 module.exports = __webpack_require__.p + "images/ironman.png";
 
 /***/ }),
-/* 110 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = __webpack_require__.p + "images/lighttunnel.png";
-
-/***/ }),
+/* 110 */,
 /* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25475,140 +25467,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 119 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _simple_vertex_shader = __webpack_require__(19);
-
-var _simple_vertex_shader2 = _interopRequireDefault(_simple_vertex_shader);
-
-var _light_tunnel_fragment_shader = __webpack_require__(128);
-
-var _light_tunnel_fragment_shader2 = _interopRequireDefault(_light_tunnel_fragment_shader);
-
-var _light_tunnel_buffer_shader = __webpack_require__(127);
-
-var _light_tunnel_buffer_shader2 = _interopRequireDefault(_light_tunnel_buffer_shader);
-
-var _light_tunnel_buffer2_shader = __webpack_require__(126);
-
-var _light_tunnel_buffer2_shader2 = _interopRequireDefault(_light_tunnel_buffer2_shader);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var ShauGL = __webpack_require__(14); //general 3D utils
-var ShauRMGL = __webpack_require__(17); //raymarching utils
-
-var lightTunnelSrc = __webpack_require__(110);
-
-function getTitle() {
-    return "Tunnel";
-}
-
-function getDescription() {
-    var description = "WIP.";
-    return description;
-}
-
-function getSnapshotImage() {
-    return lightTunnelSrc;
-}
-
-function initGLContent(gl, mBuffExt) {
-
-    var vsSource = _simple_vertex_shader2.default.vertexSource();
-    var fsSource = _light_tunnel_fragment_shader2.default.fragmentSource();
-    var fsBufferSource = _light_tunnel_buffer_shader2.default.fragmentSource();
-    var fsBuffer2Source = _light_tunnel_buffer2_shader2.default.fragmentSource();
-
-    var shaderProgram = ShauGL.initShaderProgram(gl, vsSource, fsSource);
-    var bufferProgram = ShauGL.initShaderProgram(gl, vsSource, fsBufferSource);
-    var buffer2Program = ShauGL.initShaderProgram(gl, vsSource, fsBuffer2Source);
-
-    var programInfo = {
-        program: shaderProgram,
-        attribLocations: {
-            positionAttributePosition: gl.getAttribLocation(shaderProgram, 'a_position')
-        },
-        uniformLocations: {
-            texture1UniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture1'),
-            texture2UniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture2'),
-            resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
-        }
-    };
-
-    var bufferProgramInfo = {
-        program: bufferProgram,
-        attribLocations: {
-            positionAttributePosition: gl.getAttribLocation(bufferProgram, 'a_position')
-        },
-        uniformLocations: {
-            resolutionUniformLocation: gl.getUniformLocation(bufferProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(bufferProgram, 'u_time')
-        }
-    };
-
-    var buffer2ProgramInfo = {
-        program: buffer2Program,
-        attribLocations: {
-            positionAttributePosition: gl.getAttribLocation(buffer2Program, 'a_position')
-        },
-        uniformLocations: {
-            resolutionUniformLocation: gl.getUniformLocation(buffer2Program, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(buffer2Program, 'u_time')
-        }
-    };
-
-    var programInfos = { renderProgramInfo: programInfo,
-        bufferProgramInfo: bufferProgramInfo,
-        buffer2ProgramInfo: buffer2ProgramInfo };
-
-    var buffers = ShauRMGL.initBuffers(gl);
-    var framebuffers = { renderBuffer: ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0),
-        renderBuffer2: ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0) };
-
-    return { programInfos: programInfos,
-        textureInfos: [],
-        buffers: buffers,
-        framebuffers: framebuffers };
-}
-
-function loadGLContent(gl, mBuffExt, content) {
-    //do nothing
-    return new Promise(function (resolve) {
-        resolve(content);
-    });
-}
-
-function renderGLContent(gl, content, dt) {
-
-    //render to frame buffer 1
-    gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.renderBuffer.framebuffer);
-    ShauRMGL.drawRMScene(gl, content.programInfos.bufferProgramInfo, content.buffers, undefined, undefined, undefined, undefined, dt);
-
-    //render to frame buffer 2
-    gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.renderBuffer2.framebuffer);
-    ShauRMGL.drawRMScene(gl, content.programInfos.buffer2ProgramInfo, content.buffers, undefined, undefined, undefined, undefined, dt);
-
-    //render to canvas
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    ShauRMGL.drawRMScene(gl, content.programInfos.renderProgramInfo, content.buffers, content.framebuffers.renderBuffer.texture, content.framebuffers.renderBuffer2.texture, undefined, undefined, dt);
-}
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};
-
-/***/ }),
+/* 119 */,
 /* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -25820,60 +25679,9 @@ module.exports = {
 };
 
 /***/ }),
-/* 126 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function fragmentSource() {
-
-    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define EPS 0.005\n        #define FAR 40.0 \n        #define PI 3.14159265359\n        #define T u_time\n        #define NTILES 16.0\n\n        vec3 lp = vec3(0.0, 0.0, 4.0); //light position\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 path(float t) {\n              float a = sin(t * 3.14159265/ 16.0 + 1.5707963 * 1.0);\n              float b = cos(t * 3.14159265 / 16.0);\n              return vec3(a * 2.0, b * a, t);    \n        }\n\n        vec3 map(vec3 rp) {\n\n            rp.xy -= path(rp.z).xy;\n            rp.xy *= rot(T);            \n            float tun = 1.4 - length(rp.xy);\n            \n            //polar coordinates\n            float a = atan(rp.y, rp.x) / 6.2831853;\n            \n            float zid = floor(rp.z + 0.5);\n\n            return vec3(tun, zid, a);\n        }\n\n        //finds gradients across small deltas on each axis\n        vec3 normal(vec3 rp) {\n            vec2 e = vec2(EPS, 0);\n            float d1 = map(rp + e.xyy).x, d2 = map(rp - e.xyy).x;\n            float d3 = map(rp + e.yxy).x, d4 = map(rp - e.yxy).x;\n            float d5 = map(rp + e.yyx).x, d6 = map(rp - e.yyx).x;\n            return normalize(vec3(d1 - d2, d3 - d4, d5 - d6));\n        }\n\n        vec3 march(vec3 ro, vec3 rd) {\n\n            float t = 0.0;\n            float zid = 0.0;\n            float pid = 0.0;\n\n            for (int i = 0; i < 80; i++) {\n                vec3 rp = ro + rd * t;\n                vec3 ns = map(rp);\n                if (ns.x < EPS || t > FAR) {\n                    zid = ns.y;\n                    pid = ns.z;\n                    break;\n                }\n                \n                t += ns.x;\n            }\n\n            return vec3(t, zid, pid);\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            float ct = T * 6.0;\n\n            vec3 lookAt = vec3(0.0, 0.0, ct);\n            lp = lookAt + vec3(0.0, 0.0, -3.0);\n            ro = lookAt + vec3(0.0, 0.0, -5.0);\n            \n            lookAt.xy += path(lookAt.z).xy;\n            ro.xy += path(ro.z).xy;\n            lp.xy += path(lp.z).xy;\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR;\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            vec3 t = march(ro, rd);\n            if (t.x > 0.0 && t.x < FAR) {\n\n                vec3 rp = ro + rd * t.x;\n                vec3 n = normal(rp);\n                vec3 ld = normalize(lp - rp);\n                float diff = max(dot(ld, n), 0.05);\n\n                float aa = floor((t.z + 0.5) * NTILES);\n                vec2 tileid = vec2(t.y, aa);\n                vec2 mx1 = mod(tileid, 2.0) - 1.0;\n                if (mx1.x * mx1.y > 0.0) {\n                    if (mod(t.z, 0.01) > 0.008) {\n                        pc = vec3(1.0, 1.0, 0.0) * diff * 0.2;\n                        mint = t.x;\n                    }\n                }\n\n                float mz = mod(rp.z - sin(T * 0.5) * 20.0, 40.0);\n                if (mz > 39.0 && mz < 39.4 || mz > 39.6) {\n                    if (mod(t.z, 0.05) > 0.025) {\n                        pc = vec3(1.0, 1.0, 0.0) * diff * 0.5;\n                        mint = t.x;\n                    }\n                }\n            }\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), mint / FAR);\n        }\n    ';
-
-    return fsSource;
-};
-
-module.exports = {
-    fragmentSource: fragmentSource
-};
-
-/***/ }),
-/* 127 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function fragmentSource() {
-
-    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define EPS 0.005\n        #define FAR 40.0 \n        #define PI 3.14159265359\n        #define T u_time\n        #define NTILES 12.0\n\n        vec3 lp = vec3(0.0, 0.0, 4.0); //light position\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 path(float t) {\n              float a = sin(t * 3.14159265/ 16.0 + 1.5707963 * 1.0);\n              float b = cos(t * 3.14159265 / 16.0);\n              return vec3(a * 2.0, b * a, t);    \n        }\n\n        // Repeat around the origin by a fixed angle.\n        // For easier use, num of repetitions is use to specify the angle.\n        float pModPolar(inout vec2 p, float repetitions) {\n            float angle = 2.0 * PI / repetitions;\n            float a = atan(p.y, p.x) + angle / 2.0;\n            float r = length(p);\n            float c = floor(a / angle);\n            a = mod(a, angle) - angle / 2.0;\n            p = vec2(cos(a), sin(a)) * r;\n            // For an odd number of repetitions, fix cell index of the cell in -x direction\n            // (cell index would be e.g. -5 and 5 in the two halves of the cell):\n            if (abs(c) >= (repetitions / 2.0)) c = abs(c);\n            return c;\n        }\n\n        float map(vec3 rp) {\n            \n            rp.xy -= path(rp.z).xy;      \n\n            vec3 q1 = rp;\n            float a = atan(q1.y, q1.x) / 6.2831853;\n            float ia = floor(a * NTILES) / NTILES * 6.2831853;\n            q1.xy *= rot(ia);\n            q1.z = mod(q1.z, 1.0) - .5;\n            q1 = abs(q1);\n\n            vec2 cellid = vec2(floor(q1.z + 0.5), floor(a * NTILES));\n\n            vec3 q2 = rp;\n            pModPolar(q2.xy, 12.0);\n            vec2 c = vec2(1.6, 0.0);\n            float sl = length(q2.xy - c) - 0.005;\n            q2.z = mod(q2.z, 140.0) - 39.0;\n            q2.z = abs(q2.z);\n            sl = max(sl, -(q2.z - 0.5));\n            \n            vec3 q3 = rp;\n            q3.z = mod(q3.z, 100.0) - 39.0;\n            q3.z = abs(q3.z);\n            sl = max(sl, -(q3.z - 0.5));\n\n            vec3 q4 = rp;\n            q4.z = mod(q4.z, 80.0) - 24.0;\n            q4.z = abs(q4.z);\n            sl = max(sl, -(q4.z - 0.5));\n\n            vec3 q5 = rp;\n            q5.z = mod(q5.z, 60.0) - 59.0;\n            q5.z = abs(q5.z);\n            sl = max(sl, -(q5.z - 0.5));\n\n            /*\n            vec3 q6 = rp;\n            q6.z = mod(q6.z, 140.0) - 39.0;\n            q6.z = abs(q6.z);\n            vec2 tor = vec2(length(q6.xy) - 1.6, q6.z);\n            float rt = length(tor) - 0.01;\n            */\n\n            //sl = max(sl, -(q3.z - 0.5));\n            //sl = max(sl, -(q3.z - 1.0));\n            \n    \n            //if (cellid.y == 1.0 || cellid.y == 4.0 || cellid.y == -4.0) {\n            //rt = max(rt, -(q1.y - 1.0));\n            //}\n\n            return sl;\n\n            /*\n            vec3 q = rp;\n            q.x = abs(q.x);\n            vec2 c = vec2(1.5, 0.0);\n            float sl = length(q.xy - c) - 0.02;\n            c *= rot(PI * 2.0 / NTILES);\n            sl = min(sl, length(q.xy - c) - 0.02);\n            c *= rot(PI * -4.0 / NTILES);\n            sl = min(sl, length(q.xy - c) - 0.02);\n\n            vec3 q2 = rp;\n            q2.y = abs(q2.y);\n            c = vec2(0.0, 1.5);\n            float sl2 = length(q2.xy - c) - 0.02;\n            c *= rot(PI * 2.0 / NTILES);\n            sl2 = min(sl2, length(q2.xy - c) - 0.02);\n            c *= rot(PI * -4.0 / NTILES);\n            sl2 = min(sl2, length(q2.xy - c) - 0.02);\n\n            vec3 q3 = rp;\n            q3.z = mod(q3.z, 1.0) - 0.5;\n            vec2 tor = vec2(length(q3.xy) - 1.5, q3.z);\n            float rt = length(tor) - 0.02;\n            \n            return min(rt, min(sl, sl2));\n            */\n        }\n\n        //finds gradients across small deltas on each axis\n        vec3 normal(vec3 rp) {\n            vec2 e = vec2(EPS, 0);\n            float d1 = map(rp + e.xyy), d2 = map(rp - e.xyy);\n            float d3 = map(rp + e.yxy), d4 = map(rp - e.yxy);\n            float d5 = map(rp + e.yyx), d6 = map(rp - e.yyx);\n            float d = map(rp) * 2.0;\n            return normalize(vec3(d1 - d2, d3 - d4, d5 - d6));\n        }\n\n        float march(vec3 ro, vec3 rd) {\n            \n            float t = 0.0;\n\n            for (int i = 0; i < 96; i++) {\n                vec3 rp = ro + rd * t;\n                float ns = map(rp);\n                if (ns < EPS * (t * 0.25 + 1.0) || t > FAR) break;\n                t += ns;\n            }\n\n            return t;\n        }\n\n        float relaxedMarch(vec3 ro, vec3 rd) {\n\n            float omega = 1.3;\n            float t = EPS;\n            float candidate_error = FAR;\n            float candidate_t = EPS;\n            float previousRadius = 0.0;\n            float stepLength = 0.0;\n            float pixelRadius = EPS;\n            float functionSign = map(ro) < 0.0 ? -1.0 : 1.0;\n\n            for (int i = 0; i < 100; ++i) {\n                float signedRadius = functionSign * map(ro + rd * t);\n                float radius = abs(signedRadius);\n                bool sorFail = omega > 1.0 && (radius + previousRadius) < stepLength;\n                if (sorFail) {\n                    stepLength -= omega * stepLength;\n                    omega = 1.0;\n                } else {\n                    stepLength = signedRadius * omega;\n                }\n                previousRadius = radius;\n                float error = radius / t;\n                if (!sorFail && error < candidate_error) {\n                    candidate_t = t;\n                    candidate_error = error;\n                }\n                if (!sorFail && error < pixelRadius || t > FAR) break;\n                t += stepLength;\n            }\n\n            if (t > FAR || candidate_error > pixelRadius) candidate_t = FAR;\n\n            return candidate_t;\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            float ct = T * 6.0;\n\n            vec3 lookAt = vec3(0.0, 0.0, ct);\n            lp = lookAt + vec3(0.0, 0.0, -3.0);\n            ro = lookAt + vec3(0.0, 0.0, -5.0);\n            \n            lookAt.xy += path(lookAt.z).xy;\n            ro.xy += path(ro.z).xy;\n            lp.xy += path(lp.z).xy;\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR;\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            //float t = march(ro, rd);\n            \n            float t = relaxedMarch(ro, rd);\n            \n            if (t > 0.0 && t < FAR) {\n                //vec3 rp = ro + rd * t;\n                //vec3 n = normal(rp);\n                //vec3 ld = normalize(lp - rp);\n                //float diff = max(dot(ld, n), 0.05);\n\n                pc = vec3(0.0, 1.0, 0.0);\n                mint = t;\n            }\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), mint / FAR);\n        }\n    ';
-
-    return fsSource;
-};
-
-module.exports = {
-    fragmentSource: fragmentSource
-};
-
-/***/ }),
-/* 128 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function fragmentSource() {
-
-    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n\t        precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        uniform sampler2D u_texture1;                \n        uniform sampler2D u_texture2;                \n        \n        #define EPS 0.005\n        #define FAR 40.0 \n        #define PI 3.14159265359\n        #define T u_time\n        #define NTILES 12.0\n\n        struct Scene {\n            float t;\n            vec2 walluv;\n            vec2 cellid;\n            float edge1;\n        };\n\n        vec3 lp = vec3(0.0, 0.0, 4.0); //light position\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        //random generator between 0 and 1\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n        \n        vec3 path(float t) {\n              float a = sin(t * PI / 16.0 + 1.5707963 * 1.0);\n              float b = cos(t * PI / 16.0);\n              return vec3(a * 2.0, b * a, t);    \n        }\n\n        /* TEXTURES START */\n\n        //glyph panels\n        float glyphpanel(float uvz, float uva, float endtype) {\n            vec2 cuv = vec2(uvz, uva) * 15.0 - 7.5;\n            vec2 cmx = mod(cuv, 1.0) - 0.5;\n            float lc = length(cmx);\n            float glyph = smoothstep(0.4, 0.3, lc); \n            float r1 = rand(floor(vec2(cuv.x + floor(T * 8.0), cuv.y))) > 0.5 ? 1.0 : 0.0;\n            glyph *= step(cuv.y, 2.0) * step(-3.0, cuv.y) * r1;\n            float gy = mod(cuv.x + floor(T * 8.0), 15.0);\n            glyph *= step(1.0, gy) * step(gy, 7.0) + step(9.0, gy) * step(gy, 14.0);\n            float l1 = step(3.0, cuv.y) * step(cuv.y, 3.5);\n            float l2 = step(cuv.y, -4.0) * step(-4.5, cuv.y);\n            float l3 = 0.0;\n            float fuvz = 15.0 * mod(uvz, 1.0);\n            if (endtype == 2.0) {\n                glyph *= step(3.0, fuvz);\n                l1 *= step(1.0, fuvz);\n                l2 *= step(1.0, fuvz);\n                l3 = step(fuvz, 1.5) * step(1.0, fuvz) * step(uva, 0.7) * step(0.2, uva);\n            } else if (endtype == 0.0) {\n                glyph *= step(fuvz, 12.0);\n                l1 *= step(fuvz, 14.0);\n                l2 *= step(fuvz, 14.0);\n                l3 = step(13.5, fuvz) * step(fuvz, 14.0) * step(uva, 0.7) * step(0.2, uva);\n            }\n            return glyph + l1 + l2 + l3;\n        }\n\n        //draw random ticking dots in cell\n        float glyphcell(float uvz, float uva, vec2 cellid) {\n            vec2 cuv = vec2(uvz, uva) * 10.0 - 5.0;\n            vec2 cmx = mod(cuv, 1.0) - 0.5;\n            float lc = length(cmx);\n            float r1 = rand(floor(vec2(cuv.x + cellid.y, cuv.y + cellid.x + floor(T)))) > 0.7 ? 1.0 : 0.0;\n            float pc = smoothstep(0.4, 0.3, lc) * r1; \n            pc *= step(cuv.x, 4.0) * step(-4.0, cuv.x);\n            pc *= step(cuv.y, 4.0) * step(-4.0, cuv.y);\n            return pc;\n        }\n        \n        float metercell(float uvz, float uva) {\n            float st1 = clamp(sin(T * 8.0) * 0.5 + 0.5, 0.2, 1.0);\n            float st2 = clamp(sin((T + 0.3) * 9.0) * 0.5 + 0.5, 0.2, 1.0);\n            float st3 = clamp(sin((T + 1.2) * 8.5) * 0.5 + 0.5, 0.2, 1.0);\n            float mz = mod(uvz, 0.08) > 0.03 ? 1.0 : 0.0;\n            mz *= step(0.1, uvz) * step(uvz, 0.9);\n            mz *= clamp(step(0.7, uvz), 0.3, 1.0);\n            float m1 = mz * step(0.1, uva) * step(uva, 0.3) * step(uvz, st1);\n            float m2 = mz * step(0.4, uva) * step(uva, 0.6) * step(uvz, st2);\n            float m3 = mz * step(0.7, uva) * step(uva, 0.9) * step(uvz, st3);\n            return m1 + m2 + m3;\n        }\n\n        float slidercell(float uvz, float uva) {\n            float tm = clamp(sin(T * 0.5), 0.3, 0.9);\n            float bm = 1.0 - tm;\n            float z = mod(uvz, 0.1);\n            float tz = z > 0.07 && z < 0.09 ? 1.0 : 0.0;\n            float t = step(tm - 0.3, uva) * step(uva, tm) * step(0.1, uvz) * step(uvz, 0.9) * tz;\n            float bz = z > 0.01 && z < 0.03 ? 1.0 : 0.0;\n            float b = step(bm, uva) * step(uva, bm + 0.3) * step(0.1, uvz) * step(uvz, 0.9) * bz;\n            float y = mod(uva, 0.1);\n            float my = y > 0.05 ? 1.0 : 0.0;    \n            return (t + b) * my;\n        }\n\n        float gridcell(float uvz, float uva) {\n            vec2 cuv = vec2(uvz, uva) * 15.0;\n            float mz = mod(cuv.y, 1.0);\n            float mzg =  mz > 0.4 && mz < 0.6 ? 1.0 : 0.0; \n            return step(1.0, cuv.x) * step(cuv.x, 14.0) * step(1.0, cuv.y) * step(cuv.y, 14.0) * mzg;\n        }\n\n        float cellborder(float uvz, float uva) {\n            float border = step(0.05, uvz) * step(uvz, 0.07) * step(0.05, uva) * step(uva, 0.95);\n            border += step(0.93, uvz) * step(uvz, 0.95) * step(0.05, uva) * step(uva, 0.95);\n            border += step(0.05, uva) * step(uva, 0.07) * step(0.05, uvz) * step(uvz, 0.95);\n            border += step(0.93, uva) * step(uva, 0.95) * step(0.05, uvz) * step(uvz, 0.95);\n            return border;\n        }\n\n        float ringedge(float uvz, float uva) {\n            return step(uvz, 0.06) + step(0.94, uvz);\n        }\n\n        float ringcore(float uvz, float uva) {\n            float mz = mod(uva, 0.125) > 0.06 ? 1.0 : 0.0;\n            float core = step(sin(T) * 7.5, uva) * mz;\n            core *= step(0.2, uvz) * step(uvz, 0.3) + step(0.7, uvz) * step(uvz, 0.8);\n            float corea = step(sin(T) * -7.5, uva) * mz;\n            corea *= step(0.4, uvz) * step(uvz, 0.6);\n            return core + corea;\n        }\n\n        /* TEXTURES END */\n\n        Scene map(vec3 rp) {\n\n            rp.xy -= path(rp.z).xy;      \n\n            float tun = 1.7 - length(rp.xy);\n            float edge1 = 0.0;\n\n            vec3 q1 = rp; \n            vec3 q2 = rp;\n            vec3 q3 = rp;\n            \n            //polar coordinates\n            float a = atan(q1.y, q1.x) / 6.2831853;\n            float ia1 = floor(a * NTILES) / NTILES * 6.2831853;\n\n            vec2 cellid = vec2(floor(q1.z + 0.5), a);\n\n            q1.xy *= rot(ia1);\n            q1.z = mod(q1.z, 1.0) - .5;\n            q1 = abs(q1);\n\n            /*\n            q2.z = mod(q2.z, 140.0) - 39.0;\n            q2.z = abs(q2.z);\n            float rlFrame = q2.z - 0.5;\n            rlFrame = max(rlFrame, tun - 0.5);\n            float rlCutout = q2.z - 0.4;\n            rlCutout = max(rlCutout, tun - 0.6);\n            rlFrame = max(rlFrame, -rlCutout);\n\n            //tun = min(tun, rlFrame);\n            */\n\n\n\n            edge1 = -min(q1.y - 0.03, q1.z - 0.03);\n\n            return Scene(tun, rp.yz, cellid, edge1);\n        }\n\n        //finds gradients across small deltas on each axis\n        vec3 normal(vec3 rp) {\n            vec2 e = vec2(EPS, 0);\n            float d1 = map(rp + e.xyy).t, d2 = map(rp - e.xyy).t;\n            float d3 = map(rp + e.yxy).t, d4 = map(rp - e.yxy).t;\n            float d5 = map(rp + e.yyx).t, d6 = map(rp - e.yyx).t;\n            float d = map(rp).t * 2.0;\n            return normalize(vec3(d1 - d2, d3 - d4, d5 - d6));\n        }\n\n        Scene march(vec3 ro, vec3 rd) {\n            \n            float t = 0.0;\n            vec2 walluv = vec2(0.0);\n            vec2 cellid = vec2(0.0);\n            float edge1 = 0.0;\n\n            for (int i = 0; i < 96; i++) {\n                vec3 rp = ro + rd * t;\n                Scene ns = map(rp);\n                if (ns.t < EPS  * (t * 0.25 + 1.0) || t > FAR) {\n                    walluv = ns.walluv;\n                    cellid = ns.cellid;\n                    edge1 = ns.edge1;\n                    break;\n                }\n\n                t += ns.t;\n            }\n\n            return Scene(t, walluv, cellid, edge1);\n        }\n\n        Scene relaxedMarch(vec3 ro, vec3 rd) {\n            \n            float omega = 1.3;\n            float t = EPS;\n            float candidate_error = FAR;\n            float candidate_t = EPS;\n            float previousRadius = 0.0;\n            float stepLength = 0.0;\n            float pixelRadius = EPS;\n            float functionSign = map(ro).t < 0.0 ? -1.0 : 1.0;\n\n            vec2 walluv = vec2(0.0);\n            vec2 cellid = vec2(0.0);\n            float edge1 = 0.0;\n\n            for (int i = 0; i < 100; ++i) {\n                Scene scene = map(ro + rd * t);\n                float signedRadius = functionSign * scene.t;\n                float radius = abs(signedRadius);\n                \n                bool sorFail = omega > 1.0 && (radius + previousRadius) < stepLength;\n                if (sorFail) {\n                    stepLength -= omega * stepLength;\n                    omega = 1.0;\n                } else {\n                    stepLength = signedRadius * omega;\n                }\n                previousRadius = radius;\n                float error = radius / t;\n                if (!sorFail && error < candidate_error) {\n                    candidate_t = t;\n                    candidate_error = error;\n                }\n                \n                if (!sorFail && error < pixelRadius || t > FAR) {\n                    walluv = scene.walluv;\n                    cellid = scene.cellid;\n                    edge1 = scene.edge1;\n                    break;\n                }\n\n                t += stepLength;\n            }\n\n            if (t > FAR || candidate_error > pixelRadius) candidate_t = FAR;\n\n            return Scene(candidate_t, walluv, cellid, edge1);\n        }\n\n\n        vec3 colour(Scene scene) {\n\n            vec3 pc = vec3(0.0);\n\n            vec2 tileid = vec2(scene.cellid.x, floor((scene.cellid.y) * NTILES));\n            float r = rand(tileid);\n            float r2 = rand(vec2(tileid.y, tileid.x));\n            r2 = r2 > 0.5 && r2 < 0.6 ? 1.0 : 0.0;\n            vec3 bc = rand(vec2(r, r2)) > 0.5 ? vec3(1.0) : vec3(0.0, 1.0, 0.0);\n            \n            //edges\n            pc = max(scene.edge1, 0.0) * vec3(0.0, 1.0, 0.0);\n            \n            //cells\n            if (r > 0.2 && r < 0.3) {\n                pc += glyphcell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES), tileid) * vec3(0.0, 1.0, 0.0);\n            } else if (r > 0.4 && r < 0.5) {\n                pc += slidercell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * bc;\n            } else if (r > 0.7 && r < 0.75) {\n                pc += gridcell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * vec3(1.0, 1.0, 1.0);\n            } else if (r > 0.6 && r < 0.65) {\n                pc += glyphcell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES), tileid) * vec3(0.0, 1.0, 0.0);\n            }                \n            //*/\n\n            //cell borders\n            pc += cellborder(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * bc * r2;\n            \n            if (mod(tileid.x, 11.0) >= 10.0) {\n                if (r > 0.3 && r < 0.4) {\n                    pc = metercell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * vec3(1.0, 1.0, 1.0);\n                }\n            }\n\n            //glyph panels\n            float gs = 0.0;\n            if (tileid.y == 1.0) {\n                float gpm = mod(scene.walluv.y - 0.5, 18.0);\n                if (gpm < 1.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm < 2.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                } else if (gpm > 7.0 && gpm < 8.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 8.0 && gpm < 9.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 9.0 && gpm < 10.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 10.0 && gpm < 11.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                }\n                pc = vec3(1.0) * gs;\n            }\n            if (tileid.y == 4.0) {\n                float gpm = mod(scene.walluv.y - 0.5, 25.0);\n                if (gpm > 3.0 && gpm < 4.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 4.0 && gpm < 5.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 5.0 && gpm < 6.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                } else if (gpm > 11.0 && gpm < 12.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 12.0 && gpm < 13.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 13.0 && gpm < 14.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 14.0 && gpm < 15.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 15.0 && gpm < 16.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                }\n                pc = vec3(1.0) * gs;\n            }\n            if (tileid.y == -4.0) {\n                float gpm = mod(scene.walluv.y - 0.5, 40.0);\n                if (gpm > 7.0 && gpm < 8.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 8.0 && gpm < 9.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 9.0 && gpm < 10.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                } else if (gpm > 20.0 && gpm < 21.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 21.0 && gpm < 22.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                } else if (gpm > 31.0 && gpm < 32.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 2.0);\n                } else if (gpm > 32.0 && gpm < 33.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 33.0 && gpm < 34.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 34.0 && gpm < 35.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 1.0);\n                } else if (gpm > 35.0 && gpm < 36.0) {\n                    gs = glyphpanel(scene.walluv.y - 0.5, fract(scene.cellid.y * NTILES), 0.0);\n                }\n                pc = vec3(1.0) * gs;\n            } \n            //*/\n\n            //rings\n            if (mod(tileid.x, 60.0) >= 59.0) {\n                pc = ringedge(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(1.0);\n                pc += ringcore(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(0.0, 1.0, 0.0);\n            } \n            if (mod(tileid.x - 25.0, 80.0) >= 79.0) {\n                pc = ringedge(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(1.0);\n                pc += glyphcell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES), tileid) * vec3(0.0, 1.0, 0.0);\n            } \n            if (mod(tileid.x -40.0, 100.0) >= 99.0) {\n                pc = ringedge(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(1.0);\n                pc += slidercell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * vec3(0.0, 1.0, 0.0);\n            } \n            if (mod(tileid.x -40.0, 140.0) >= 139.0) {\n                pc = ringedge(fract(scene.walluv.y - 0.5), scene.cellid.y * (NTILES - 1.0)) * vec3(1.0);\n                pc += metercell(fract(scene.walluv.y - 0.5), fract(scene.cellid.y * NTILES)) * vec3(1.0);\n            } \n            //*/\n\n            return pc;\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            float ct = T * 6.0;\n\n            vec3 lookAt = vec3(0.0, 0.0, ct);\n            lp = lookAt + vec3(0.0, 0.0, 3.0);\n            ro = lookAt + vec3(0.0, 0.0, -5.0);\n            \n            lookAt.xy += path(lookAt.z).xy;\n            ro.xy += path(ro.z).xy;\n            lp.xy += path(lp.z).xy;\n\n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0); //pixel colour\n            float mint = FAR;\n\n            vec3 ro, rd; //ray origin and direction\n            setupCamera(ro, rd);\n\n            \n            \n            //Scene scene = march(ro, rd);\n            Scene scene = relaxedMarch(ro, rd);\n            \n            if (scene.t > 0.0 && scene.t < FAR) {\n\n               // vec3 rp = ro + rd * scene.t;\n                //vec3 n = normal(rp);\n                //vec3 ld = normalize(lp - rp);\n                //float diff = max(dot(ld, n), 0.2);\n\n                pc = colour(scene);\n\n            }\n            //*/\n\n            vec4 sleeve = texture2D(u_texture1, gl_FragCoord.xy / u_resolution);\n            \n            \n            if (sleeve.w > 0.0) {\n                if (sleeve.w * FAR < scene.t) {\n                    pc = sleeve.xyz;\n                } else {\n                    pc = mix(pc, sleeve.xyz, (1.0 - sleeve.w) * 0.3);\n                }\n            }\n            //*/\n\n            //pc = sleeve.xyz;\n\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);\n        }\n    ';
-
-    return fsSource;
-};
-
-module.exports = {
-    fragmentSource: fragmentSource
-};
-
-/***/ }),
+/* 126 */,
+/* 127 */,
+/* 128 */,
 /* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -26851,9 +26659,9 @@ var _ironmancontent = __webpack_require__(116);
 
 var _ironmancontent2 = _interopRequireDefault(_ironmancontent);
 
-var _tunnelcontent = __webpack_require__(119);
+var _bitsweepcontent = __webpack_require__(289);
 
-var _tunnelcontent2 = _interopRequireDefault(_tunnelcontent);
+var _bitsweepcontent2 = _interopRequireDefault(_bitsweepcontent);
 
 var _bugatticontent = __webpack_require__(114);
 
@@ -26870,6 +26678,10 @@ var _particlecontent2 = _interopRequireDefault(_particlecontent);
 var _voxelbridgecontent = __webpack_require__(120);
 
 var _voxelbridgecontent2 = _interopRequireDefault(_voxelbridgecontent);
+
+var _mobiusspherecontent = __webpack_require__(293);
+
+var _mobiusspherecontent2 = _interopRequireDefault(_mobiusspherecontent);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -26911,7 +26723,7 @@ function loadContentItemsForPage(navUri) {
         contentItemsCurrentPage = 1;
         contentItems.push(_littlecubescontent2.default);
         contentItems.push(_ironmancontent2.default);
-        contentItems.push(_tunnelcontent2.default);
+        contentItems.push(_bitsweepcontent2.default);
     }
 
     if ('prev' === navUri) {
@@ -26922,7 +26734,7 @@ function loadContentItemsForPage(navUri) {
             //page 1
             contentItems.push(_littlecubescontent2.default);
             contentItems.push(_ironmancontent2.default);
-            contentItems.push(_tunnelcontent2.default);
+            contentItems.push(_bitsweepcontent2.default);
         } else {
             //page 2 - only three pages at the moment
             contentItems.push(_bugatticontent2.default);
@@ -26942,6 +26754,7 @@ function loadContentItemsForPage(navUri) {
         if (contentItemsCurrentPage === CI_PAGES) {
             //page 3
             contentItems.push(_voxelbridgecontent2.default);
+            contentItems.push(_mobiusspherecontent2.default);
             pageLinks = { first: { href: 'first' },
                 prev: { href: 'prev' },
                 last: { href: 'last' } };
@@ -26960,6 +26773,7 @@ function loadContentItemsForPage(navUri) {
     if ('last' === navUri) {
         contentItemsCurrentPage = CI_PAGES;
         contentItems.push(_voxelbridgecontent2.default);
+        contentItems.push(_mobiusspherecontent2.default);
         pageLinks = { first: { href: 'first' },
             prev: { href: 'prev' },
             last: { href: 'last' } };
@@ -46793,6 +46607,270 @@ module.exports = "data:application/font-woff;base64,d09GRgABAAAAAFuAAA8AAAAAsVwA
 /***/ (function(module, exports) {
 
 module.exports = "data:application/font-woff2;base64,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"
+
+/***/ }),
+/* 289 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _simple_vertex_shader = __webpack_require__(19);
+
+var _simple_vertex_shader2 = _interopRequireDefault(_simple_vertex_shader);
+
+var _bitsweep_fragment_shader = __webpack_require__(290);
+
+var _bitsweep_fragment_shader2 = _interopRequireDefault(_bitsweep_fragment_shader);
+
+var _bitsweep_buffer_fragment_shader = __webpack_require__(291);
+
+var _bitsweep_buffer_fragment_shader2 = _interopRequireDefault(_bitsweep_buffer_fragment_shader);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var bitsweepImgSrc = __webpack_require__(292);
+
+var ShauGL = __webpack_require__(14); //general 3D utils
+var ShauRMGL = __webpack_require__(17); //raymarching utils
+
+function getTitle() {
+    return "Bitsweep";
+}
+
+function getDescription() {
+    var description = "Another raytracer this time inspired by Bitsweep by Beeple.";
+    return description;
+}
+
+function getSnapshotImage() {
+    return bitsweepImgSrc;
+}
+
+function initGLContent(gl, mBuffExt) {
+
+    var vsSource = _simple_vertex_shader2.default.vertexSource();
+    var fsSource = _bitsweep_fragment_shader2.default.fragmentSource();
+    var shaderProgram = ShauGL.initShaderProgram(gl, vsSource, fsSource);
+    var programInfo = {
+        program: shaderProgram,
+        attribLocations: {
+            positionAttributePosition: gl.getAttribLocation(shaderProgram, 'a_position')
+        },
+        uniformLocations: {
+            resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
+            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
+        }
+    };
+
+    var bfsSource = _bitsweep_buffer_fragment_shader2.default.fragmentSource();
+    var bufferProgram = ShauGL.initShaderProgram(gl, vsSource, bfsSource);
+    var bufferProgramInfo = {
+        program: bufferProgram,
+        attribLocations: {
+            positionAttributePosition: gl.getAttribLocation(bufferProgram, 'a_position')
+        },
+        uniformLocations: {
+            resolutionUniformLocation: gl.getUniformLocation(bufferProgram, 'u_resolution'),
+            timeUniformLocation: gl.getUniformLocation(bufferProgram, 'u_time')
+        }
+    };
+
+    var programInfos = { renderProgramInfo: programInfo,
+        bufferProgramInfo: bufferProgramInfo };
+
+    var buffers = ShauRMGL.initBuffers(gl);
+
+    var renderBuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
+    var framebuffers = { renderBuffer: renderBuffer };
+
+    return { programInfos: programInfos,
+        textureInfos: [],
+        buffers: buffers,
+        framebuffers: framebuffers };
+}
+
+function loadGLContent(gl, mBuffExt, content) {
+    //do nothing
+    return new Promise(function (resolve) {
+        resolve(content);
+    });
+}
+
+function renderGLContent(gl, content, dt) {
+
+    //render light
+    gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.renderBuffer.framebuffer);
+    ShauRMGL.drawRMScene(gl, content.programInfos.bufferProgramInfo, content.buffers, undefined, undefined, undefined, undefined, dt);
+
+    //render to canvas
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    ShauRMGL.drawRMScene(gl, content.programInfos.renderProgramInfo, content.buffers, content.framebuffers.renderBuffer.texture, undefined, undefined, undefined, dt);
+}
+
+module.exports = {
+    getTitle: getTitle,
+    getDescription: getDescription,
+    getSnapshotImage: getSnapshotImage,
+    initGLContent: initGLContent,
+    loadGLContent: loadGLContent,
+    renderGLContent: renderGLContent
+};
+
+/***/ }),
+/* 290 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function fragmentSource() {
+
+    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n            precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        uniform sampler2D u_texture1;        \n\n        #define T u_time * 4.0\n        #define PI 3.14159265359\n        #define FAR 100.0 \n        #define EPS 0.001\n        #define STEP_SIZE 4.0\n        #define FLOOR 1.0\n        #define BRICK 2.0\n        #define TOWER 3.0\n        #define LIGHT3 6.0\n        \n        vec3 lp = vec3(0.0);\n        float TX = 0.0;\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n\n        float tex(vec2 rp) {\n            float edge = 0.0;\n            edge = step(0.99, abs(rp.x));\n            edge += step(0.99, abs(rp.y));\n            return edge;\n        }        \n\n        // Cube mapping routine from Fizzer\n        // I\'m not sure where I got this from\n        float fizz(vec3 rp, vec3 box) {\n            rp /= box;\n            vec3 f = abs(rp);\n            f = step(f.zxy, f) * step(f.yzx, f); \n            f.xy = f.x > .5 ? rp.yz / rp.x : f.y > .5 ? rp.xz / rp.y : rp.xy / rp.z; \n            return tex(f.xy);\n        }\n\n        //IQ Box, Sphere and DE functions\n        vec3 boxIntersection(vec3 ro, vec3 rd, vec3 boxSize, out vec3 outNormal) {\n            float edge = 0.0;\n            vec3 m = 1.0 / rd;\n            vec3 n = m * ro;\n            vec3 k = abs(m) * boxSize;\n            vec3 t1 = -n - k;\n            vec3 t2 = -n + k;\n            float tN = max(max(t1.x, t1.y), t1.z);\n            float tF = min(min(t2.x, t2.y), t2.z);\n            if( tN > tF || tF < 0.0) return vec3(-1.0); // no intersection\n            outNormal = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz);\n            edge = fizz(ro + rd * tN, boxSize);\n            return vec3(tN, tF, edge);\n        }\n        \n        float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n            return dot(o - ro, n) / dot(rd, n);\n        }\n        \n        struct Scene {\n            float t;\n            float id;\n            vec3 n;\n            float edge;\n        };\n\n        vec3 colourScene(vec3 ro, vec3 rd, Scene scene) {\n            \n            vec3 pc = vec3(0.0);\n            \n            vec3 rp = ro + rd * scene.t;\n            vec3 ld = normalize(lp - rp);\n            float lt = length(lp - rp);\n            float diff = max(dot(ld, scene.n), 0.05);\n            float spec = pow(max(dot(reflect(-ld, scene.n), -rd), 0.0), 32.0);\n            float fres = pow(clamp(dot(scene.n, rd) + 1.0, 0.0, 1.0), 8.0);\n            float atten = 1.0 / (1.0 + lt * lt * 0.02);\n            \n            vec2 grid = vec2((rp.x + 2.0) * 0.25, rp.z + 0.5);\n            vec2 cell = floor(grid);\n            vec2 cuv = fract(grid);\n        \n            if (scene.id == FLOOR) {\n                \n                pc = vec3(0.3) * diff;\n                pc += vec3(1.0) * spec;\n                pc += vec3(1.0) * fres;\n                pc += (smoothstep(0.01, 0.005, cuv.x) + smoothstep(0.998, 0.999, cuv.x)) * vec3(0.0, 1.0, 0.0);\n                pc += (smoothstep(0.04, 0.01, cuv.y) + smoothstep(0.96, 0.99, cuv.y)) * vec3(0.0, 1.0, 0.0);\n                pc *= atten;\n            \n            } else if (scene.id == BRICK || scene.id == TOWER) {\n                \n                pc = vec3(0.3) * diff;  \n                pc += vec3(1.0) * spec;\n                pc += vec3(1.0) * fres;\n                pc = mix(pc, vec3(0.0, 1.0, 0.0) * scene.edge, 0.5);\n                pc *= atten;\n            }\n            \n            return pc;\n        }\n\n        Scene drawScene(vec3 ro, vec3 rd) {\n            \n            float mint = FAR;\n            vec3 minn = vec3(0.0);\n            float id = 0.0;\n            float edge = 0.0;\n            \n            TX = (floor(T / 50.0) * 50.0) + 10.0;;\n            \n            vec3 fo = vec3(0.0, 0.0, 0.0);\n            vec3 fn = vec3(0.0, 1.0, 0.0);\n            float ft = planeIntersection(ro, rd, fn, fo);\n            if (ft > 0.0) {\n                mint = ft;\n                minn = fn;\n                id = FLOOR;\n            }\n            \n            vec3 tn = vec3(0.0);\n            vec3 tt = boxIntersection(ro - vec3(TX, 0.0, 1.0), rd, vec3(0.2, 2.5, 0.2), tn);\n            //bounds check\n            if (tt.x > 0.0 && tt.x < mint) {\n                //base\n                vec3 tbase = boxIntersection(ro - vec3(TX, 0.0, 1.0), rd, vec3(0.2, 2.0, 0.2), tn);\n                if (tbase.x > 0.0 && tbase.x < mint) {\n                    mint = tbase.x;\n                    minn = tn;\n                    edge = tbase.z;\n                    id = TOWER;\n                }\n                //light\n                vec3 tlight = boxIntersection(ro - vec3(TX, 2.1, 1.0), rd, vec3(0.15, 0.1, 0.15), tn);\n                if (tlight.x > 0.0 && tlight.x < mint) {\n                    mint = tlight.x;\n                    minn = tn;\n                    id = LIGHT3;\n                }\n                //roof\n                vec3 troof = boxIntersection(ro - vec3(TX, 2.25, 1.0), rd, vec3(0.2, 0.1, 0.2), tn);\n                if (troof.x > 0.0 && troof.x < mint) {\n                    mint = troof.x;\n                    minn = tn;\n                    edge = troof.z;\n                    id = TOWER;\n                }        \n            }\n            \n            float steps = 10.0;\n            float wmin = T - steps * STEP_SIZE;\n            wmin -= mod(wmin , STEP_SIZE);\n                \n            //for (float i = 0.0; i < steps + 4.0 * STEP_SIZE; i += 1.0) {    \n            for (float i = 0.0; i < 18.0; i += 1.0) {    \n                float xidx = wmin + i * STEP_SIZE;\n        \n                //ROW 1\n                float r = rand(vec2(xidx, 0.0));\n                vec3 bn;\n                float bh = 1.0 - r * 1.5;\n                if (bh > 0.0) {\n                    vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 0.0), \n                                                rd, \n                                                vec3(1.95, bh, 0.45), \n                                                bn);\n                    if (box.x > 0.0 && box.x < mint) {\n                        mint = box.x;\n                        minn = bn;\n                        edge = box.z;\n                        id = BRICK;\n                    }  \n                }\n                \n                //ROW 2\n                r = rand(vec2(xidx, 2.0));\n                bh = 1.0 - r * 1.2;\n                if (bh > 0.0) {\n                    vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 2.0), \n                                                rd, \n                                                vec3(1.95, bh, 0.45), \n                                                bn);\n                    if (box.x > 0.0 && box.x < mint) {\n                        mint = box.x;\n                        minn = bn;\n                        edge = box.z;\n                        id = BRICK;\n                    }  \n                }\n            }\n            //*/\n            \n            return Scene(mint, id, minn, edge);\n        }\n\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n        \n            vec3 lookAt = vec3(T, 0.0, 0.0);\n            lp = lookAt + vec3(4.0, 4.0, -2.0);\n            ro = lookAt + vec3(3.0 - sin(T * 0.1) * 2.0, 4.0, -4.0);\n            \n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n\n        void main() {\n\n            vec3 pc = vec3(0.0);\n            vec2 uv = gl_FragCoord.xy / u_resolution.xy;\n\n            vec3 ro, rd;\n            setupCamera(ro, rd);\n\n            Scene scene = drawScene(ro, rd);\n            if (scene.t > 0.0 && scene.t < FAR) {\n                \n                vec3 oc = colourScene(ro, rd, scene);\n                \n                if (scene.id == 1.0) {\n                    vec3 rp = ro + rd * (scene.t - EPS);\n                    vec3 rrd = reflect(rd, scene.n);\n                    Scene reflectedScene = drawScene(rp, rrd);\n        \n                    if (reflectedScene.t > 0.0 && reflectedScene.t < FAR) {\n                        vec3 rc = colourScene(ro, rd, reflectedScene);\n                        float atten = 1.0 / (1.0 + reflectedScene.t * reflectedScene.t * 2.2);\n                        oc += rc * atten;\n                    }\n                }\n                \n                pc = oc;\n            }\n\n            vec3 bc = texture2D(u_texture1, uv).xyz;\n            \n            gl_FragColor = vec4(pc + bc, 1.0);\n        }\n    ';
+
+    return fsSource;
+};
+
+module.exports = {
+    fragmentSource: fragmentSource
+};
+
+/***/ }),
+/* 291 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function fragmentSource() {
+
+    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n            precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define T u_time * 4.0\n        #define PI 3.14159265359\n        #define FAR 100.0 \n        #define EPS 0.001\n        #define STEP_SIZE 4.0\n        #define FLOOR 1.0\n        #define BRICK 2.0\n        #define TOWER 3.0\n        #define LIGHT1 4.0\n        #define LIGHT2 5.0\n        #define LIGHT3 6.0\n\n        float SX1 = 0.0;\n        float SX2 = 0.0;\n        float TX = 0.0;\n\n        //compact 2 axis rotation\n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        float rand(vec2 p) {return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);}\n\n        //IQ Box, Sphere and DE functions\n        vec3 boxIntersection(vec3 ro, vec3 rd, vec3 boxSize, out vec3 outNormal) {\n            float edge = 0.0;\n            vec3 m = 1.0 / rd;\n            vec3 n = m * ro;\n            vec3 k = abs(m) * boxSize;\n            vec3 t1 = -n - k;\n            vec3 t2 = -n + k;\n            float tN = max(max(t1.x, t1.y), t1.z);\n            float tF = min(min(t2.x, t2.y), t2.z);\n            if( tN > tF || tF < 0.0) return vec3(-1.0); // no intersection\n            outNormal = -sign(rd) * step(t1.yzx, t1.xyz) * step(t1.zxy, t1.xyz);\n            return vec3(tN, tF, edge);\n        }\n\n        float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n            return dot(o - ro, n) / dot(rd, n);\n        }\n        \n        struct Scene {\n            float t;\n            float id;\n            vec3 n;\n            float edge;\n        };\n        \n        vec3 colourScene(vec3 ro, vec3 rd, Scene scene) {\n            \n            vec3 pc = vec3(0.0);\n            \n            vec3 rp = ro + rd * scene.t;\n            \n            if (scene.id == LIGHT1) {\n                if (rp.x < SX1) {\n                    pc = vec3(0.0, 1.0, 0.0);    \n                }\n            } else if (scene.id == LIGHT2) {\n                if (rp.x < SX2) {\n                    pc = vec3(0.0, 1.0, 0.0);    \n                }\n            } else if (scene.id == LIGHT3) {\n                pc = vec3(0.0, 1.0, 0.0);    \n            }\n            \n            return pc;\n        }\n\n        Scene drawScene(vec3 ro, vec3 rd) {\n            \n            float mint = FAR;\n            vec3 minn = vec3(0.0);\n            float id = 0.0;\n            float edge = 0.0;\n            \n            SX1 = T + sin(T * 0.1) * 2.0;\n            SX2 = T + cos(T * 0.2) * 3.0;\n            TX = (floor(T / 50.0) * 50.0) + 10.0;;\n            \n            vec3 fo = vec3(0.0, 0.0, 0.0);\n            vec3 fn = vec3(0.0, 1.0, 0.0);\n            float ft = planeIntersection(ro, rd, fn, fo);\n            if (ft > 0.0) {\n                mint = ft;\n                minn = fn;\n                id = FLOOR;\n            }\n            \n            vec3 tn = vec3(0.0);\n            vec3 tt = boxIntersection(ro - vec3(TX, 0.0, 1.0), rd, vec3(0.2, 2.5, 0.2), tn);\n            //bounds check\n            if (tt.x > 0.0 && tt.x < mint) {\n                //base\n                vec3 tbase = boxIntersection(ro - vec3(TX, 0.0, 1.0), rd, vec3(0.2, 2.0, 0.2), tn);\n                if (tbase.x > 0.0 && tbase.x < mint) {\n                    mint = tbase.x;\n                    minn = tn;\n                    edge = tbase.z;\n                    id = TOWER;\n                }\n                //light\n                vec3 tlight = boxIntersection(ro - vec3(TX, 2.1, 1.0), rd, vec3(0.15, 0.1, 0.15), tn);\n                if (tlight.x > 0.0 && tlight.x < mint) {\n                    mint = tlight.x;\n                    minn = tn;\n                    id = LIGHT3;\n                }\n                //roof\n                vec3 troof = boxIntersection(ro - vec3(TX, 2.25, 1.0), rd, vec3(0.2, 0.1, 0.2), tn);\n                if (troof.x > 0.0 && troof.x < mint) {\n                    mint = troof.x;\n                    minn = tn;\n                    edge = troof.z;\n                    id = TOWER;\n                }        \n            }\n            \n            float steps = 10.0;\n            float wmin = T - steps * STEP_SIZE;\n            wmin -= mod(wmin , STEP_SIZE);\n                \n            //for (float i = 0.0; i < steps + 4.0 * STEP_SIZE; i += 1.0) {\n            for (float i = 0.0; i < 18.0; i += 1.0) {\n                float xidx = wmin + i * STEP_SIZE;\n        \n                //ROW 1\n                float r = rand(vec2(xidx, 0.0));\n                vec3 bn;\n                float bh = 1.0 - r * 1.5;\n                if (bh > 0.0) {\n                    vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 0.0), \n                                                rd, \n                                                vec3(1.95, bh, 0.45), \n                                                bn);\n                    if (box.x > 0.0 && box.x < mint) {\n                        mint = box.x;\n                        minn = bn;\n                        edge = box.z;\n                        id = BRICK;\n                    }  \n                }\n                vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 0.0), \n                                            rd, \n                                            vec3(2.0, max(bh + 0.05, 0.05), 0.05), \n                                            bn);\n                if (box.x > 0.0 && box.x < mint) {\n                    mint = box.x;\n                    minn = bn;\n                    edge = box.z;\n                    id = LIGHT1;\n                }\n                \n                //ROW 2\n                r = rand(vec2(xidx, 2.0));\n                bh = 1.0 - r * 1.2;\n                if (bh > 0.0) {\n                    vec3 box = boxIntersection(ro - vec3(xidx, 0.0, 2.0), \n                                                rd, \n                                                vec3(1.95, bh, 0.45), \n                                                bn);\n                    if (box.x > 0.0 && box.x < mint) {\n                        mint = box.x;\n                        minn = bn;\n                        edge = box.z;\n                        id = BRICK;\n                    }  \n                }\n                box = boxIntersection(ro - vec3(xidx, 0.0, 2.0), \n                                            rd, \n                                            vec3(2.0, max(bh + 0.05, 0.05), 0.05), \n                                            bn);\n                if (box.x > 0.0 && box.x < mint) {\n                    mint = box.x;\n                    minn = bn;\n                    edge = box.z;\n                    id = LIGHT2;\n                }\n            }\n            \n            return Scene(mint, id, minn, edge);\n        }\n\n        //standard right hand camera setup\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            //Coordinate system\n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n\n            vec3 lookAt = vec3(T, 0.0, 0.0);\n            ro = lookAt + vec3(3.0 - sin(T * 0.1) * 2.0, 4.0, -4.0);\n        \n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void main() {\n\n            vec3 pc = vec3(0.0);\n\n            vec3 ro, rd;\n            setupCamera(ro, rd);\n            \n            Scene scene = drawScene(ro, rd);\n            if (scene.t > 0.0 && scene.t < FAR) {\n                \n                vec3 oc = colourScene(ro, rd, scene);\n                \n                vec3 rp = ro + rd * (scene.t - EPS);\n                vec3 rrd = reflect(rd, scene.n);\n                Scene reflectedScene = drawScene(rp, rrd);\n                if (reflectedScene.t > 0.0 && reflectedScene.t < FAR) {\n                    vec3 rc = colourScene(rp, rrd, reflectedScene);\n                    float atten = 1.0 / (1.0 + reflectedScene.t * reflectedScene.t * 6.2);\n                    oc += rc * atten;\n                }\n                \n                pc = oc;\n                pc /= scene.t * 0.1; \n            }\n            \n            gl_FragColor = vec4(pc, 1.0);\n        }\n    ';
+
+    return fsSource;
+};
+
+module.exports = {
+    fragmentSource: fragmentSource
+};
+
+/***/ }),
+/* 292 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = __webpack_require__.p + "images/bitsweep.png";
+
+/***/ }),
+/* 293 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _simple_vertex_shader = __webpack_require__(19);
+
+var _simple_vertex_shader2 = _interopRequireDefault(_simple_vertex_shader);
+
+var _mobius_sphere_fragment_shader = __webpack_require__(294);
+
+var _mobius_sphere_fragment_shader2 = _interopRequireDefault(_mobius_sphere_fragment_shader);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mobiusSphereImgSrc = __webpack_require__(295);
+
+var ShauGL = __webpack_require__(14); //general 3D utils
+var ShauRMGL = __webpack_require__(17); //raymarching utils
+
+function getTitle() {
+    return "Mobius Sphere";
+}
+
+function getDescription() {
+    var description = "This is a rework of one of my first fragment shaders. A simple demonstration of a Mobius projection from a sphere.";
+    return description;
+}
+
+function getSnapshotImage() {
+    return mobiusSphereImgSrc;
+}
+
+function initGLContent(gl, mBuffExt) {
+
+    var vsSource = _simple_vertex_shader2.default.vertexSource();
+    var fsSource = _mobius_sphere_fragment_shader2.default.fragmentSource();
+    var shaderProgram = ShauGL.initShaderProgram(gl, vsSource, fsSource);
+    var programInfo = {
+        program: shaderProgram,
+        attribLocations: {
+            positionAttributePosition: gl.getAttribLocation(shaderProgram, 'a_position')
+        },
+        uniformLocations: {
+            resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
+            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
+        }
+    };
+    var programInfos = { renderProgramInfo: programInfo };
+
+    var buffers = ShauRMGL.initBuffers(gl);
+
+    return { programInfos: programInfos,
+        textureInfos: [],
+        buffers: buffers,
+        framebuffers: [] };
+}
+
+function loadGLContent(gl, mBuffExt, content) {
+    //do nothing
+    return new Promise(function (resolve) {
+        resolve(content);
+    });
+}
+
+function renderGLContent(gl, content, dt) {
+
+    //render to canvas
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    ShauRMGL.drawRMScene(gl, content.programInfos.renderProgramInfo, content.buffers, undefined, undefined, undefined, undefined, dt);
+}
+
+module.exports = {
+    getTitle: getTitle,
+    getDescription: getDescription,
+    getSnapshotImage: getSnapshotImage,
+    initGLContent: initGLContent,
+    loadGLContent: loadGLContent,
+    renderGLContent: renderGLContent
+};
+
+/***/ }),
+/* 294 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function fragmentSource() {
+
+    var fsSource = '\n\n        #ifdef GL_FRAGMENT_PRECISION_HIGH\n            precision highp float;\n        #else\n            precision mediump float;\n        #endif\n\n        uniform vec2 u_resolution;\n        uniform float u_time;\n\n        #define T u_time * 0.5\n        #define EPS 0.005\n        #define FAR 100.0 \n        #define PI 3.14159265359\n        #define FLOOR 1.0\n        #define SPHERE 2.0\n\n        vec3 lp = vec3(4.0, 5.0, 2.0);\n        vec4 sphere = vec4(0.0, 0.0, 0.0, 1.5);\n        vec3 fo = vec3(0.0, -2.0, 0.0);\n        vec3 fn = vec3(0.0, 1.0, 0.0);\n        vec3 pp = vec3(0.0, 1.5 - EPS, 0.0); //projection point just under topmost pole of sphere\n        \n        float rotation = 0.0;\n        float displayScene = 0.0;\n        float displayProjection = 0.0;\n        float rotateProjection = 0.0;\n        \n        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}\n        \n        //IQ Sphere functions\n        \n        vec2 sphIntersect(vec3 ro, vec3 rd, vec4 sph) {\n            vec3 oc = ro - sph.xyz;\n            float b = dot(oc, rd);\n            float c = dot(oc, oc) - sph.w * sph.w;\n            float h = b * b - c;\n            if (h < 0.0) return vec2(0.0);\n            h = sqrt(h);\n            float tN = -b - h;\n            float tF = -b + h;\n            return vec2(tN, tF);\n        }\n        \n        float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {\n            return dot(o - ro, n) / dot(rd, n);\n        }\n\n        vec3 sphNormal(in vec3 pos, in vec4 sph) {\n            return normalize(pos - sph.xyz);\n        }\n        \n        float sphSoftShadow(vec3 ro, vec3 rd, vec4 sph, float k) {\n            vec3 oc = ro - sph.xyz;\n            float r = sph.w * sph.w;\n            float b = dot(oc, rd);\n            float c = dot(oc, oc) - r;\n            float h = b * b - c;\n            float d = -sph.w + sqrt(max(0.0, r - h));\n            float t = -b - sqrt(max(0.0, h));\n            return (t < 0.0) ? 1.0 : smoothstep(0.0, 1.0, k * d / t);\n        }\n        \n        struct Scene {\n            float t;\n            vec3 n;\n            float id;\n            float bft;\n        };\n\n        Scene drawScene(vec3 ro, vec3 rd) {\n            \n            float mint = FAR;\n            float bft = 0.0;\n            vec3 minn = vec3(0.0);\n            float id = 0.0;\n            \n            float ft = planeIntersection(ro, rd, fn, fo);\n            if (ft > 0.0) {\n                mint = ft;\n                minn = fn;\n                id = FLOOR;\n            }\n            \n            vec2 st = sphIntersect(ro, rd, sphere);\n            if (st.x > 0.0 && st.x < mint) {\n                \n                vec3 rp = ro + rd * st.x;\n           \n                mint = st.x;\n                bft = st.y;\n                minn = sphNormal(rp, sphere);\n                id = SPHERE;\n            }\n            \n            return Scene(mint, minn, id, bft);\n        }\n\n        vec3 gridColour(vec3 rp, vec3 col) {\n            \n            vec3 pc = vec3(0.0);\n            \n            vec2 grid = fract(rp.xz * 2.0);\n            pc += col * (step(grid.x, 0.1) + step(0.9, grid.x));\n            pc += col * (step(grid.y, 0.1) + step(0.9, grid.y));    \n            pc *= step(abs(rp.x), 2.55) * step(abs(rp.z), 2.55);\n        \n            return pc;\n        }\n        \n        vec3 sphereProjectionColour(vec3 rp, vec3 col) {\n            \n            vec3 pc = vec3(0.0);\n        \n            rp.xy *= rot(rotation * rotateProjection);\n                \n            vec3 pd = normalize(rp - pp);\n            float ft = planeIntersection(pp, pd, fn, fo);\n            if (ft > 0.0) {\n                vec3 prp = pp + pd * ft; \n                pc += gridColour(prp, col);\n            }\n        \n            return pc;\n        }\n\n        vec3 floorProjectionColour(vec3 rp, vec3 col) {\n            \n            vec3 pc = vec3(0.0);\n            \n            vec3 pd = normalize(pp - rp);\n            vec2 st = sphIntersect(rp, pd, sphere);\n            if (st.x > 0.0) {\n                vec3 srp = rp + pd * st.x;\n                pc += sphereProjectionColour(srp, col);            \n            }\n            \n            return pc * 0.4;\n        }\n           \n        vec3 colourScene(vec3 ro, vec3 rd, Scene scene) {\n        \n            vec3 pc = vec3(0.0);\n            \n            vec3 rp = ro + rd * scene.t;\n            vec3 ld = normalize(lp - rp);\n            float lt = length(lp - rp);\n            float diff = max(dot(ld, scene.n), 0.01);\n            float spec = pow(max(dot(reflect(-ld, scene.n), -rd), 0.0), 16.0);\n            float atten = 1.0 / (1.0 + lt * lt * 0.008);\n            float sh = 1.0; \n            \n            //scene colour\n            vec3 sc = vec3(0.05, 0.0, 0.3) * 0.1 * clamp(scene.n.y * -1.0, 0.0, 1.0);\n            sc += vec3(0.0, 0.5, 0.0) * diff; \n            sc += vec3(1.0) * spec;\n            sc *= atten;\n            \n            //projection colour\n            vec3 prc = vec3(0.0);\n            \n            if (scene.id == FLOOR) {\n                \n                sh = sphSoftShadow(rp - (rd * EPS), ld, sphere, 2.0);\n                \n                prc += floorProjectionColour(rp, vec3(0.0, 1.0, 0.0));\n        \n            } else if (scene.id == SPHERE) {\n                                \n                prc += sphereProjectionColour(rp, vec3(0.0, 1.0, 0.0));\n                //back face\n                vec3 bfrp = ro + rd * scene.bft;\n                prc += sphereProjectionColour(bfrp, vec3(0.0, 1.0, 0.0)) * (1.0 - displayScene) * 0.8;\n        \n                //see through to floor\n                vec3 fpc = vec3(0.0);\n                float ft = planeIntersection(ro, rd, fn, fo);\n                if (ft > 0.0) {\n                    vec3 frp = ro + rd * ft;\n                    fpc = floorProjectionColour(frp, vec3(0.0, 1.0, 0.0)) * (1.0 - displayScene);\n                }  \n                //TODO: this is a bit crap\n                prc += fpc;\n            }\n            \n            sc *= sh;\n            pc += sc * displayScene;\n            \n            prc *= atten;\n            pc += prc * displayProjection;\n            \n            return pc;\n        }\n\n        void setupCamera(inout vec3 ro, inout vec3 rd) {\n            \n            vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;\n        \n            vec3 lookAt = vec3(0.0, 0.0, 0.0);\n            ro = lookAt + vec3(3.0, 2.0, -5.0);\n            \n            ro.xz *= rot(T);\n        \n            float FOV = PI / 3.0;\n            vec3 forward = normalize(lookAt - ro);\n            vec3 right = normalize(vec3(forward.z, 0.0, -forward.x)); \n            vec3 up = cross(forward, right);\n        \n            rd = normalize(forward + FOV * uv.x * right + FOV * uv.y * up);\n        }\n\n        void setupScene() {\n            \n            float timeline = mod(T, 20.0);\n            \n            if (timeline < 5.0) {\n                displayScene = 1.0;\n                displayProjection = 0.0;\n                rotateProjection = 0.0;\n            } else if (timeline < 10.0) {\n                displayScene = 1.0;\n                displayProjection += clamp((timeline - 5.0) * 0.5, 0.0, 1.0);\n                rotateProjection = 0.0;\n            } else if (timeline < 15.0) {\n                displayScene = clamp(1.0 - (timeline - 10.0) * 0.5, 0.0, 1.0);\n                displayProjection = 1.0;\n                rotateProjection = 1.0;\n                rotation = timeline - 10.0;\n            } else if (timeline < 20.0) {\n                displayScene = clamp((timeline - 15.0) * 0.5, 0.0, 1.0);\n                displayProjection = clamp(1.0 - (timeline - 15.0) * 0.5, 0.0, 1.0);\n                rotateProjection = 1.0;\n                rotation = timeline - 10.0;        \n            }\n        }\n\n        void main() {\n            \n            vec3 pc = vec3(0.0);\n    \n            setupScene();\n    \n            vec3 ro, rd;\n            setupCamera(ro, rd);\n    \n            Scene scene = drawScene(ro, rd);\n            if (scene.t > 0.0 && scene.t < FAR) {\n                pc = colourScene(ro, rd, scene);        \n            }\n\t\n            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);\n        }\n    ';
+
+    return fsSource;
+};
+
+module.exports = {
+    fragmentSource: fragmentSource
+};
+
+/***/ }),
+/* 295 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = __webpack_require__.p + "images/mobiussphere.png";
 
 /***/ })
 /******/ ]);
