@@ -149,7 +149,7 @@ function fragmentSource() {
         vec2 e = vec2(EPS, 0.0);
         float n0 = noise(rp);
         vec3 d = vec3(noise(rp + e.xyy) - n0, noise(rp + e.yxy) - n0, noise(rp + e.yyx) - n0) / e.x;
-        n = normalize(n - d * 0.5 / sqrt(ds));
+        n = normalize(n - d * 0.2 / sqrt(ds));
         return n;
     }
 

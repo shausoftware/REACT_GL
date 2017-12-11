@@ -3,6 +3,11 @@
 const React = require('react');
 const ShauGL = require('./shaugl3D');
 
+const cat1 = require('./static/images/cat1.jpg');
+const cat2 = require('./static/images/cat2.jpg');
+const cat3 = require('./static/images/cat3.jpg');
+const cat4 = require('./static/images/cat4.jpg');
+
 var animId = undefined;
 
 export default class WebGLContentItem extends React.Component {
@@ -15,6 +20,7 @@ export default class WebGLContentItem extends React.Component {
                       displayBackButton: this.props.displayBackButton,
                       supported: true};
         this.goBack = this.goBack.bind(this);
+        this.gracefullFallback = this.gracefullFallback.bind(this);
     }
 
     componentDidMount() {
@@ -25,6 +31,7 @@ export default class WebGLContentItem extends React.Component {
             //TODO: fail gracefully
             this.setState({supported: false});
             alert('Please update to a web browser that supports WebGL.');
+            this.gracefullFallback();  
             return;
         }
 
@@ -66,7 +73,24 @@ export default class WebGLContentItem extends React.Component {
         //stop animation thread
         window.cancelAnimationFrame(animId);        
     }
-        
+     
+    gracefullFallback() {
+        var ctx = this.refs.glCanvas.getContext('2d');
+        var img = new Image();
+        img.onload = function() {
+          ctx.drawImage(img, 0, 0);
+        };
+        var r = Math.random();
+        if (r < 0.25) {
+            img.src = cat1;
+        } else if (r < 0.5) {
+            img.src = cat2;
+        } else if (r < 0.75) {
+            img.src = cat3;
+        }
+        img.src = cat4;
+    }
+
     render() {
 
         var titleH = undefined;
