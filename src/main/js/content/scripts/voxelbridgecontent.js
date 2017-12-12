@@ -17,7 +17,7 @@ function getTitle() {
 
 function getDescription() {
     var description = "Another raymarching shader. This time utilising voxel traversal. " +
-                      "It was also my first attempt at using framebuffers for off-screen renndering.";
+                      "It was also my first attempt at using framebuffers for off-screen rendering.";
     return description;
 }
 

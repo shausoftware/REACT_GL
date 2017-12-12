@@ -27,7 +27,7 @@ function getTitle() {
 function getDescription() {
     var description = "This is my second attempt at loading and rendering an OBJ model. " +
                       "The awesome Iron Man model is by Deadcode3. This time I tried adding " +
-                      "a glow effect some planar reflections in the floor."
+                      "a glow effect some planar reflections in the floor. " +
                       "The models are quite large and take a little while to load.";
     return description;
 }
