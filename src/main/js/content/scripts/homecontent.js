@@ -16,7 +16,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "This is the third incarnation of my website SHAUSTUFF and this time around the focus is on WebGL." +        
+    var description = "This is the third incarnation of my website SHAUSTUFF and this time around the focus is on WebGL and Javascript." +        
                       " All of the code to this site is available from my github repository" +
                       " should you be interested in such things (see links). Now on to business..." +
                       " some pictures of cats (rendered using WebGL).";

@@ -15,7 +15,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "I created this shader I created a while back. It utilises " +
+    var description = "This is a shader I created a while back on Shadertoy. It utilises " +
                       " raytracing and volumetric raymarching for the glow/light effect.";
     return description;
 }

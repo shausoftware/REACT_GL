@@ -13,7 +13,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "This is a rework of one of my first fragment shaders. A simple demonstration of a Mobius projection from a sphere.";
+    var description = "This is a rework of one of my first fragment shaders on Shadertoy. A simple demonstration of a Mobius projection from a sphere.";
     return description;
 }
 

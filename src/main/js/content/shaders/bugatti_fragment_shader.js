@@ -141,6 +141,7 @@ function fragmentSource() {
         return amountInLight;
     }
 
+    //Nimitz
     vec3 bump(vec3 rp, vec3 n, float ds) {
         vec2 e = vec2(EPS, 0.0);
         float n0 = noise(rp);

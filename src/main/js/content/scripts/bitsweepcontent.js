@@ -14,7 +14,7 @@ function getTitle() {
 }
 
 function getDescription() {
-    var description = "Another raytracer this time inspired by Bitsweep by Beeple.";
+    var description = "Again using raytracing to draw the scene. This time inspired by Bitsweep by Beeple. Kind of.";
     return description;
 }
 

@@ -21,8 +21,7 @@ function getTitle() {
 function getDescription() {
     var description = "This is my first attempt at loading at loading and rendering " +
                       "a reasonably complex OBJ model file. I had to create a pre-processor that " +
-                      "optimises and breaks up the geometry by material assignment " +
-                      "before parsing to JSON. " +
+                      "breaks up the geometry by material assignment before parsing to JSON. " +
                       "The excellent Bugatti model is by Kimzauto. The lighting uses screen space " +
                       "ambient occlusion, shadow maps and opacity.";
     return description;

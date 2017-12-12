@@ -25,7 +25,7 @@ function getTitle() {
 function getDescription() {
     var description = "My first attempt at a particle shader. The particle positions and velocities " +
                       "are computated in fragment buffers before rendering. Curl noise is used " +
-                      "for the FBM type motion.";
+                      "for the FBM type motion. The work of Nop Jiarathanakul and Edan Kwan inspired this.";
     return description;
 }
 
