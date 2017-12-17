@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/shausoftware/SHAU_GL",
   "dependencies": {
+    "augmented-compile-shader": "^1.0.0",
     "bootstrap": "^3.3.7",
     "gl-matrix": "^2.4.0",
     "jquery": "^3.2.1",

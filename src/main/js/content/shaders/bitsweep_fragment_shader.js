@@ -90,7 +90,7 @@ function fragmentSource() {
             vec2 grid = vec2((rp.x + 2.0) * 0.25, rp.z + 0.5);
             vec2 cell = floor(grid);
             vec2 cuv = fract(grid);
-        
+
             if (scene.id == FLOOR) {
                 
                 pc = vec3(0.3) * diff;
