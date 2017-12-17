@@ -23,7 +23,8 @@ function getDescription() {
                       "a reasonably complex OBJ model file. I had to create a pre-processor that " +
                       "breaks up the geometry by material assignment before parsing to JSON. " +
                       "The excellent Bugatti model is by Kimzauto. The lighting uses screen space " +
-                      "ambient occlusion, shadow maps and opacity.";
+                      "ambient occlusion, shadow maps and opacity. Again this is a large model and " +
+                      "takes approximately 90 seconds to load.";
     return description;
 }
 

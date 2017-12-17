@@ -8,6 +8,7 @@ import DiscoWallContent from './content/scripts/discowallcontent';
 import ParticleContent from './content/scripts/particlecontent';
 import VoxelBridgeContent from './content/scripts/voxelbridgecontent';
 import MobiusSphereContent from './content/scripts/mobiusspherecontent';
+import GreenCycleContent from './content/scripts/greencyclecontent';
 
 const link1 = {title: 'Source Code',
                description: "The source code to this site, the OBJ model loading toolchain and a few other projects I'm working on can be found in my Github repository.",
@@ -44,10 +45,11 @@ function loadContentItemsForPage(navUri) {
                      last: {href: 'last'}};
     
     if ('first' === navUri) {
+        //PAGE 1
         contentItemsCurrentPage = 1;
         contentItems.push(LittleCubesContent);
+        contentItems.push(GreenCycleContent);
         contentItems.push(IronManContent);
-        contentItems.push(BitsweepContent);
     } 
     
     if ('prev' === navUri) {
@@ -57,12 +59,13 @@ function loadContentItemsForPage(navUri) {
         if (contentItemsCurrentPage === 1) {
             //page 1
             contentItems.push(LittleCubesContent);
+            contentItems.push(GreenCycleContent);        
             contentItems.push(IronManContent);
-            contentItems.push(BitsweepContent);
         } else {
+
             //page 2 - only three pages at the moment
-            contentItems.push(BugattiContent);
-            contentItems.push(DiscoWallContent);
+            contentItems.push(BitsweepContent);
+            contentItems.push(MobiusSphereContent);
             contentItems.push(ParticleContent);
             pageLinks = {first: {href: 'first'},
                          prev: {href: 'prev'},
@@ -77,15 +80,16 @@ function loadContentItemsForPage(navUri) {
         }
         if (contentItemsCurrentPage === CI_PAGES) {
             //page 3
+            contentItems.push(BugattiContent);            
+            contentItems.push(DiscoWallContent);
             contentItems.push(VoxelBridgeContent);
-            contentItems.push(MobiusSphereContent);
             pageLinks = {first: {href: 'first'},
                          prev: {href: 'prev'},
                          last: {href: 'last'}};
         } else {
             //page 2 - only three pages at the moment
-            contentItems.push(BugattiContent);
-            contentItems.push(DiscoWallContent);
+            contentItems.push(BitsweepContent);
+            contentItems.push(MobiusSphereContent);
             contentItems.push(ParticleContent);
             pageLinks = {first: {href: 'first'},
                          prev: {href: 'prev'},
@@ -95,9 +99,11 @@ function loadContentItemsForPage(navUri) {
     }
 
     if ('last' === navUri) {
+        //page 3
         contentItemsCurrentPage = CI_PAGES;        
-        contentItems.push(VoxelBridgeContent);
-        contentItems.push(MobiusSphereContent);
+        contentItems.push(BugattiContent);            
+        contentItems.push(DiscoWallContent);
+        contentItems.push(VoxelBridgeContent);    
         pageLinks = {first: {href: 'first'},
                      prev: {href: 'prev'},
                      last: {href: 'last'}};

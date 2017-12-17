@@ -39,7 +39,6 @@ export default class WebGLContentList extends React.Component {
                      </div>);
         }
         
-
         return(
             <div className='panel-body'>
                 <div className="row">
