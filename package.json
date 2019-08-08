@@ -32,7 +32,7 @@
   "scripts": {
     "build": "webpack --mode development",
     "start:showcase": "webpack-dev-server",
-    "watch": "webpack --watch -d"
+    "start:dev": "webpack --mode development --watch -d & webpack-dev-server --hot"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
