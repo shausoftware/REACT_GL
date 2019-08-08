@@ -5,7 +5,7 @@ navigate from the root directory to /src/main/js/static and extract bugatti.obj 
 
 gunzip bugatti.obj.gz
 
-gunzip ironman.obj.gz
+gunzip IronMan.obj.gz
 
 ...then open a terminal,  navigate to the project root directory and run:
 
