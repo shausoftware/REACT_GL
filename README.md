@@ -4,6 +4,7 @@ Showcase built using React, Bootstrap and WebGL. It also serves as a simple WebG
 navigate from the root directory to /src/main/js/static and extract bugatti.obj from bugatti.obj.gz and ironman.obj.gz.
 
 gunzip bugatti.obj.gz
+
 gunzip ironman.obj.gz
 
 ...then open a terminal,  navigate to the project root directory and run:
