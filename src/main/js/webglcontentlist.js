@@ -25,8 +25,8 @@ export default class WebGLContentList extends React.Component {
         for (var i = 0; i < this.state.contentItems.length; i++) {
             var ci = this.state.contentItems[i];
             cis.push(<div key={ci.getTitle()} className="col-sm-6 col-md-4">
-                         <div className="thumbnail">
-                             <img src={ci.getSnapshotImage()} alt={ci.getTitle()} />
+                         <div>
+                             <img className="img-thumbnail" src={ci.getSnapshotImage()} alt={ci.getTitle()} />
                              <div className="caption">
                                  <h3>{ci.getTitle()}</h3>
                                  <p>{ci.getDescription()}</p>

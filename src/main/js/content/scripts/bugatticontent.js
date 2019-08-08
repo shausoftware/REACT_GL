@@ -6,33 +6,31 @@ const bugattiJsonSrc = require('../../static/bugatti.obj');
 const ShauGL = require('../../shaugl3D'); //general 3D utils
 const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
-import ModelVertexShader from '../../shaders/model_vertex_shader';
-import BugattiFragmentShader from '../../content/shaders/bugatti_fragment_shader';
+import * as ModelVertexShader from '../../shaders/model_vertex_shader';
+import * as BugattiFragmentShader from '../../content/shaders/bugatti_fragment_shader';
 
 var glm = require('gl-matrix');
 
 var shadowDepthTextureSize = 4096;
 var lightPosition = [-3.5, 8.0, 6.0];
 
-function getTitle() {
+export function getTitle() {
     return "Bugatti";
 }
 
-function getDescription() {
-    var description = "This is my first attempt at loading at loading and rendering " +
-                      "a reasonably complex OBJ model file. I had to create a pre-processor that " +
-                      "breaks up the geometry by material assignment before parsing to JSON. " +
-                      "The excellent Bugatti model is by Kimzauto. The lighting uses screen space " +
+export function getDescription() {
+    var description = "The excellent Bugatti OBJ model by Kimzauto has been passed through my pre-processor (source on GIT)" + 
+                      " to create a JSON representaion. The lighting uses screen space " +
                       "ambient occlusion, shadow maps and opacity. Again this is a large model and " +
-                      "takes approximately 90 seconds to load.";
+                      "takes a few seconds to load.";
     return description;
 }
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
     return bugattiImgSrc;
 }
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
 
     //bugatti program
     const modelVsSource = ModelVertexShader.vertexSource();
@@ -116,7 +114,7 @@ function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};                        
 }
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
     //do nothing
     return new Promise(resolve => {
 
@@ -187,7 +185,7 @@ function loadGLContent(gl, mBuffExt, content) {
     });
 }
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
 
     var cameraPosition = glm.vec3.fromValues(7.0, 3.0, 9.0);
     var target = glm.vec3.fromValues(0.0, 0.0, 0.5);
@@ -569,12 +567,3 @@ function postProcess(gl,
     
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};

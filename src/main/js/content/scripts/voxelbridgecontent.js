@@ -5,27 +5,27 @@ const voxelBridgeImgSrc = require('../../static/images/voxelbridge.png');
 const ShauGL = require('../../shaugl3D'); //general 3D utils
 const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
-import SimpleVertexShader from '../../shaders/simple_vertex_shader';
-import VoxelBridgeFragmentShader from '../../content/shaders/voxel_bridge_fragment_shader';
-import VoxelBridgeBufferFragmentShader from '../../content/shaders/voxel_bridge_buffer_fragment_shader';
+import * as SimpleVertexShader from '../../shaders/simple_vertex_shader';
+import * as VoxelBridgeFragmentShader from '../../content/shaders/voxel_bridge_fragment_shader';
+import * as VoxelBridgeBufferFragmentShader from '../../content/shaders/voxel_bridge_buffer_fragment_shader';
 
 var glm = require('gl-matrix');
 
-function getTitle() {
+export function getTitle() {
     return "Voxel Bridge";
 }
 
-function getDescription() {
+export function getDescription() {
     var description = "Another raymarching shader. This time utilising voxel traversal. " +
                       "It was also my first attempt at using framebuffers for off-screen rendering.";
     return description;
 }
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
     return voxelBridgeImgSrc;
 }
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
 
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = VoxelBridgeFragmentShader.fragmentSource();
@@ -73,14 +73,14 @@ function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};
 }
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
     });
 }
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
 
     //render glow trail
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.renderBuffer1.framebuffer);
@@ -109,12 +109,3 @@ function renderGLContent(gl, content, dt) {
     content.framebuffers.renderBuffer1 = content.framebuffers.renderBuffer2;
     content.framebuffers.renderBuffer2 = tempBuffer; 
 }
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};

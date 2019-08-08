@@ -1,6 +1,6 @@
 'use strict';
 
-function fragmentSource() {
+export function fragmentSource() {
     
     const fsSource = `
 
@@ -29,8 +29,4 @@ function fragmentSource() {
     `;
     
     return fsSource;
-};
-    
-module.exports = {
-    fragmentSource: fragmentSource
 };

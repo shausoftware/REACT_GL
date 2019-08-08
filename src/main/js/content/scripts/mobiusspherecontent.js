@@ -5,23 +5,23 @@ const mobiusSphereImgSrc = require('../../static/images/mobiussphere.png');
 const ShauGL = require('../../shaugl3D'); //general 3D utils
 const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
-import SimpleVertexShader from '../../shaders/simple_vertex_shader';
-import MobiusSphereFragmentShader from '../../content/shaders/mobius_sphere_fragment_shader';
+import * as SimpleVertexShader from '../../shaders/simple_vertex_shader';
+import * as MobiusSphereFragmentShader from '../../content/shaders/mobius_sphere_fragment_shader';
 
-function getTitle() {
+export function getTitle() {
     return "Mobius Sphere";
 }
 
-function getDescription() {
-    var description = "This is a rework of one of my first fragment shaders on Shadertoy. A simple demonstration of a Mobius projection from a sphere.";
+export function getDescription() {
+    var description = "A raytraced rework of one of my first fragment shaders on Shadertoy. A simple demonstration of a Mobius projection from a sphere.";
     return description;
 }
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
     return mobiusSphereImgSrc;
 }
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
     
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = MobiusSphereFragmentShader.fragmentSource();
@@ -46,14 +46,14 @@ function initGLContent(gl, mBuffExt) {
             framebuffers: []};
 }
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
     });
 }
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
     
     //render to canvas
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -66,12 +66,3 @@ function renderGLContent(gl, content, dt) {
                             undefined,
                             dt);  
 }
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};

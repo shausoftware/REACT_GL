@@ -7,6 +7,8 @@ import Pagination from './pagination';
 import WebGLContentList from './webglcontentlist';
 import WebGLContentItem from './webglcontentitem';
 
+/* WebGL experiments */
+
 export default class Exports extends React.Component {
 
     constructor(props) {
@@ -62,8 +64,8 @@ export default class Exports extends React.Component {
         }
 
         return(
-            <div className='panel panel-default'>
-                <div className='panel-heading'>Experiments</div>
+            <div className='panel'>
+                <div className='panel-heading'><h4>Experiments</h4></div>
                 <div className='panel-body'>
                     {pagination}
                     {displayItem}        

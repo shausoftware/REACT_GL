@@ -2,14 +2,15 @@
 
 const React = require('react');
 
-require('bootstrap-loader');
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import ShauNavBar from './shaunavbar';
 
 import WebGLContentItem from './webglcontentitem';
 import HomeContent from './content/scripts/homecontent';
 
-import ShauCss from './shaucss';
+import * as ShauCss from './shaucss';
 
 import Home from './home';
 import Experiments from './experiments';
@@ -18,6 +19,8 @@ import ShauLinks from './shaulinks';
 import TestPage from './testpage';
 
 const TEST_MODE = false;
+
+/* Main React Component */
 
 export default class App extends React.Component {
 	

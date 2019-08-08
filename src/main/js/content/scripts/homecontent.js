@@ -8,26 +8,27 @@ const cat4 = require('../../static/images/cat4.jpg');
 const ShauGL = require('../../shaugl3D'); //general 3D utils
 const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
-import SimpleVertexShader from '../../shaders/simple_vertex_shader';
-import HomeFragmentShader from '../../content/shaders/home_fragment_shader';
+import * as SimpleVertexShader from '../../shaders/simple_vertex_shader';
+import * as HomeFragmentShader from '../../content/shaders/home_fragment_shader';
 
-function getTitle() {
+export function getTitle() {
     return undefined;
 }
 
-function getDescription() {
-    var description = "This is the third incarnation of my website SHAUSTUFF and this time around the focus is on WebGL and Javascript." +        
+export function getDescription() {
+    var description = "Welcome to my little showcase. The focus is on WebGL, REACT, Bootstrap and Javascript development and some of my artistic endeavours." +
+                      " It also serves as WebGL development environment allowing me to quickly prototype ideas leveraging Webpack for autonomous build ands deployment." +       
                       " All of the code to this site is available from my github repository" +
                       " should you be interested in such things (see links). Now on to business..." +
-                      " some pictures of cats (rendered using WebGL).";
+                      " some pictures of cats rendered using WebGL.";
     return description;
 }
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
     return cat1;
 }
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
 
     var programInfos = undefined;
     var framebuffers = [];
@@ -64,7 +65,7 @@ function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};
 }
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
     //already fully initialised
     //do nothing
     return new Promise(resolve => {
@@ -72,7 +73,7 @@ function loadGLContent(gl, mBuffExt, content) {
     });
 }
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
 
     // 4 images
     var vignette = 1.0;
@@ -120,12 +121,3 @@ function renderGLContent(gl, content, dt) {
     gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
     gl.useProgram(null);
 }
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};

@@ -1,7 +1,7 @@
 'use strict';
 
 const React = require('react');
-import ShauCss from './shaucss';
+import * as ShauCss from './shaucss';
 
 export default class ShauNavBar extends React.Component {
 
@@ -30,38 +30,24 @@ export default class ShauNavBar extends React.Component {
     render() {
 
         return(
-            <div className='navbar navbar-default'>
-                <div className='container-fluid'>
-                    <div className='navbar-header'>
-                        <button type='button' className='navbar-toggle collapsed' 
-                                              data-toggle='collapse' 
-                                              data-target='#bs-example-navbar-collapse-1' 
-                                              aria-expanded='false'>
+            <div className='navbar navbar-expand-lg shnavbar'>
+                <a className='navbar-brand' href='#'>
+                    <canvas ref='shauLogo' width='271' height='70' title='Logo generated from one of my old pen and ink drawings'></canvas>
+                </a>                     
 
-                            <span className='sr-only'>Toggle navigation</span>
-                            <span className='icon-bar'></span>
-                            <span className='icon-bar'></span>
-                            <span className='icon-bar'></span>                        
-                        </button> 
-                        <a className='navbar-brand' href='#'>
-                            <canvas ref='shauLogo' width='271' height='70'></canvas>
-                        </a>                     
-                    </div>
-
-                    <div className='collapse navbar-collapse' id='bs-example-navbar-collapse-1'>
-                        <ul className='nav navbar-nav'>
-                            <li className={'PAGE_HOME' === this.state.currentPage ? 'active' : undefined}>
-                                <a className='shau-home' href='#' name='PAGE_HOME' onClick={this.handleChangePage}>Home</a>
-                            </li>
-                            <li className={'PAGE_EXPERIMENTS' === this.state.currentPage ? 'active' : undefined}>
-                                <a className='shau-experiments' href='#' name='PAGE_EXPERIMENTS' onClick={this.handleChangePage}>WebGL Experiments</a>
-                            </li>
-                            <li className={'PAGE_LINKS' === this.state.currentPage ? 'active' : undefined}>
-                                <a className='shau-links' href='#' name='PAGE_LINKS' onClick={this.handleChangePage}>Links</a>
-                            </li>
-                        </ul>
-                    </div>                  
-                </div>
+                <div className='collapse navbar-collapse' id='bs-example-navbar-collapse-1'>
+                    <ul className='navbar-nav'>
+                        <li className='nav-item'>
+                            <a className='nav-link' href='#' name='PAGE_HOME' onClick={this.handleChangePage}>Home</a>
+                        </li>
+                        <li className='nav-item'>
+                            <a className='nav-link' href='#' name='PAGE_EXPERIMENTS' onClick={this.handleChangePage}>WebGL Experiments</a>
+                        </li>
+                        <li className='nav-item'>
+                            <a className='nav-link' href='#' name='PAGE_LINKS' onClick={this.handleChangePage}>Links</a>
+                        </li>
+                    </ul>
+                </div>                  
             </div>
         );
     }

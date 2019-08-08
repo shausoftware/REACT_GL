@@ -95,7 +95,7 @@ export default class WebGLContentItem extends React.Component {
 
         var titleH = undefined;
         if (this.state.title != undefined) {
-            titleH = <div className='text-center'><h4>{this.state.title}</h4></div>;
+            titleH = <div className='text-center'><h2>{this.state.title}</h2></div>;
         }
         var backButton = undefined;
         if (this.state.displayBackButton === true) {

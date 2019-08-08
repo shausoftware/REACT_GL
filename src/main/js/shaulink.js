@@ -22,14 +22,14 @@ export default class ShauLink extends React.Component {
         return (
             <tr>
                 <td> 
-                    <p className='text-center'>
-                        {this.state.title}
+                    <p className='text-center linktext'>
+                        <h4>{this.state.title}</h4>
                     </p>
-                    <p className='text-center'>
+                    <p className='text-center linktext'>
                         {this.state.description}
                     </p>
                     <p className='text-center'>
-                        <a href={this.state.href}>{this.state.href}</a>                        
+                        <a target='_blank' href={this.state.href}>{this.state.href}</a>                        
                     </p>                    
                 </td>
             </tr>

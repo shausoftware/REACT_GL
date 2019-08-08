@@ -8,32 +8,32 @@ const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 const PDIM = 256;
 var last = 0.0;
 
-import SimpleVertexShader from '../../shaders/simple_vertex_shader';
-import VignetteFragmentShader from '../../shaders/vignette_fragment_shader';
-import ParticleVertexShader from '../../content/shaders/particle_vertex_shader';
-import ParticleFragmentShader from '../../content/shaders/particle_fragment_shader';
-import ParticleComputeVertexShader from '../../content/shaders/particle_compute_vertex_shader';
-import ParticleComputeFragmentShader from '../../content/shaders/particle_compute_fragment_shader';
-import ParticleInitFragmentShader from '../../content/shaders/particle_init_fragment_shader';
+import * as SimpleVertexShader from '../../shaders/simple_vertex_shader';
+import * as VignetteFragmentShader from '../../shaders/vignette_fragment_shader';
+import * as ParticleVertexShader from '../../content/shaders/particle_vertex_shader';
+import * as ParticleFragmentShader from '../../content/shaders/particle_fragment_shader';
+import * as ParticleComputeVertexShader from '../../content/shaders/particle_compute_vertex_shader';
+import * as ParticleComputeFragmentShader from '../../content/shaders/particle_compute_fragment_shader';
+import * as ParticleInitFragmentShader from '../../content/shaders/particle_init_fragment_shader';
 
 var glm = require('gl-matrix');
 
-function getTitle() {
+export function getTitle() {
     return "Curl Particles";
 }
 
-function getDescription() {
-    var description = "My first attempt at a particle shader. The particle positions and velocities " +
+export function getDescription() {
+    var description = "My first attempt at a particle/compute shader. The particle positions and velocities " +
                       "are computated in fragment buffers before rendering. Curl noise is used " +
                       "for the FBM type motion. The work of Nop Jiarathanakul and Edan Kwan inspired this.";
     return description;
 }
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
     return particlesImgSrc;
 }
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
 
     //vignette program
     const vvsSource = SimpleVertexShader.vertexSource();
@@ -167,14 +167,14 @@ function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};       
 }
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
     });
 }
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
 
     var elapsedSeconds = dt;
     var delta = last != 0.0 ? elapsedSeconds - last : 0.0;
@@ -402,12 +402,3 @@ function drawVignette(gl, programInfo, buffers, texture) {
     gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
     gl.useProgram(null);
 }
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};

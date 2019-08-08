@@ -1,6 +1,6 @@
 'use strict';
 
-function vertexSource() {
+export function vertexSource() {
 
     const vsSource = `
 
@@ -31,7 +31,3 @@ function vertexSource() {
 
     return vsSource;
 }
-
-module.exports = {
-    vertexSource: vertexSource
-};

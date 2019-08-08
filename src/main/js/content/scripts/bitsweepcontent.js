@@ -5,24 +5,24 @@ const bitsweepImgSrc = require('../../static/images/bitsweep.png');
 const ShauGL = require('../../shaugl3D'); //general 3D utils
 const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
-import SimpleVertexShader from '../../shaders/simple_vertex_shader';
-import BitsweepFragmentShader from '../../content/shaders/bitsweep_fragment_shader';
-import BitsweepBufferFragmentShader from '../../content/shaders/bitsweep_buffer_fragment_shader';
+import * as SimpleVertexShader from '../../shaders/simple_vertex_shader';
+import * as BitsweepFragmentShader from '../../content/shaders/bitsweep_fragment_shader';
+import * as BitsweepBufferFragmentShader from '../../content/shaders/bitsweep_buffer_fragment_shader';
 
-function getTitle() {
+export function getTitle() {
     return "Bitsweep";
-}
+};
 
-function getDescription() {
-    var description = "Again using raytracing to draw the scene. This time inspired by Bitsweep by Beeple. Kind of.";
+export function getDescription() {
+    var description = "A raytraced scene inspired by Bitsweep by Beeple. Kind of.";
     return description;
-}
+};
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
     return bitsweepImgSrc;
-}
+};
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
     
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = BitsweepFragmentShader.fragmentSource();
@@ -63,16 +63,16 @@ function initGLContent(gl, mBuffExt) {
             textureInfos: [],
             buffers: buffers,
             framebuffers: framebuffers};
-}
+};
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
     });
-}
+};
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
     
     //render light
     gl.bindFramebuffer(gl.FRAMEBUFFER, content.framebuffers.renderBuffer.framebuffer);
@@ -95,13 +95,4 @@ function renderGLContent(gl, content, dt) {
                             undefined,
                             undefined,
                             dt);  
-}
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
 };

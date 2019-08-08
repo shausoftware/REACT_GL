@@ -36,16 +36,16 @@ export default class Pagination extends React.Component {
 		
 		var navLinks = [];
 		if ("first" in this.props.links) {
-			navLinks.push(<li key="first"><a onClick={this.handleNavFirst} href="#">&lt;&lt;</a></li>);
+			navLinks.push(<li key="first"><a onClick={this.handleNavFirst} href="#">First</a></li>);
 		}
 		if ("prev" in this.props.links) {
-			navLinks.push(<li key="prev"><a onClick={this.handleNavPrev} href="#">&lt;</a></li>);
+			navLinks.push(<li key="prev"><a onClick={this.handleNavPrev} href="#">Back</a></li>);
 		}
 		if ("next" in this.props.links) {
-			navLinks.push(<li key="next"><a onClick={this.handleNavNext} href="#">&gt;</a></li>);
+			navLinks.push(<li key="next"><a onClick={this.handleNavNext} href="#">Next</a></li>);
 		}
 		if ("last" in this.props.links) {
-			navLinks.push(<li key="last"><a onClick={this.handleNavLast} href="#">&gt;&gt;</a></li>);
+			navLinks.push(<li key="last"><a onClick={this.handleNavLast} href="#">Last</a></li>);
 		}
 		
 		return (

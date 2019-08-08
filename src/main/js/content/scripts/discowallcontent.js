@@ -5,26 +5,26 @@ const discoWallImgSrc = require('../../static/images/discowall.png');
 const ShauGL = require('../../shaugl3D'); //general 3D utils
 const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
-import SimpleVertexShader from '../../shaders/simple_vertex_shader';
-import DiscoWallFragmentShader from '../../content/shaders/disco_wall_fragment_shader';
+import * as SimpleVertexShader from '../../shaders/simple_vertex_shader';
+import * as DiscoWallFragmentShader from '../../content/shaders/disco_wall_fragment_shader';
 
 var glm = require('gl-matrix');
 
-function getTitle() {
+export function getTitle() {
     return "Disco Wall";
 }
 
-function getDescription() {
+export function getDescription() {
     var description = "This is a shader I created a while back on Shadertoy. It utilises " +
                       " raytracing and volumetric raymarching for the glow/light effect.";
     return description;
 }
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
     return discoWallImgSrc;
 }
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
 
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = DiscoWallFragmentShader.fragmentSource();
@@ -49,14 +49,14 @@ function initGLContent(gl, mBuffExt) {
             framebuffers: []};
 }
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
     });
 }
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
     ShauRMGL.drawRMScene(gl, 
                          content.programInfos.renderProgramInfo, 
                          content.buffers, 
@@ -66,12 +66,3 @@ function renderGLContent(gl, content, dt) {
                          undefined,
                          dt);
 }
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};

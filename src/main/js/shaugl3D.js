@@ -1,23 +1,25 @@
 'use strict';
 
-import SimpleVertexShader from './shaders/simple_vertex_shader';
-import LoadScreenFragmentShader from './shaders/load_screen_fragment_shader';
-import ShadowVertexShader from './shaders/shadow_vertex_shader';
-import ShadowFragmentShader from './shaders/shadow_fragment_shader';
-import SSAOVertexShader from './shaders/ssao_vertex_shader';
-import SSAOFragmentShader from './shaders/ssao_fragment_shader';
-import PostProcessVertexShader from './shaders/post_process_vertex_shader';
-import PostProcessFragmentShader from './shaders/post_process_fragment_shader';
-import GlowVertexShader from './shaders/glow_vertex_shader';
-import GlowFragmentShader from './shaders/glow_fragment_shader';
-import BlurVertexShader from './shaders/blur_vertex_shader';
-import BlurFragmentShader from './shaders/blur_fragment_shader';
-import SkyVertexShader from './shaders/sky_vertex_shader';
-import SkyFragmentSHader from './shaders/sky_fragment_shader';
+import * as SimpleVertexShader from './shaders/simple_vertex_shader';
+import * as LoadScreenFragmentShader from './shaders/load_screen_fragment_shader';
+import * as ShadowVertexShader from './shaders/shadow_vertex_shader';
+import * as ShadowFragmentShader from './shaders/shadow_fragment_shader';
+import * as SSAOVertexShader from './shaders/ssao_vertex_shader';
+import * as SSAOFragmentShader from './shaders/ssao_fragment_shader';
+import * as PostProcessVertexShader from './shaders/post_process_vertex_shader';
+import * as PostProcessFragmentShader from './shaders/post_process_fragment_shader';
+import * as GlowVertexShader from './shaders/glow_vertex_shader';
+import * as GlowFragmentShader from './shaders/glow_fragment_shader';
+import * as BlurVertexShader from './shaders/blur_vertex_shader';
+import * as BlurFragmentShader from './shaders/blur_fragment_shader';
+import * as SkyVertexShader from './shaders/sky_vertex_shader';
+import * as SkyFragmentSHader from './shaders/sky_fragment_shader';
+
+/* 3D Helper */
 
 const glm = require('gl-matrix');
 
-function initShaderProgram(gl, vsSource, fsSource) {
+export function initShaderProgram(gl, vsSource, fsSource) {
 
     const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
     const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
@@ -35,7 +37,7 @@ function initShaderProgram(gl, vsSource, fsSource) {
     return shaderProgram;
 };
 
-function loadShader(gl, type, source) {
+export function loadShader(gl, type, source) {
 
     const shader = gl.createShader(type);
 
@@ -51,7 +53,7 @@ function loadShader(gl, type, source) {
     return shader;
 };
 
-function checkExtensions(gl) {
+export function checkExtensions(gl) {
     
     var ext1 = undefined;
     var ext2 = undefined;
@@ -78,7 +80,7 @@ function checkExtensions(gl) {
     return ext2;
 }
 
-function initSkyProgram(gl) {
+export function initSkyProgram(gl) {
     const skyVsSource = SkyVertexShader.vertexSource();
     const skyFsSource = SkyFragmentSHader.fragmentSource();
     const skyShaderProgram = initShaderProgram(gl, skyVsSource, skyFsSource);
@@ -100,7 +102,7 @@ function initSkyProgram(gl) {
     return skyProgramInfo;
 }
 
-function initShadowProgram(gl) {
+export function initShadowProgram(gl) {
     const shadowMapVsSource = ShadowVertexShader.vertexSource();
     const shadowMapFsSource = ShadowFragmentShader.fragmentSource();
     const shadowMapShaderProgram = initShaderProgram(gl, shadowMapVsSource, shadowMapFsSource);
@@ -118,7 +120,7 @@ function initShadowProgram(gl) {
     return shadowMapProgramInfo;
 }
 
-function initGlowProgram(gl) {
+export function initGlowProgram(gl) {
     const glowVsSource = GlowVertexShader.vertexSource();
     const glowFsSource = GlowFragmentShader.fragmentSource();
     const glowShaderProgram = initShaderProgram(gl, glowVsSource, glowFsSource);
@@ -136,7 +138,7 @@ function initGlowProgram(gl) {
     return glowProgramInfo;
 }
 
-function initBlurProgram(gl) {
+export function initBlurProgram(gl) {
     const blurVsSource = BlurVertexShader.vertexSource();
     const blurFsSource = BlurFragmentShader.fragmentSource();
     const blurShaderProgram = initShaderProgram(gl, blurVsSource, blurFsSource);
@@ -156,7 +158,7 @@ function initBlurProgram(gl) {
     return blurProgramInfo;
 };
 
-function initSSAOProgram(gl) {
+export function initSSAOProgram(gl) {
     const ssaoVsSource = SSAOVertexShader.vertexSource();
     const ssaoFsSource = SSAOFragmentShader.fragmentSource();
     const ssaoShaderProgram = initShaderProgram(gl, ssaoVsSource, ssaoFsSource);
@@ -177,7 +179,7 @@ function initSSAOProgram(gl) {
     return ssaoProgramInfo;  
 }
 
-function initPostProcessProgram(gl) {
+export function initPostProcessProgram(gl) {
     const ppVsSource = PostProcessVertexShader.vertexSource();
     const ppFsSource = PostProcessFragmentShader.fragmentSource();
     const ppShaderProgram = initShaderProgram(gl, ppVsSource, ppFsSource);
@@ -195,7 +197,7 @@ function initPostProcessProgram(gl) {
     return ppProgramInfo;
 }
 
-function initLoadScreenProgram(gl) {
+export function initLoadScreenProgram(gl) {
     const lsVsSource = SimpleVertexShader.vertexSource();
     const lsFsSource = LoadScreenFragmentShader.fragmentSource();
     const lsShaderProgram = initShaderProgram(gl, lsVsSource, lsFsSource);
@@ -212,11 +214,11 @@ function initLoadScreenProgram(gl) {
     return lsProgramInfo;
 }
 
-function isPowerOf2(value) {
+export function isPowerOf2(value) {
     return (value & (value - 1)) == 0;
 }
 
-function initTexture(gl, width, height) {
+export function initTexture(gl, width, height) {
     
     var texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -234,7 +236,7 @@ function initTexture(gl, width, height) {
     return texture;
 }
 
-function loadImageAndInitTextureInfo(gl, url) {
+export function loadImageAndInitTextureInfo(gl, url) {
     
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -288,7 +290,7 @@ function loadImageAndInitTextureInfo(gl, url) {
     };
 }
 
-function initFramebuffer(gl, width, height, scale) {
+export function initFramebuffer(gl, width, height, scale) {
     
     var texture = this.initTexture(gl, width * scale, height * scale);
     
@@ -314,7 +316,7 @@ function initFramebuffer(gl, width, height, scale) {
     };
 }
 
-function initDepthFramebuffer(gl, width, height) {
+export function initDepthFramebuffer(gl, width, height) {
     
     var shadowDepthTexture = this.initTexture(gl, width, height);
 
@@ -338,7 +340,7 @@ function initDepthFramebuffer(gl, width, height) {
 }
 
 //process OBJ file
-function loadObj(objdata) {
+export function loadObj(objdata) {
     
     var lines = objdata.split('\n');
     var objectGroups = [];
@@ -461,7 +463,7 @@ function loadObj(objdata) {
     return objectGroups;
 }
 
-function loadMesh(uri, useMaterials) {
+export function loadMesh(uri, useMaterials) {
     return new Promise(resolve => {
         $.ajax({
             url: uri,
@@ -474,7 +476,7 @@ function loadMesh(uri, useMaterials) {
     });
 }
 
-function loadJsonMesh(uri) {
+export function loadJsonMesh(uri) {
     return new Promise(resolve => {
         $.ajax({
             url: uri,
@@ -487,7 +489,7 @@ function loadJsonMesh(uri) {
     });
 }
 
-function setupCamera(cameraPosition, target, projectionMatrix) {
+export function setupCamera(cameraPosition, target, projectionMatrix) {
 
     var up = [0.0, 1.0, 0.0];
 
@@ -505,7 +507,7 @@ function setupCamera(cameraPosition, target, projectionMatrix) {
     };
 }
 
-function renderLoadScreen(gl, programInfo, buffers, runningTime) {
+export function renderLoadScreen(gl, programInfo, buffers, runningTime) {
 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0.0, 0.0, 0.0, 1.0); //clear to white fully opaque
@@ -527,7 +529,7 @@ function renderLoadScreen(gl, programInfo, buffers, runningTime) {
     gl.useProgram(null);
 }
 
-function renderSky(gl, 
+export function renderSky(gl, 
                    programInfo, 
                    buffers, 
                    lightPosition, 
@@ -568,25 +570,3 @@ function renderSky(gl,
     gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
     gl.useProgram(null);
 }
-
-module.exports = {
-    initShaderProgram: initShaderProgram,
-    loadShader: loadShader,
-    checkExtensions: checkExtensions,
-    initSkyProgram: initSkyProgram,
-    initShadowProgram: initShadowProgram,
-    initSSAOProgram: initSSAOProgram,
-    initGlowProgram: initGlowProgram,
-    initBlurProgram: initBlurProgram,
-    initPostProcessProgram: initPostProcessProgram,
-    initLoadScreenProgram: initLoadScreenProgram,
-    initTexture: initTexture,
-    loadImageAndInitTextureInfo: loadImageAndInitTextureInfo,
-    initFramebuffer: initFramebuffer,
-    initDepthFramebuffer: initDepthFramebuffer,
-    loadMesh: loadMesh,
-    loadJsonMesh: loadJsonMesh,
-    setupCamera: setupCamera,
-    renderLoadScreen: renderLoadScreen,
-    renderSky: renderSky
-};

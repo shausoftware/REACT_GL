@@ -5,39 +5,30 @@ const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
 var glm = require('gl-matrix');
 
-function getTitle() {
+export function getTitle() {
     return undefined;
 }
 
-function getDescription() {
+export function getDescription() {
     var description = "Description.";
     return description;
 }
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
 
 }
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
 
 }
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
     });
 }
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
 
 }
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};

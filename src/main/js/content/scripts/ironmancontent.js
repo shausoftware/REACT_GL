@@ -6,9 +6,9 @@ const ironManJsonSrc = require('../../static/IronMan.obj');
 const ShauGL = require('../../shaugl3D'); //general 3D utils
 const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
-import ModelVertexShader from '../../shaders/model_vertex_shader';
-import IronManFragmentShader from '../../content/shaders/iron_man_fragment_shader';
-import IronManReflectionFragmentShader from '../../content/shaders/iron_man_reflection_fragment_shader';
+import * as ModelVertexShader from '../../shaders/model_vertex_shader';
+import * as IronManFragmentShader from '../../content/shaders/iron_man_fragment_shader';
+import * as IronManReflectionFragmentShader from '../../content/shaders/iron_man_reflection_fragment_shader';
 
 var glm = require('gl-matrix');
 
@@ -20,23 +20,22 @@ var blurAmount = 8; //0 - 10
 var blurScale = 0.9;
 var blurStrength = 0.6; //0.0 - 1.0
 
-function getTitle() {
+export function getTitle() {
     return "Iron Man";
 }
 
-function getDescription() {
-    var description = "This is my second attempt at loading and rendering an OBJ model. " +
-                      "The awesome Iron Man model is by Deadcode3. This time I tried adding " +
-                      "a glow effect some planar reflections in the floor. " +
+export function getDescription() {
+    var description = "This great Iron-Man OBJ model by Kimzauto has been passed through my pre-processor (source on GIT)" + 
+                      " to create a JSON representaion. This time I tried adding a glow effect some planar reflections in the floor. " +
                       "The models are quite large and take a little while to load.";
     return description;
 }
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
     return ironManImgSrc;
 }
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
 
     //bugatti program
     const modelVsSource = ModelVertexShader.vertexSource();
@@ -167,7 +166,7 @@ function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};
 }
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
 
     return new Promise(resolve => {
         
@@ -238,7 +237,7 @@ function loadGLContent(gl, mBuffExt, content) {
     });
 }
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
 
     var cameraPosition = glm.vec3.fromValues(4.0, 10.0 + Math.sin(dt * 0.2) * 2.0, 10.0 + Math.sin(dt * 0.2) * 2.0);
     var target = glm.vec3.fromValues(0.0, 5.0 + Math.cos(dt * 0.2) * .0, 0.5);
@@ -394,7 +393,7 @@ function drawShadowMap(gl, programInfo, buffers, cameraMatrices, depthRez) {
     }
 }
 
-function drawGlowMap(gl, programInfo, buffers, viewCameraMatrices) {
+export function drawGlowMap(gl, programInfo, buffers, viewCameraMatrices) {
 
     gl.useProgram(programInfo.program);
     
@@ -791,12 +790,3 @@ function blur(gl,
     
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};

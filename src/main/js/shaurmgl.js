@@ -2,11 +2,9 @@
 
 var glm = require('gl-matrix');
 
-/*
- * Raymarching utility functions 
- */
+/* Raymarching Helper */
 
-function initBuffers(gl) {
+export function initBuffers(gl) {
 
     var quad = new Float32Array([
         -1.0, -1.0,  0.0,
@@ -40,7 +38,7 @@ function initBuffers(gl) {
     };
 }
 
-function drawRMScene(gl, 
+export function drawRMScene(gl, 
                      programInfo, 
                      buffers, 
                      texture1,
@@ -89,8 +87,3 @@ function drawRMScene(gl,
     gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
     gl.useProgram(null);
 }
-
-module.exports = {
-    initBuffers: initBuffers,
-    drawRMScene: drawRMScene
-};

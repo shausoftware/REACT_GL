@@ -1,7 +1,7 @@
 'use strict';
 
 const React = require('react');
-import ApiUtils from './apiutils';
+import * as ApiUtils from './apiutils';
 import ShauLink from './shaulink';
 import Pagination from './pagination';
 
@@ -18,13 +18,6 @@ export default class ShauLinks extends React.Component {
     }
 
     loadShauLinksFromServer(pageSize) {
-        /*
-        ApiUtils.loadLinksFromServer(pageSize).then(entity => {
-            this.setState({shauLinks: entity._embedded.shauLinks,
-                           pageSize: this.state.pageSize,
-                           links: entity._links});
-        });
-        */
         var entity = ApiUtils.loadLinksFromServer(3);
         this.setState({shauLinks: entity._embedded.shauLinks,
                        pageSize: this.state.pageSize,
@@ -32,13 +25,6 @@ export default class ShauLinks extends React.Component {
     }
 
     onNavigate(navUri) {
-        /*
-        ApiUtils.onLinksNavigate(navUri).then(entity => {
-            this.setState({shauLinks: entity._embedded.shauLinks,
-                           pageSize: this.state.pageSize,
-                           links: entity._links}); 
-        });
-        */
         var entity = ApiUtils.onLinksNavigate(navUri);
         this.setState({shauLinks: entity._embedded.shauLinks,
                        pageSize: this.state.pageSize,
@@ -57,9 +43,10 @@ export default class ShauLinks extends React.Component {
         }
 
         return (
-            <div className='panel panel-default'>
-                <div className='panel-heading'>Links Page</div>
+            <div className='panel'>
+                <div className='panel-heading'><h4>Links Page</h4></div>
                 <div className='panel-body'>
+                    <Pagination links={this.state.links} onNavigate={this.onNavigate} />
                     <p className='text-center'>
                         and finally some links to stuff that I find interesting and useful.
                     </p>
@@ -68,7 +55,6 @@ export default class ShauLinks extends React.Component {
                             {linkItems}
                         </tbody>
                     </table>
-                    <Pagination links={this.state.links} onNavigate={this.onNavigate} />
                 </div>
             </div>
         );

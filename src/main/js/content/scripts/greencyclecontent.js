@@ -5,23 +5,23 @@ const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
 const greencycleImgSrc = require('../../static/images/greencycle.png');
 
-import SimpleVertexShader from '../../shaders/simple_vertex_shader';
-import GreenCycleFragmentShader from '../../content/shaders/green_cycle_fragment_shader';
+import * as SimpleVertexShader from '../../shaders/simple_vertex_shader';
+import * as GreenCycleFragmentShader from '../../content/shaders/green_cycle_fragment_shader';
 
-function getTitle() {
+export function getTitle() {
     return "Green Cycle";
 }
 
-function getDescription() {
-    var description = "Another piece inspired by Beeple. This time emulating his PurpCycle VJ clip.";
+export function getDescription() {
+    var description = "My first Shader of the Week on Shadertoy inspired by Beeple. This time emulating his PurpCycle VJ clip.";
     return description;
 }
 
-function getSnapshotImage() {
+export function getSnapshotImage() {
     return greencycleImgSrc;
 }
 
-function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl, mBuffExt) {
 
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = GreenCycleFragmentShader.fragmentSource();
@@ -46,14 +46,14 @@ function initGLContent(gl, mBuffExt) {
             framebuffers: []};
 }
 
-function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, mBuffExt, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
     });
 }
 
-function renderGLContent(gl, content, dt) {
+export function renderGLContent(gl, content, dt) {
     ShauRMGL.drawRMScene(gl, 
                          content.programInfos.renderProgramInfo, 
                          content.buffers, 
@@ -63,12 +63,3 @@ function renderGLContent(gl, content, dt) {
                          undefined,
                          dt);
 }
-
-module.exports = {
-    getTitle: getTitle,
-    getDescription: getDescription,
-    getSnapshotImage: getSnapshotImage,
-    initGLContent: initGLContent,
-    loadGLContent: loadGLContent,
-    renderGLContent: renderGLContent
-};
