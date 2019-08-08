@@ -26,10 +26,10 @@ const link5 = {title: 'Shadertoy',
                description: 'The awesome fragment shader community setup by Inigo Quilez.',
                href: 'http://www.shadertoy.com'};
 const link6 = {title: 'Beeple',
-               description: 'Just come across this guy. The art is amazing.',
+               description: 'The art is amazing and he has an interesting work ethic.',
                href: 'http://www.beeple-crap.com'};
 const link7 = {title: 'Pouet',
-               description: 'Demoscene is also new to me though I do remember the old Cracktros. Be warned it does get weird.',
+               description: 'Demoscene is quite new to me though I do remember the old Cracktros. Be warned it does get weird.',
                href: 'http://www.pouet.net'};
 
 var contentItemsCurrentPage = 1;
