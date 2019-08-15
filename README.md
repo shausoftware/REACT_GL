@@ -1,5 +1,5 @@
-# SHAU_GL
-Showcase built using React, Bootstrap and WebGL. It also serves as a simple WebGL development framework with GLSL error messages (see details on running in test mode). It's built using webpack allowing for quick local deployments. To run this locally first make sure you have Node installed then:
+# REACT_GL
+Showcase built using React, Bootstrap and WebGL2. It also serves as a simple WebGL development framework with GLSL error messages (see details on running in test mode). It's built using webpack allowing for quick local deployments. To run this locally first make sure you have Node installed then:
 
 navigate from the root project directory to src/main/js/static and unzip bugatti.obj.gz and ironman.obj.gz using your favourite zip tool. This is because the models are quite large and are zipped in the distribution.
 
