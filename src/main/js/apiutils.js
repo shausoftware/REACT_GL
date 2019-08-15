@@ -1,7 +1,7 @@
 'use strict';
 
 import * as LittleCubesContent from './content/scripts/littlecubescontent';
-import * as IronManContent from './content/scripts/ironmancontent';
+import * as VoxelBridge3Content from './content/scripts/voxelbridge3content';
 import * as BitsweepContent from './content/scripts/bitsweepcontent';
 import * as BugattiContent from './content/scripts/bugatticontent';
 import * as SubspaceContent from './content/scripts/subspacecontent';
@@ -83,7 +83,8 @@ function loadContentItemsForPage(navUri) {
         if (contentItemsCurrentPage === CI_PAGES) {
             //page 3
             contentItems.push(SubspaceContent);
-            contentItems.push(IronManContent);
+            //contentItems.push(IronManContent);
+            contentItems.push(VoxelBridge3Content);
             contentItems.push(DataSurgeContent);
             pageLinks = {first: {href: 'first'},
                          prev: {href: 'prev'},
@@ -104,7 +105,8 @@ function loadContentItemsForPage(navUri) {
         //page 3
         contentItemsCurrentPage = CI_PAGES;        
         contentItems.push(SubspaceContent);
-        contentItems.push(IronManContent);
+        //contentItems.push(IronManContent);
+        contentItems.push(VoxelBridge3Content);
         contentItems.push(DataSurgeContent);    
         pageLinks = {first: {href: 'first'},
                      prev: {href: 'prev'},

@@ -23,7 +23,7 @@ export function getTitle() {
 }
 
 export function getDescription() {
-    var description = "This particle/compute shader uses multiple output buffers from a single fragment shader " +
+    var description = "This simple particle/compute shader uses multiple output buffers from a single fragment shader " +
                       "to store and compute particle positions and velocities. Edan Kwan's curl noise is used " +
                       "for the FBM type motion.";
     return description;
