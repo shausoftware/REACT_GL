@@ -19,7 +19,7 @@ export function getDescription() {
     var description = "Welcome to my little showcase. The focus is on WebGL2, REACT, Bootstrap, Canvas (logo), Javascript development, " +                                
                       " and some of my artistic endeavours. Some of the features include dynamic CSS overrides of Bootstrap themes, autonomous " +
                       "build ands deployment using Webpack and some original artwork. It also serves as WebGL development environment " +
-                      "allowing me to quickly prototype ideas. All of the code to this site is available from my github repository" +
+                      "allowing me to quickly prototype ideas. All of the code to this site is available from my github repository " +
                       "should you be interested in such things (see links). Now on to business... " +
                       "some pictures of cats rendered using WebGL.";
     return description;
