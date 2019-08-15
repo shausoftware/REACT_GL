@@ -25,7 +25,7 @@ export default class WebGLContentItem extends React.Component {
 
     componentDidMount() {
 
-        const gl = this.refs.glCanvas.getContext('webgl');
+        const gl = this.refs.glCanvas.getContext('webgl2');
         
         if (!gl) {
             //TODO: fail gracefully
@@ -37,10 +37,10 @@ export default class WebGLContentItem extends React.Component {
 
         var glScript = this.state.script;
 
-        var mBuffExt = ShauGL.checkExtensions(gl); //multiple buffer writes
         const loadScreenProgramInfo = ShauGL.initLoadScreenProgram(gl); //loading screen
 
-        var glContent = glScript.initGLContent(gl, mBuffExt);
+        var glContent = glScript.initGLContent(gl);
+
         var contentLoaded = false;
         function renderFrame(now) {
 
@@ -57,7 +57,7 @@ export default class WebGLContentItem extends React.Component {
             animId = requestAnimationFrame(renderFrame);            
         };
         
-        glScript.loadGLContent(gl, mBuffExt, glContent).then(loadedContent => {
+        glScript.loadGLContent(gl, glContent).then(loadedContent => {
             glContent = loadedContent;
             contentLoaded = true;
         });

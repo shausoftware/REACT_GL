@@ -4,10 +4,10 @@ import * as LittleCubesContent from './content/scripts/littlecubescontent';
 import * as IronManContent from './content/scripts/ironmancontent';
 import * as BitsweepContent from './content/scripts/bitsweepcontent';
 import * as BugattiContent from './content/scripts/bugatticontent';
-import * as DiscoWallContent from './content/scripts/discowallcontent';
+import * as SubspaceContent from './content/scripts/subspacecontent';
 import * as ParticleContent from './content/scripts/particlecontent';
-import * as VoxelBridgeContent from './content/scripts/voxelbridgecontent';
-import * as MobiusSphereContent from './content/scripts/mobiusspherecontent';
+import * as DataSurgeContent from './content/scripts/datasurgecontent';
+import * as MistakeNotContent from './content/scripts/mistakenotcontent';
 import * as GreenCycleContent from './content/scripts/greencyclecontent';
 
 const link1 = {title: 'Source Code',
@@ -51,7 +51,7 @@ function loadContentItemsForPage(navUri) {
         contentItemsCurrentPage = 1;
         contentItems.push(LittleCubesContent);
         contentItems.push(GreenCycleContent);
-        contentItems.push(IronManContent);
+        contentItems.push(BugattiContent);            
     } 
     
     if ('prev' === navUri) {
@@ -62,12 +62,12 @@ function loadContentItemsForPage(navUri) {
             //page 1
             contentItems.push(LittleCubesContent);
             contentItems.push(GreenCycleContent);        
-            contentItems.push(IronManContent);
+            contentItems.push(BugattiContent);            
         } else {
 
             //page 2 - only three pages at the moment
             contentItems.push(BitsweepContent);
-            contentItems.push(MobiusSphereContent);
+            contentItems.push(MistakeNotContent);
             contentItems.push(ParticleContent);
             pageLinks = {first: {href: 'first'},
                          prev: {href: 'prev'},
@@ -82,16 +82,16 @@ function loadContentItemsForPage(navUri) {
         }
         if (contentItemsCurrentPage === CI_PAGES) {
             //page 3
-            contentItems.push(BugattiContent);            
-            contentItems.push(DiscoWallContent);
-            contentItems.push(VoxelBridgeContent);
+            contentItems.push(SubspaceContent);
+            contentItems.push(IronManContent);
+            contentItems.push(DataSurgeContent);
             pageLinks = {first: {href: 'first'},
                          prev: {href: 'prev'},
                          last: {href: 'last'}};
         } else {
             //page 2 - only three pages at the moment
             contentItems.push(BitsweepContent);
-            contentItems.push(MobiusSphereContent);
+            contentItems.push(MistakeNotContent);
             contentItems.push(ParticleContent);
             pageLinks = {first: {href: 'first'},
                          prev: {href: 'prev'},
@@ -103,9 +103,9 @@ function loadContentItemsForPage(navUri) {
     if ('last' === navUri) {
         //page 3
         contentItemsCurrentPage = CI_PAGES;        
-        contentItems.push(BugattiContent);            
-        contentItems.push(DiscoWallContent);
-        contentItems.push(VoxelBridgeContent);    
+        contentItems.push(SubspaceContent);
+        contentItems.push(IronManContent);
+        contentItems.push(DataSurgeContent);    
         pageLinks = {first: {href: 'first'},
                      prev: {href: 'prev'},
                      last: {href: 'last'}};

@@ -13,8 +13,8 @@ export function getTitle() {
 }
 
 export function getDescription() {
-    var description = "One of my favourite shaders that I've created so far. It's rendered " +
-                      " using simple raytracing techniques. I think it's quite cute.";
+    var description = "One of my first shaders on Shadertoy and one my favourite shaders that I've created so far. It's rendered " +
+                      " using simple raytracing techniques to draw the main scene, relections, transparency and shadows. I think it's quite cute.";
     return description;
 }
 
@@ -22,7 +22,7 @@ export function getSnapshotImage() {
     return littleCubesImgSrc;
 }
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
 
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = LittleCubesFragmentShader.fragmentSource();
@@ -34,7 +34,8 @@ export function initGLContent(gl, mBuffExt) {
         },
         uniformLocations: {
             resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
+            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time'),
+            frameUniformLocation: gl.getUniformLocation(shaderProgram, 'u_frame')
         }
     };
     var programInfos = {renderProgramInfo: programInfo};
@@ -47,7 +48,7 @@ export function initGLContent(gl, mBuffExt) {
             framebuffers: []};
 }
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
@@ -62,5 +63,6 @@ export function renderGLContent(gl, content, dt) {
                          undefined,
                          undefined,
                          undefined,
-                         dt);
+                         dt,
+                         0);
 }

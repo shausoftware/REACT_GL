@@ -2,10 +2,10 @@
 
 export function vertexSource() {
 
-    const vsSource = `
+    const vsSource = `#version 300 es
 
-    attribute vec3 a_position;
-    attribute vec3 a_normal;
+    in vec3 a_position;
+    in vec3 a_normal;
     
     uniform mat4 u_model_view_matrix;
     uniform mat4 u_projection_matrix;
@@ -14,12 +14,13 @@ export function vertexSource() {
     uniform mat4 u_sm_projection_matrix;
     uniform float u_y_scale;
 
-    varying vec4 v_shadow_position;
-    varying vec3 v_position;
-    varying vec3 v_normal;    
-    varying vec3 v_w_position;
-    varying vec3 v_w_normal;
-    varying float v_discard;
+    //varying
+    out vec4 v_shadow_position;
+    out vec3 v_position;
+    out vec3 v_normal;    
+    out vec3 v_w_position;
+    out vec3 v_w_normal;
+    out float v_discard;
 
     // Used to normalize our coordinates from clip space to (0 - 1)
     // so that we can access the corresponding point in our depth color texture

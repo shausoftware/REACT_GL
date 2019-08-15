@@ -2,16 +2,17 @@
 
 export function vertexSource() {
 
-    const vsSource = `
+    const vsSource = `#version 300 es
 
-    attribute vec3 a_position;
+    in vec3 a_position;
     
     uniform mat4 u_model_view_matrix;
     uniform mat4 u_projection_matrix;
     uniform float u_y_scale;
     
-    varying float v_discard;
-    varying vec3 v_w_position;
+    //varying
+    out float v_discard;
+    out vec3 v_w_position;
 
     void main(void) {
 

@@ -2,8 +2,8 @@
 
 export function fragmentSource() {
 
-    const fsSource = `
-
+    const fsSource = `#version 300 es
+        
         #ifdef GL_FRAGMENT_PRECISION_HIGH
 	        precision highp float;
         #else
@@ -12,11 +12,14 @@ export function fragmentSource() {
 
         uniform vec2 u_resolution;
         uniform float u_time;
+        uniform int u_frame;
 
         #define EPS 0.005
         #define FAR 200.0 
         #define PI 3.14159265359
         #define T u_time * 2.0
+
+        out vec4 outputColour;
 
         vec3 lp = vec3(4.0, 5.0, -2.0); //light position
 
@@ -290,7 +293,7 @@ export function fragmentSource() {
                 }
             }
 
-            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);
+            outputColour = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);
         }
     `;
 

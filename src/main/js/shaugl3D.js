@@ -12,8 +12,6 @@ import * as GlowVertexShader from './shaders/glow_vertex_shader';
 import * as GlowFragmentShader from './shaders/glow_fragment_shader';
 import * as BlurVertexShader from './shaders/blur_vertex_shader';
 import * as BlurFragmentShader from './shaders/blur_fragment_shader';
-import * as SkyVertexShader from './shaders/sky_vertex_shader';
-import * as SkyFragmentSHader from './shaders/sky_fragment_shader';
 
 /* 3D Helper */
 
@@ -52,55 +50,6 @@ export function loadShader(gl, type, source) {
 
     return shader;
 };
-
-export function checkExtensions(gl) {
-    
-    var ext1 = undefined;
-    var ext2 = undefined;
-    var ext3 = undefined;
-
-    try {ext1 = gl.getExtension('OES_texture_float');} catch(e) {}
-    if (!ext1) {
-        console.error("OES_texture_float extension not supported");
-        return undefined;
-    }
-
-    try {ext2 = gl.getExtension('WEBGL_draw_buffers');} catch(e) {}
-    if (!ext2) {
-        console.error("WEBGL_draw_buffers extension not supported");
-        return undefined;
-    }
-
-    try {ext3 = gl.getExtension('OES_standard_derivatives');} catch(e) {}
-    if (!ext3) {
-        console.error("OES_standard_derivatives extension not supported");
-        return undefined;
-    }
-
-    return ext2;
-}
-
-export function initSkyProgram(gl) {
-    const skyVsSource = SkyVertexShader.vertexSource();
-    const skyFsSource = SkyFragmentSHader.fragmentSource();
-    const skyShaderProgram = initShaderProgram(gl, skyVsSource, skyFsSource);
-    const skyProgramInfo = {
-        program: skyShaderProgram,
-        attribLocations: {
-            positionAttributeLocation: gl.getAttribLocation(skyShaderProgram, 'a_position')
-        },
-        uniformLocations: {
-            resolutionUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_resolution'),
-            lightPositionUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_light_position'),
-            cameraPositionUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_camera_position'),
-            targetUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_target'),
-            fovUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_fov'),
-            farUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_far'),
-            yScaleUniformLocation: gl.getUniformLocation(skyShaderProgram, 'u_y_scale')            
-        }
-    };
-    return skyProgramInfo;
-}
 
 export function initShadowProgram(gl) {
     const shadowMapVsSource = ShadowVertexShader.vertexSource();
@@ -218,23 +167,6 @@ export function isPowerOf2(value) {
     return (value & (value - 1)) == 0;
 }
 
-export function initTexture(gl, width, height) {
-    
-    var texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0,
-                  gl.RGBA, gl.UNSIGNED_BYTE, null);
-
-    gl.bindTexture(gl.TEXTURE_2D, null); //clean up
-
-    return texture;
-}
 
 export function loadImageAndInitTextureInfo(gl, url) {
     
@@ -267,19 +199,7 @@ export function loadImageAndInitTextureInfo(gl, url) {
                       gl.UNSIGNED_BYTE, 
                       image);
   
-        // WebGL1 has different requirements for power of 2 images
-        // vs non power of 2 images so check if the image is a
-        // power of 2 in both dimensions.
-        if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
-            // Yes, it's a power of 2. Generate mips.
-            gl.generateMipmap(gl.TEXTURE_2D);
-        } else {
-            // No, it's not a power of 2. Turn of mips and set
-            // wrapping to clamp to edge
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        }
+        gl.generateMipmap(gl.TEXTURE_2D);
     };
     image.src = url;
   
@@ -290,21 +210,43 @@ export function loadImageAndInitTextureInfo(gl, url) {
     };
 }
 
+export function initTexture(gl, width, height) {
+    
+    var texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, width, height, 0, gl.RGBA, gl.FLOAT, null);    
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+    gl.bindTexture(gl.TEXTURE_2D, null); //clean up
+
+    return texture;
+}
+
 export function initFramebuffer(gl, width, height, scale) {
     
+    var ext = gl.getExtension('EXT_color_buffer_float');
+    if (!ext) {
+        console.log("Extension EXT_color_buffer_float not available");
+    }
+
     var texture = this.initTexture(gl, width * scale, height * scale);
-    
+
     var fbo = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     fbo.width = gl.canvas.width;
     fbo.height = gl.canvas.height;
 
     var renderbuffer = gl.createRenderbuffer();
-    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+    gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer); 
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, fbo.width, fbo.height);
-    
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+
+    var status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+    if (status !== gl.FRAMEBUFFER_COMPLETE) {
+        console.log("Failed to build Framebuffer: Incomplete or Unsupported");
+    }
 
     gl.bindTexture(gl.TEXTURE_2D, null);
     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
@@ -326,7 +268,6 @@ export function initDepthFramebuffer(gl, width, height) {
     var renderBuffer = gl.createRenderbuffer();
     gl.bindRenderbuffer(gl.RENDERBUFFER, renderBuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
-
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, shadowDepthTexture, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderBuffer);
 
@@ -521,48 +462,6 @@ export function renderLoadScreen(gl, programInfo, buffers, runningTime) {
     gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
     gl.uniform1f(programInfo.uniformLocations.timeUniformLocation, runningTime);
     
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-    gl.bindTexture(gl.TEXTURE_2D, null);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-    gl.useProgram(null);
-}
-
-export function renderSky(gl, 
-                   programInfo, 
-                   buffers, 
-                   lightPosition, 
-                   camera,
-                   yScale) {
-
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.enable(gl.DEPTH_TEST); // Enable depth testing
-    gl.depthFunc(gl.LESS); // Near things obscure far things            
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    gl.useProgram(programInfo.program);
-    
-    gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.screenQuadBuffer);
-    gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-
-    //resolution
-    gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, gl.canvas.width, gl.canvas.height);    
-    //light position
-    gl.uniform3fv(programInfo.uniformLocations.lightPositionUniformLocation, lightPosition);
-    //camera position
-    gl.uniform3fv(programInfo.uniformLocations.cameraPositionUniformLocation, camera.position);
-    //target
-    gl.uniform3fv(programInfo.uniformLocations.targetUniformLocation, camera.target);
-    //fov
-    gl.uniform1f(programInfo.uniformLocations.fovUniformLocation, camera.fov);
-    //far
-    gl.uniform1f(programInfo.uniformLocations.farUniformLocation, camera.far);
-    //y scale
-    gl.uniform1f(programInfo.uniformLocations.yScaleUniformLocation, yScale);
-
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
     gl.bindTexture(gl.TEXTURE_2D, null);

@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
         #ifdef GL_FRAGMENT_PRECISION_HIGH
             precision highp float;
@@ -12,6 +12,7 @@ export function fragmentSource() {
 
         uniform vec2 u_resolution;
         uniform float u_time;
+        uniform int u_frame;
 
         uniform sampler2D u_texture1;        
 
@@ -24,6 +25,8 @@ export function fragmentSource() {
         #define BRICK 2.0
         #define TOWER 3.0
         #define LIGHT3 6.0
+
+        out vec4 outputColour;
         
         vec3 lp = vec3(0.0);
         float TX = 0.0;
@@ -248,9 +251,9 @@ export function fragmentSource() {
                 pc = oc;
             }
 
-            vec3 bc = texture2D(u_texture1, uv).xyz;
+            vec3 bc = texture(u_texture1, uv).xyz;
             
-            gl_FragColor = vec4(pc + bc, 1.0);
+            outputColour = vec4(pc + bc, 1.0);
         }
     `;
     

@@ -2,13 +2,16 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
     precision mediump float;
 
-    varying float v_discard;
-    varying vec3 v_w_position;
+    //varying
+    in float v_discard;
+    in vec3 v_w_position;
     
+    out vec4 outputColour;
+
     vec4 encodeFloat (float depth) {
 
         const vec4 bitShift = vec4(256 * 256 * 256,
@@ -33,7 +36,7 @@ export function fragmentSource() {
             if (v_w_position.y > -0.05) discard;
         }
         vec4 shadowDepth = encodeFloat(gl_FragCoord.z);
-        gl_FragColor = shadowDepth;          
+        outputColour = shadowDepth;          
     }
     
     `;

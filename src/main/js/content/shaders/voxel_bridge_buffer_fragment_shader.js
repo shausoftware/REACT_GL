@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
 
-    const fsSource = `
+    const fsSource = `#version 300 es
 
         #ifdef GL_FRAGMENT_PRECISION_HIGH
 	        precision highp float;
@@ -12,6 +12,7 @@ export function fragmentSource() {
 
         uniform vec2 u_resolution;
         uniform float u_time;
+        uniform int u_frame;
 
         uniform sampler2D u_texture1;        
         
@@ -19,6 +20,8 @@ export function fragmentSource() {
         #define FAR 100.0 
         #define PI 3.14159265359
         #define T u_time
+
+        out vec4 outputColour;
 
         //compact 2 axis rotation
         mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}
@@ -101,11 +104,11 @@ export function fragmentSource() {
                 }
             }
 
-            vec3 aa = texture2D(u_texture1, gl_FragCoord.xy / u_resolution).xyz;
+            vec3 aa = texture(u_texture1, gl_FragCoord.xy / u_resolution).xyz;
             aa -= 0.01;
             pc += aa;
 
-            gl_FragColor = vec4(pc, 1.0);
+            outputColour = vec4(pc, 1.0);
         }
     `;
 

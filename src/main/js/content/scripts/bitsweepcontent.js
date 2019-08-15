@@ -14,7 +14,8 @@ export function getTitle() {
 };
 
 export function getDescription() {
-    var description = "A raytraced scene inspired by Bitsweep by Beeple. Kind of.";
+    var description = "Another raytraced scene, using offscreen buffers for glow and glow reflections. This was also inspired by another " +
+                      "Beeple VJ clip of the same name. Kind of.";
     return description;
 };
 
@@ -22,7 +23,7 @@ export function getSnapshotImage() {
     return bitsweepImgSrc;
 };
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
     
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = BitsweepFragmentShader.fragmentSource();
@@ -34,7 +35,8 @@ export function initGLContent(gl, mBuffExt) {
         },
         uniformLocations: {
             resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
+            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time'),
+            frameUniformLocation: gl.getUniformLocation(shaderProgram, 'u_frame')
         }
     };
 
@@ -47,7 +49,9 @@ export function initGLContent(gl, mBuffExt) {
         },
         uniformLocations: {
             resolutionUniformLocation: gl.getUniformLocation(bufferProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(bufferProgram, 'u_time')
+            timeUniformLocation: gl.getUniformLocation(bufferProgram, 'u_time'),
+            frameUniformLocation: gl.getUniformLocation(bufferProgram, 'u_frame')
+
         }
     };
 
@@ -65,7 +69,7 @@ export function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};
 };
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
@@ -83,7 +87,8 @@ export function renderGLContent(gl, content, dt) {
                             undefined,
                             undefined,
                             undefined, 
-                            dt);
+                            dt,
+                            0);
                             
     //render to canvas
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -94,5 +99,6 @@ export function renderGLContent(gl, content, dt) {
                             undefined,
                             undefined,
                             undefined,
-                            dt);  
+                            dt,
+                            0);  
 };

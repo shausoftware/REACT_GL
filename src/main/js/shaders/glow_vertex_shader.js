@@ -2,14 +2,15 @@
 
 export function vertexSource() {
 
-    const vsSource = `
+    const vsSource = `#version 300 es
 
-    attribute vec3 a_position;
+    in vec3 a_position;
     
     uniform mat4 u_model_view_matrix;
     uniform mat4 u_projection_matrix;
 
-    varying vec3 v_w_position;
+    //varying
+    out vec3 v_w_position;
     
     void main(void) {
         v_w_position = a_position;

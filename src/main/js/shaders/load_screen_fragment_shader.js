@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
         #ifdef GL_FRAGMENT_PRECISION_HIGH
             precision highp float;
@@ -12,7 +12,9 @@ export function fragmentSource() {
 
         uniform vec2 u_resolution;
         uniform float u_time;
-    
+
+        out vec4 outputColour;
+
         void main() {
 
             vec3 pc = vec3(0.0);
@@ -23,11 +25,10 @@ export function fragmentSource() {
             //compact loader icon from IQ
             float a = atan(uv.y, uv.x) + 1.0 * u_time;      
             pc = mix(pc, vec3(1.0, 1.0, 1.0), 
-                     (1.0 - smoothstep(0.10, 0.14, abs(r - 0.5)))
-                     * smoothstep(0.4, 0.6, sin(17.0 * a)));
+                     (1.0 - smoothstep(0.10, 0.14, abs(r - 0.5)))  * smoothstep(0.4, 0.6, sin(17.0 * a)));
 
                      
-            gl_FragColor = vec4(pc, 1.0);
+            outputColour = vec4(pc, 1.0);
         }
     `;
     

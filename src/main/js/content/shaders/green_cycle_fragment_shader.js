@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
         #ifdef GL_FRAGMENT_PRECISION_HIGH
             precision highp float;
@@ -12,6 +12,7 @@ export function fragmentSource() {
 
         uniform vec2 u_resolution;
         uniform float u_time;
+        uniform int u_frame;
 
         #define EPS 0.005
         #define FAR 50.0 
@@ -27,6 +28,8 @@ export function fragmentSource() {
         #define BLUE_GLOW 7.0
         #define ARCH 8.0
         #define ARCH_2 9.0
+
+        out vec4 outputColour;
 
         vec3 lp = vec3(0.0);
         
@@ -501,7 +504,7 @@ export function fragmentSource() {
             pc += vec3(1.0) * scene.wli * 0.8;
             pc += vec3(0.3, 1.0, 0.3) * scene.bli;
                 
-            gl_FragColor = vec4(pc, 1.0);
+            outputColour = vec4(pc, 1.0);
         }
     `;
     

@@ -12,12 +12,13 @@ import * as VoxelBridgeBufferFragmentShader from '../../content/shaders/voxel_br
 var glm = require('gl-matrix');
 
 export function getTitle() {
-    return "Voxel Bridge";
+    return "Voxel Bridge 3";
 }
 
 export function getDescription() {
-    var description = "Another raymarching shader. This time utilising voxel traversal. " +
-                      "It was also my first attempt at using framebuffers for off-screen rendering.";
+    var description = "Yet another Shadertoy raymarcher, this time demonstrating voxel space traversal/partitioning " +
+                      "(A bit like Minecraft). This is my first attempt at using offscreen render buffers, in this " +
+                      "instance for the particle glow effect.";
     return description;
 }
 
@@ -25,7 +26,7 @@ export function getSnapshotImage() {
     return voxelBridgeImgSrc;
 }
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
 
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = VoxelBridgeFragmentShader.fragmentSource();
@@ -41,7 +42,8 @@ export function initGLContent(gl, mBuffExt) {
         uniformLocations: {
             texture1UniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture1'),
             resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
+            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time'),
+            frameUniformLocation: gl.getUniformLocation(shaderProgram, 'u_frame')
         }
     };
 
@@ -53,7 +55,8 @@ export function initGLContent(gl, mBuffExt) {
         uniformLocations: {
             texture1UniformLocation: gl.getUniformLocation(bufferProgram, 'u_texture1'),
             resolutionUniformLocation: gl.getUniformLocation(bufferProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(bufferProgram, 'u_time')
+            timeUniformLocation: gl.getUniformLocation(bufferProgram, 'u_time'),
+            frameUniformLocation: gl.getUniformLocation(bufferProgram, 'u_frame')
         }
     };
 
@@ -73,7 +76,7 @@ export function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};
 }
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
@@ -91,7 +94,8 @@ export function renderGLContent(gl, content, dt) {
                          undefined,
                          undefined,
                          undefined, 
-                         dt);
+                         dt,
+                         0);
 
     //render to canvas
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -102,7 +106,8 @@ export function renderGLContent(gl, content, dt) {
                          undefined,
                          undefined,
                          undefined,
-                         dt);    
+                         dt,
+                         0);    
 
     //swap buffers for feedback in trail
     var tempBuffer = content.framebuffers.renderBuffer1;

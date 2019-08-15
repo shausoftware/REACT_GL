@@ -21,7 +21,7 @@ export function getSnapshotImage() {
     return mobiusSphereImgSrc;
 }
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
     
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = MobiusSphereFragmentShader.fragmentSource();
@@ -33,7 +33,8 @@ export function initGLContent(gl, mBuffExt) {
         },
         uniformLocations: {
             resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
+            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time'),
+            frameUniformLocation: gl.getUniformLocation(shaderProgram, 'u_frame')
         }
     };
     var programInfos = {renderProgramInfo: programInfo};
@@ -46,7 +47,7 @@ export function initGLContent(gl, mBuffExt) {
             framebuffers: []};
 }
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
@@ -64,5 +65,6 @@ export function renderGLContent(gl, content, dt) {
                             undefined,
                             undefined,
                             undefined,
-                            dt);  
+                            dt,
+                            0);  
 }

@@ -13,7 +13,8 @@ export function getTitle() {
 }
 
 export function getDescription() {
-    var description = "My first Shader of the Week on Shadertoy inspired by Beeple. This time emulating his PurpCycle VJ clip.";
+    var description = "I  first came across the art of Beeple (Mike Winlemann) a couple years ago and this shader is an attempt to re-create his " +
+                      "PurpCycle VJ clip. It was also my first 'Shader of the Week' on Shadertoy.";
     return description;
 }
 
@@ -21,7 +22,7 @@ export function getSnapshotImage() {
     return greencycleImgSrc;
 }
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
 
     const vsSource = SimpleVertexShader.vertexSource();
     const fsSource = GreenCycleFragmentShader.fragmentSource();
@@ -33,7 +34,8 @@ export function initGLContent(gl, mBuffExt) {
         },
         uniformLocations: {
             resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
+            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time'),
+            frameUniformLocation: gl.getUniformLocation(shaderProgram, 'u_frame')
         }
     };
     var programInfos = {renderProgramInfo: programInfo};
@@ -46,7 +48,7 @@ export function initGLContent(gl, mBuffExt) {
             framebuffers: []};
 }
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
@@ -61,5 +63,6 @@ export function renderGLContent(gl, content, dt) {
                          undefined,
                          undefined,
                          undefined,
-                         dt);
+                         dt,
+                         0);
 }

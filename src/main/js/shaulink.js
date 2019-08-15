@@ -23,7 +23,7 @@ export default class ShauLink extends React.Component {
             <tr>
                 <td> 
                     <p className='text-center linktext'>
-                        <h4>{this.state.title}</h4>
+                        <b>{this.state.title}</b>
                     </p>
                     <p className='text-center linktext'>
                         {this.state.description}

@@ -2,9 +2,9 @@
 
 export function vertexSource() {
 
-    const vsSource = `
+    const vsSource = `#version 300 es
 
-        attribute vec4 a_position;
+        in vec4 a_position;
 
         void main() {
             gl_Position = a_position;

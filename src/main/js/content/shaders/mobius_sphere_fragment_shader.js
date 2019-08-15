@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
         #ifdef GL_FRAGMENT_PRECISION_HIGH
             precision highp float;
@@ -12,6 +12,7 @@ export function fragmentSource() {
 
         uniform vec2 u_resolution;
         uniform float u_time;
+        uniform int u_frame;
 
         #define T u_time * 0.5
         #define EPS 0.005
@@ -19,6 +20,8 @@ export function fragmentSource() {
         #define PI 3.14159265359
         #define FLOOR 1.0
         #define SPHERE 2.0
+
+        out vec4 outputColour;
 
         vec3 lp = vec3(4.0, 5.0, 2.0);
         vec4 sphere = vec4(0.0, 0.0, 0.0, 1.5);
@@ -253,7 +256,7 @@ export function fragmentSource() {
                 pc = colourScene(ro, rd, scene);        
             }
 	
-            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);
+            outputColour = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);
         }
     `;
     

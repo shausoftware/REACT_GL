@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
     precision mediump float;
     
@@ -20,12 +20,15 @@ export function fragmentSource() {
     uniform vec3 u_eye_position;
     uniform vec3 u_light_position;
 
-    varying vec4 v_shadow_position;
-    varying vec3 v_position;
-    varying vec3 v_normal;
-    varying vec3 v_w_position;
-    varying vec3 v_w_normal;
-    varying float v_discard;
+    //varying
+    in vec4 v_shadow_position;
+    in vec3 v_position;
+    in vec3 v_normal;
+    in vec3 v_w_position;
+    in vec3 v_w_normal;
+    in float v_discard;
+
+    out vec4 outputColour;
 
     //Spiral AO logic from reinder
     //https://www.shadertoy.com/view/Ms33WB
@@ -84,7 +87,7 @@ export function fragmentSource() {
         
         pc *= clamp(u_light_strength, 0.1, 1.0);
 
-        gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), abs(pos.y));          
+        outputColour = vec4(sqrt(clamp(pc, 0.0, 1.0)), abs(pos.y));          
     }
     
     `;

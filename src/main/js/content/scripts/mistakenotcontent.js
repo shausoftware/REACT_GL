@@ -1,34 +1,40 @@
 'use strict';
 
-const discoWallImgSrc = require('../../static/images/discowall.png');
+const mistakeNotImgSrc = require('../../static/images/mistakenot.png');
 
 const ShauGL = require('../../shaugl3D'); //general 3D utils
 const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
 import * as SimpleVertexShader from '../../shaders/simple_vertex_shader';
-import * as DiscoWallFragmentShader from '../../content/shaders/disco_wall_fragment_shader';
+import * as MistakeNotFragmentShader from '../../content/shaders/mistake_not_fragment_shader';
 
 var glm = require('gl-matrix');
 
 export function getTitle() {
-    return "Disco Wall";
+    return "The Mistake Not";
 }
 
 export function getDescription() {
-    var description = "This is a shader I created a while back on Shadertoy. It utilises " +
-                      " raytracing and volumetric raymarching for the glow/light effect.";
+    var description = "Some of my own modelling this time. I'm a big fan of science fiction writing especially the works " +
+                      "of Brian Aldiss, William Gibson & Iain M. Banks. This is my interpretation of my favourite " +
+                      "space ship (Mind) the 'Mistake Not " +
+                      "My Current State Of Joshing Gentle Peevishness For The Awesome And Terrible Majesty Of The " +
+                      "Towering Seas Of Ire That Are Themselves The Mere Milquetoast Shallows Fringing My Vast Oceans Of Wrath'. "  +
+                      "Phew what a name, this is from the Iain M. Banks book 'The Hydrogen Sonata'.";
     return description;
 }
 
 export function getSnapshotImage() {
-    return discoWallImgSrc;
+    return mistakeNotImgSrc;
 }
 
 export function initGLContent(gl) {
 
     const vsSource = SimpleVertexShader.vertexSource();
-    const fsSource = DiscoWallFragmentShader.fragmentSource();
+    const fsSource = MistakeNotFragmentShader.fragmentSource();
     const shaderProgram = ShauGL.initShaderProgram(gl, vsSource, fsSource);
+
+
     const programInfo = {
         program: shaderProgram,
         attribLocations: {
@@ -43,11 +49,12 @@ export function initGLContent(gl) {
     var programInfos = {renderProgramInfo: programInfo};
 
     const buffers = ShauRMGL.initBuffers(gl);
+    var framebuffers = {};
 
     return {programInfos: programInfos,
             textureInfos: [],
             buffers: buffers,
-            framebuffers: []};
+            framebuffers: framebuffers};
 }
 
 export function loadGLContent(gl, content) {
@@ -58,13 +65,16 @@ export function loadGLContent(gl, content) {
 }
 
 export function renderGLContent(gl, content, dt) {
+
+    //render to canvas
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     ShauRMGL.drawRMScene(gl, 
                          content.programInfos.renderProgramInfo, 
                          content.buffers, 
-                         undefined,
-                         undefined,
+                         undefined, 
+                         undefined, 
                          undefined,
                          undefined,
                          dt,
-                         0);
+                         0);         
 }

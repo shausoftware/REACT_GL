@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
     precision mediump float;
     
@@ -10,6 +10,8 @@ export function fragmentSource() {
     uniform sampler2D u_image_texture;
     uniform float u_dof;
     
+    out vec4 outputColour;
+
     const float GA = 2.399; 
     const mat2 rot = mat2(cos(GA), sin(GA), -sin(GA), cos(GA));
 
@@ -30,7 +32,7 @@ export function fragmentSource() {
         for (int j = 0; j < 80; j++) {  
             rad += 1.0 / rad;
             angle *= rot;
-            vec4 col = texture2D(tex, uv + pixel * (rad - 1.0) * angle);
+            vec4 col = texture(tex, uv + pixel * (rad - 1.0) * angle);
             acc += col.xyz;
         }
         return acc / 80.0;
@@ -41,12 +43,10 @@ export function fragmentSource() {
         vec2 iResolution = vec2(640.0, 480.0);
         vec2 uv = gl_FragCoord.xy / iResolution.xy;
 
-        float depth = decodeFloat(texture2D(u_ssao_texture, uv));
+        float depth = decodeFloat(texture(u_ssao_texture, uv));
         vec3 pc = dof(u_image_texture, uv, depth * u_dof, iResolution);
 
-        gl_FragColor = vec4(pc, 1.0);
-        //gl_FragColor = vec4(vec3(depth), 1.0);
-        //gl_FragColor = texture2D(u_image_texture, uv);
+        outputColour = vec4(pc, 1.0);
     }
     
     `;

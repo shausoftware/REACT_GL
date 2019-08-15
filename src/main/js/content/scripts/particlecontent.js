@@ -3,7 +3,6 @@
 const particlesImgSrc = require('../../static/images/firstattempt.png');
 
 const ShauGL = require('../../shaugl3D'); //general 3D utils
-const ShauRMGL = require('../../shaurmgl'); //raymarching utils
 
 const PDIM = 256;
 var last = 0.0;
@@ -14,18 +13,19 @@ import * as ParticleVertexShader from '../../content/shaders/particle_vertex_sha
 import * as ParticleFragmentShader from '../../content/shaders/particle_fragment_shader';
 import * as ParticleComputeVertexShader from '../../content/shaders/particle_compute_vertex_shader';
 import * as ParticleComputeFragmentShader from '../../content/shaders/particle_compute_fragment_shader';
-import * as ParticleInitFragmentShader from '../../content/shaders/particle_init_fragment_shader';
 
 var glm = require('gl-matrix');
+
+var frameCount = 0;
 
 export function getTitle() {
     return "Curl Particles";
 }
 
 export function getDescription() {
-    var description = "My first attempt at a particle/compute shader. The particle positions and velocities " +
-                      "are computated in fragment buffers before rendering. Curl noise is used " +
-                      "for the FBM type motion. The work of Nop Jiarathanakul and Edan Kwan inspired this.";
+    var description = "This particle/compute shader uses multiple output buffers from a single fragment shader " +
+                      "to store and compute particle positions and velocities. Edan Kwan's curl noise is used " +
+                      "for the FBM type motion.";
     return description;
 }
 
@@ -33,7 +33,9 @@ export function getSnapshotImage() {
     return particlesImgSrc;
 }
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
+
+    frameCount = 0;
 
     //vignette program
     const vvsSource = SimpleVertexShader.vertexSource();
@@ -80,7 +82,8 @@ export function initGLContent(gl, mBuffExt) {
         },
         uniformLocations: {
             resolutionUniformLocation: gl.getUniformLocation(computeShaderProgram, 'u_resolution'),                
-            timeUniformLocation: gl.getUniformLocation(computeShaderProgram, 'u_time'),                
+            timeUniformLocation: gl.getUniformLocation(computeShaderProgram, 'u_time'), 
+            frameUniformLocation: gl.getUniformLocation(shaderProgram, 'u_frame'),               
             deltaUniformLocation: gl.getUniformLocation(computeShaderProgram, 'u_delta'),                
             inputPositionUniformLocation: gl.getUniformLocation(computeShaderProgram, 'u_input_position'),                
             forceUniformLocation: gl.getUniformLocation(computeShaderProgram, 'u_force'),                
@@ -90,19 +93,6 @@ export function initGLContent(gl, mBuffExt) {
         }
     };
 
-    //particle init program
-    const ifsSource = ParticleInitFragmentShader.fragmentSource();
-    const initShaderProgram = ShauGL.initShaderProgram(gl, cvsSource, ifsSource);    
-    const initInfo = {
-        program: initShaderProgram,
-        attribLocations: {
-            positionAttributeLocation: gl.getAttribLocation(initShaderProgram, 'a_position')
-        },
-        uniformLocations: {
-            resolutionUniformLocation: gl.getUniformLocation(initShaderProgram, 'u_resolution')                
-        }            
-    };
-    
     var programInfos = {vignetteProgramInfo: vignetteInfo,
                         shaderProgramInfo: programInfo,
                         computeProgramInfo: computeInfo};
@@ -145,9 +135,13 @@ export function initGLContent(gl, mBuffExt) {
     //2 identical framebuffers for compute operations
     //this is because read and write buffers cannot be the same buffer object
     //first time round buffer gets rendered into then next frame it is read
+    var ext = gl.getExtension('EXT_color_buffer_float');
+    if (!ext) {
+        console.log("Extension EXT_color_buffer_float not available");
+    }
     var computeBuffers = [
-        initComputeBuffer(gl, mBuffExt),
-        initComputeBuffer(gl, mBuffExt)
+        initComputeBuffer(gl),
+        initComputeBuffer(gl)
     ];
 
     var buffers = {particleUV: particleUVBuffer,
@@ -158,16 +152,13 @@ export function initGLContent(gl, mBuffExt) {
     var vignetteFramebuffer = ShauGL.initFramebuffer(gl, gl.canvas.width, gl.canvas.height, 1.0);
     var framebuffers = {vignetteFramebuffer: vignetteFramebuffer};
 
-    //initialise particles
-    drawInit(gl, initInfo, buffers, buffers.computeBuffers[0]);
-
     return {programInfos: programInfos,
             textureInfos: [],
             buffers: buffers,
             framebuffers: framebuffers};       
 }
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);
@@ -204,12 +195,14 @@ export function renderGLContent(gl, content, dt) {
               content.buffers.computeBuffers[0], 
               projectionMatrix);
 
-    //draw to screen
+    //draw to screen with border
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     drawVignette(gl, 
                  content.programInfos.vignetteProgramInfo, 
                  content.buffers, 
                  content.framebuffers.vignetteFramebuffer.texture);
+
+    frameCount++;             
 }
 
 function updateCamera(gl, elapsedSeconds) {
@@ -238,34 +231,25 @@ function updateCamera(gl, elapsedSeconds) {
     return viewProjectionMatrix;
 }
 
-//TODO: this comes for free with WebGL 2
-function initComputeBuffer(gl, ext) {
+function initComputeBuffer(gl) {
     
     var texs = [];
     for (var i = 0; i < 3; i++) {
-        var texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, PDIM, PDIM, 0, gl.RGBA, gl.FLOAT, null);
+        var texture = ShauGL.initTexture(gl, PDIM, PDIM);
         texs.push(texture);
-
-        gl.bindTexture(gl.TEXTURE_2D, null); //clean up
     }
 
     var fb = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+    
+    gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texs[0], 0);
+    gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, texs[1], 0);
+    gl.framebufferTexture2D(gl.DRAW_FRAMEBUFFER, gl.COLOR_ATTACHMENT2, gl.TEXTURE_2D, texs[2], 0);
 
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, texs[0], 0);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, texs[1], 0);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT2_WEBGL, gl.TEXTURE_2D, texs[2], 0);
-
-    ext.drawBuffersWEBGL([
-        ext.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
-        ext.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
-        ext.COLOR_ATTACHMENT2_WEBGL, // gl_FragData[2]
+    gl.drawBuffers([
+        gl.COLOR_ATTACHMENT0, // gl_FragData[0]
+        gl.COLOR_ATTACHMENT1, // gl_FragData[1]
+        gl.COLOR_ATTACHMENT2, // gl_FragData[2]
     ]);
 
     if (!gl.isFramebuffer(fb)) {
@@ -277,31 +261,6 @@ function initComputeBuffer(gl, ext) {
     return {framebuffer: fb, textures: texs};
 }
 
-function drawInit(gl, programInfo, buffers, computeBuffer) {
-    
-    gl.bindFramebuffer(gl.FRAMEBUFFER, computeBuffer.framebuffer);
-    
-    gl.viewport(0, 0, PDIM, PDIM);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.blendFunc(gl.ONE, gl.ZERO);  // so alpha output color draws correctly
-
-    gl.useProgram(programInfo.program);
-    gl.enableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffers.screenQuad);
-    gl.vertexAttribPointer(programInfo.attribLocations.positionAttributeLocation, 3, gl.FLOAT, false, 0, 0);
-
-    gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, PDIM, PDIM);
-    
-    gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-    //clean up
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    gl.disableVertexAttribArray(programInfo.attribLocations.positionAttributeLocation);
-    gl.useProgram(null);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-}
-    
 function drawCompute(gl, programInfo, buffers, fromBuffer, 
                             toBuffer, time, delta) {
 
@@ -329,9 +288,10 @@ function drawCompute(gl, programInfo, buffers, fromBuffer,
     
     gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, PDIM, PDIM);
     gl.uniform1f(programInfo.uniformLocations.timeUniformLocation, time);
+    gl.uniform1i(programInfo.uniformLocations.frameUniformLocation, frameCount);
+
     gl.uniform1f(programInfo.uniformLocations.deltaUniformLocation, delta);
     
-    //TODO: mouse
     gl.uniform3f(programInfo.uniformLocations.inputPositionUniformLocation, 0.0, 0.0, 0.0);
     gl.uniform1f(programInfo.uniformLocations.forceUniformLocation, 0.0);
 

@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
         #ifdef GL_FRAGMENT_PRECISION_HIGH
             precision highp float;
@@ -12,13 +12,15 @@ export function fragmentSource() {
 
         uniform vec2 u_resolution;
         uniform sampler2D u_vignette_texture;
+
+        out vec4 outputColour;
     
         void main() {
 
             vec2 uv = gl_FragCoord.xy / u_resolution.xy;
-            vec4 pc = texture2D(u_vignette_texture, uv);
+            vec4 pc = texture(u_vignette_texture, uv);
 
-            gl_FragColor = vec4(pc.xyz, 1.0);
+            outputColour = vec4(pc.xyz, 1.0);
         }
     `;
     

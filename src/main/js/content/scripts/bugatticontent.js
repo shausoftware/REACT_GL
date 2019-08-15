@@ -19,10 +19,10 @@ export function getTitle() {
 }
 
 export function getDescription() {
-    var description = "The excellent Bugatti OBJ model by Kimzauto has been passed through my pre-processor (source on GIT)" + 
-                      " to create a JSON representaion. The lighting uses screen space " +
-                      "ambient occlusion, shadow maps and opacity. Again this is a large model and " +
-                      "takes a few seconds to load.";
+    var description = "This excellent Bugatti OBJ model by Kimzauto has been passed through my pre-processor (source on GIT) " + 
+                      "to create an optimised JSON representaion of the model (more suited for the web). Using the more traditional WebGL " +
+                      "rendering pipeline, this shader employs screen space ambient occlusion, " +
+                      "shadow maps and opacity. This model is quite large and takes a few seconds to load.";
     return description;
 }
 
@@ -30,7 +30,7 @@ export function getSnapshotImage() {
     return bugattiImgSrc;
 }
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
 
     //bugatti program
     const modelVsSource = ModelVertexShader.vertexSource();
@@ -114,7 +114,7 @@ export function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};                        
 }
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
     //do nothing
     return new Promise(resolve => {
 

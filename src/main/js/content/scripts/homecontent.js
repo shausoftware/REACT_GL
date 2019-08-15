@@ -16,11 +16,11 @@ export function getTitle() {
 }
 
 export function getDescription() {
-    var description = "Welcome to my little showcase. The focus is on WebGL, REACT, Bootstrap and Javascript development and some of my artistic endeavours." +
-                      " It also serves as WebGL development environment allowing me to quickly prototype ideas leveraging Webpack for autonomous build ands deployment." +       
-                      " All of the code to this site is available from my github repository" +
-                      " should you be interested in such things (see links). Now on to business..." +
-                      " some pictures of cats rendered using WebGL.";
+    var description = "Welcome to my little showcase. The focus is on WebGL2, REACT, Bootstrap, Javascript development and some " +                                "of my artistic endeavours. Some of the features include dynamic CSS overrides of Bootstrap themes, autonomous " +
+                      "build ands deployment using Webpack and some original artwork. It also serves as WebGL development environment " +
+                      "allowing me to quickly prototype ideas. All of the code to this site is available from my github repository" +
+                      "should you be interested in such things (see links). Now on to business... " +
+                      "some pictures of cats rendered using WebGL.";
     return description;
 }
 
@@ -28,7 +28,7 @@ export function getSnapshotImage() {
     return cat1;
 }
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
 
     var programInfos = undefined;
     var framebuffers = [];
@@ -45,7 +45,8 @@ export function initGLContent(gl, mBuffExt) {
             textureUniformLocation: gl.getUniformLocation(shaderProgram, 'u_texture'),
             vignetteUniformLocation: gl.getUniformLocation(shaderProgram, 'u_vignette'),
             resolutionUniformLocation: gl.getUniformLocation(shaderProgram, 'u_resolution'),
-            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time')
+            timeUniformLocation: gl.getUniformLocation(shaderProgram, 'u_time'),
+            frameUniformLocation: gl.getUniformLocation(shaderProgram, 'u_frame')
         }
     };
     programInfos = {renderProgramInfo: programInfo};
@@ -65,7 +66,7 @@ export function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};
 }
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
     //already fully initialised
     //do nothing
     return new Promise(resolve => {

@@ -48,7 +48,7 @@ export default class ShauLinks extends React.Component {
                 <div className='panel-body'>
                     <Pagination links={this.state.links} onNavigate={this.onNavigate} />
                     <p className='text-center'>
-                        and finally some links to stuff that I find interesting and useful.
+                        ...and finally some links to stuff that I find interesting and useful.
                     </p>
                     <table className='table'>
                         <tbody>

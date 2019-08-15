@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
     precision mediump float;
     
@@ -28,12 +28,15 @@ export function fragmentSource() {
     uniform vec3 u_eye_position;
     uniform vec3 u_light_position;
 
-    varying vec4 v_shadow_position;
-    varying vec3 v_position;
-    varying vec3 v_normal;
-    varying vec3 v_w_position;
-    varying vec3 v_w_normal;
+    //varying
+    in vec4 v_shadow_position;
+    in vec3 v_position;
+    in vec3 v_normal;
+    in vec3 v_w_position;
+    in vec3 v_w_normal;
     
+    out vec4 outputColour;
+
     //Spiral AO logic from reinder
     //https://www.shadertoy.com/view/Ms33WB
 
@@ -75,7 +78,7 @@ export function fragmentSource() {
 
     vec3 getPosition(vec2 uv) {
         float fl = 1.5; 
-        float d = decodeFloat(texture2D(u_ssao_texture, uv));   
+        float d = decodeFloat(texture(u_ssao_texture, uv));   
         vec2 p = uv*2.-1.;
         mat3 ca = mat3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, -1.0 / 1.5);
         vec3 rd = normalize(ca * vec3(p, fl));
@@ -130,7 +133,7 @@ export function fragmentSource() {
         // that is 9/9ths in the shadow.
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                float texelDepth = decodeFloat(texture2D(u_depth_colour_texture, fragmentDepth.xy + vec2(x, y) * texelSize));
+                float texelDepth = decodeFloat(texture(u_depth_colour_texture, fragmentDepth.xy + vec2(x, y) * texelSize));
                 if (fragmentDepth.z < texelDepth) {
                     amountInLight += 1.0;
                 }
@@ -225,7 +228,7 @@ export function fragmentSource() {
         //gl_FragColor = vec4(ao, ao, ao, 1.0);
         pc *= ao;
 
-        gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), alpha);          
+        outputColour = vec4(sqrt(clamp(pc*2.4, 0.0, 1.0)), alpha);          
     }
     
     `;

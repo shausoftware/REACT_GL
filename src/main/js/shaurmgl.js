@@ -39,14 +39,15 @@ export function initBuffers(gl) {
 }
 
 export function drawRMScene(gl, 
-                     programInfo, 
-                     buffers, 
-                     texture1,
-                     texture2,
-                     texture3,
-                     texture4,
-                     runningTime) {
-    
+                            programInfo, 
+                            buffers, 
+                            texture1,
+                            texture2,
+                            texture3,
+                            texture4,
+                            runningTime,
+                            frameCount) {
+
     gl.viewport(0, 0, 640, 480);
     gl.clearColor(0.0, 1.0, 0.0, 1.0); //green
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -79,6 +80,7 @@ export function drawRMScene(gl,
 
     gl.uniform2f(programInfo.uniformLocations.resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
     gl.uniform1f(programInfo.uniformLocations.timeUniformLocation, runningTime);
+    gl.uniform1i(programInfo.uniformLocations.frameUniformLocation, frameCount);
     
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 

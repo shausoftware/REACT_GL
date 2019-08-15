@@ -2,14 +2,17 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
     precision mediump float;
     
-    varying float v_depth;
-    varying float v_discard;
-    varying vec3 v_w_position;
-        
+    //varying
+    in float v_depth;
+    in float v_discard;
+    in vec3 v_w_position;
+      
+    out vec4 outputColour;
+
     //from http://spidergl.org/example.php?id=6
 	vec4 packDepth(const in float depth) {
 		const vec4 bit_shift = vec4(256.0 * 256.0 * 256.0, 256.0 * 256.0, 256.0, 1.0);
@@ -30,7 +33,7 @@ export function fragmentSource() {
             if (v_w_position.y > -0.05) discard;
         }
 
-        gl_FragColor = packDepth(v_depth);
+        outputColour = packDepth(v_depth);
     }
     
     `;

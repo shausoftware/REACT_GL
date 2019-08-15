@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
     precision mediump float;
     
@@ -31,12 +31,15 @@ export function fragmentSource() {
     uniform vec3 u_eye_position;
     uniform vec3 u_light_position;
 
-    varying vec4 v_shadow_position;
-    varying vec3 v_position;
-    varying vec3 v_normal;
-    varying vec3 v_w_position;
-    varying vec3 v_w_normal;
-    varying float v_discard;
+    //varying
+    in vec4 v_shadow_position;
+    in vec3 v_position;
+    in vec3 v_normal;
+    in vec3 v_w_position;
+    in vec3 v_w_normal;
+    in float v_discard;
+
+    out vec4 outputColour;
 
     //Spiral AO logic from reinder
     //https://www.shadertoy.com/view/Ms33WB
@@ -44,6 +47,7 @@ export function fragmentSource() {
     float planeIntersection(vec3 ro, vec3 rd, vec3 n, vec3 o) {
         return dot(o - ro, n) / dot(rd, n);
     }
+
 
     //IQs noise
     float noise(vec3 rp) {
@@ -79,7 +83,7 @@ export function fragmentSource() {
 
     vec3 getPosition(vec2 uv) {
         float fl = 1.5; 
-        float d = decodeFloat(texture2D(u_ssao_texture, uv));   
+        float d = decodeFloat(texture(u_ssao_texture, uv));   
         vec2 p = uv*2.-1.;
         mat3 ca = mat3(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, -1.0 / 1.5);
         vec3 rd = normalize(ca * vec3(p, fl));
@@ -134,7 +138,7 @@ export function fragmentSource() {
         // that is 9/9ths in the shadow.
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                float texelDepth = decodeFloat(texture2D(u_depth_colour_texture, fragmentDepth.xy + vec2(x, y) * texelSize));
+                float texelDepth = decodeFloat(texture(u_depth_colour_texture, fragmentDepth.xy + vec2(x, y) * texelSize));
                 if (fragmentDepth.z < texelDepth) {
                     amountInLight += 1.0;
                 }
@@ -170,7 +174,7 @@ export function fragmentSource() {
         vec3 rd = normalize(pos - eye); //eye - hit position ray direction 
         float dt = length(pos - eye); //distance from eye to surface
 
-        vec4 reflection = texture2D(u_reflection_texture, uv);
+        vec4 reflection = texture(u_reflection_texture, uv);
 
         if (u_tex == 1.0) {
             //floor
@@ -207,14 +211,14 @@ export function fragmentSource() {
         //gl_FragColor = vec4(ao, ao, ao, 1.0);
         pc *= ao;
 
-        vec4 glowColour = texture2D(u_glow_map_texture, uv);
+        vec4 glowColour = texture(u_glow_map_texture, uv);
         glowColour *= 0.8;    
 
         pc *= clamp(u_light_strength, 0.3, 1.0);
 
-        vec4 sceneColour = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);          
+        vec4 sceneColour = vec4(sqrt(clamp(pc * 3.0, 0.0, 1.0)), 1.0);          
 
-        gl_FragColor = clamp((glowColour + sceneColour) - (glowColour * sceneColour), 0.0, 1.0);
+        outputColour = clamp((glowColour + sceneColour) - (glowColour * sceneColour), 0.0, 1.0);
     }
     
     `;

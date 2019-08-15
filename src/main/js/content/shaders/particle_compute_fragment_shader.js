@@ -2,27 +2,42 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
-        #extension GL_EXT_draw_buffers : require
+        precision highp float;
 
-        #ifdef GL_FRAGMENT_PRECISION_HIGH
-            precision highp float;
-        #else
-            precision mediump float;
-        #endif
+        #define UI0 1597334673U
+        #define UI1 3812015801U
+        #define UI2 uvec2(UI0, UI1)
+        #define UI3 uvec3(UI0, UI1, 2798796415U)
+        #define UIF (1.0 / float(0xffffffffU))
 
         uniform vec2 u_resolution;
         uniform float u_time;
+        uniform int u_frame;
+        
         uniform float u_delta;
         uniform vec3 u_input_position;
         uniform float u_force;
+        
         uniform sampler2D u_texture0;
         uniform sampler2D u_texture1;
         uniform sampler2D u_texture2;
 
-        // Buffering optimisations learnt and understood from excellent article by Nop Jiarathanakul
-        // http://nopjia.blogspot.com/2014/06/webgl-gpu-particles.html
+        layout(location = 0) out vec4 gbuf_position;
+        layout(location = 1) out vec4 gbuf_vel;
+        layout(location = 2) out vec4 gbuf_col;
+
+        //Dave Hoskins - Hash without sin
+        vec2 hash22(vec2 p) {
+            uvec2 q = uvec2(ivec2(p))*UI2;
+            q = (q.x ^ q.y) * UI2;
+            return vec2(q) * UIF;
+        }
+
+        //compact 2 axis rotation
+        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}
+
         // Curl noise taken verbatim from The Spirit by Edan Kwan
         // http://www.edankwan.com/experiments/the-spirit/
 
@@ -155,8 +170,6 @@ export function fragmentSource() {
                 yNoisePotentialDerivatives[0] - xNoisePotentialDerivatives[1]
             );
         }
-        //compact 2 axis rotation
-        mat2 rot(float x) {return mat2(cos(x), sin(x), -sin(x), cos(x));}
 
         vec4 dfScene(vec3 rp) {
 
@@ -213,9 +226,18 @@ export function fragmentSource() {
             //handle particle updates
             vec2 uv = gl_FragCoord.xy / u_resolution.xy;
 
-            vec3 position = texture2D(u_texture0, uv).rgb;
-            vec3 velocity = texture2D(u_texture1, uv).rgb;
-            vec3 colour = texture2D(u_texture2, uv).rgb;
+            vec3 position = texture(u_texture0, uv).rgb;
+            vec3 velocity = texture(u_texture1, uv).rgb;
+            vec3 colour = texture(u_texture2, uv).rgb;
+
+            //init
+            if (position == vec3(0)) {
+                vec2 hash = 1.0 * (hash22(gl_FragCoord.xy) - 0.5);
+                position = vec3(hash.xy, 0.0);
+                position.yz *= rot(hash.x * 3.14);
+                velocity = vec3(hash.y * 3.0, hash.x * 2.0, hash.x * hash.y * 5.0);
+                colour = vec3(1.0, 0.3, 0.1);
+            }
 
             //TODO: mouse interactions
 
@@ -231,9 +253,13 @@ export function fragmentSource() {
             colour += vec3(0.4, 1.0, 0.6) * length(velocity) * 2.0;
             
             // write out data
-            gl_FragData[0] = vec4(finalPosition, 1.0);
-            gl_FragData[1] = vec4(velocity, 1.0);
-            gl_FragData[2] = vec4(colour, 1.0);
+            //gl_FragData[0] = vec4(finalPosition, 1.0);
+            //gl_FragData[0] = vec4(position, 1.0);
+            //gl_FragData[1] = vec4(velocity, 1.0);
+            //gl_FragData[2] = vec4(colour, 1.0);
+            gbuf_position = vec4(finalPosition, 1.0);
+            gbuf_vel = vec4(velocity, 1.0);
+            gbuf_col = vec4(colour, 1.0);
         }
     `;
     

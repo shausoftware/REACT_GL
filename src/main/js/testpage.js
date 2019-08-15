@@ -5,13 +5,8 @@ const ShauGL = require('./shaugl3D');
 
 const acs = require('augmented-compile-shader');
 
-const cat1 = require('./static/images/cat1.jpg');
-const cat2 = require('./static/images/cat2.jpg');
-const cat3 = require('./static/images/cat3.jpg');
-const cat4 = require('./static/images/cat4.jpg');
-
 //change content to the script we want to test
-const testScript = require('./content/scripts/bitsweepcontent');
+const testScript = require('./content/scripts/particlecontent');
 
 var animId = undefined;
 
@@ -28,10 +23,9 @@ export default class TestPage extends React.Component {
 
     componentDidMount() {
         
-        const gl = this.refs.glCanvas.getContext('webgl');
+        const gl = this.refs.glCanvas.getContext('webgl2');
         
         if (!gl) {
-            //TODO: fail gracefully
             this.setState({supported: false});
             alert('Please update to a web browser that supports WebGL.');
             this.gracefullFallback();  
@@ -40,11 +34,11 @@ export default class TestPage extends React.Component {
 
         var glScript = this.state.script;
 
-        var mBuffExt = ShauGL.checkExtensions(gl); //multiple buffer writes
         const loadScreenProgramInfo = ShauGL.initLoadScreenProgram(gl); //loading screen
 
-        var glContent = glScript.initGLContent(gl, mBuffExt);
+        var glContent = glScript.initGLContent(gl);
         var contentLoaded = false;
+  
         function renderFrame(now) {
 
             now *= 0.001; // convert to seconds
@@ -60,7 +54,7 @@ export default class TestPage extends React.Component {
             animId = requestAnimationFrame(renderFrame);            
         };
         
-        glScript.loadGLContent(gl, mBuffExt, glContent).then(loadedContent => {
+        glScript.loadGLContent(gl, glContent).then(loadedContent => {
             glContent = loadedContent;
             contentLoaded = true;
         });

@@ -65,7 +65,7 @@ export default class Exports extends React.Component {
 
         return(
             <div className='panel'>
-                <div className='panel-heading'><h4>Experiments</h4></div>
+                <div className='panel-heading'><h4>WebGL Experiments</h4></div>
                 <div className='panel-body'>
                     {pagination}
                     {displayItem}        

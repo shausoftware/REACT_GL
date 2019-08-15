@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
     #ifdef GL_ES
 	    precision highp float;
@@ -15,6 +15,8 @@ export function fragmentSource() {
     uniform float u_blur_strength;
 
     #define PI 3.141592
+
+    out vec4 outputColour;
 
     //box blur
     //http://devmaster.net/p/3100/shader-effects-glow-and-bloom#
@@ -42,7 +44,7 @@ export function fragmentSource() {
             for (int i = 0; i < 10; ++i) {
                 if (i >= u_blur_amount) break;
                 float offset = float(i) - halfBlur;
-                texColour = texture2D(u_image_texture, uv + vec2(offset * 1.0 / iResolution.x * u_blur_scale, 0.0)) * gaussian(offset * strength, deviation);
+                texColour = texture(u_image_texture, uv + vec2(offset * 1.0 / iResolution.x * u_blur_scale, 0.0)) * gaussian(offset * strength, deviation);
                 colour += texColour;
             }
         } else {
@@ -50,13 +52,12 @@ export function fragmentSource() {
             for (int i = 0; i < 10; ++i) {
                 if (i >= u_blur_amount) break;
                 float offset = float(i) - halfBlur;
-                texColour = texture2D(u_image_texture, uv + vec2(0.0, offset * 1.0 / iResolution.y * u_blur_scale)) * gaussian(offset * strength, deviation);
+                texColour = texture(u_image_texture, uv + vec2(0.0, offset * 1.0 / iResolution.y * u_blur_scale)) * gaussian(offset * strength, deviation);
                 colour += texColour;
             }
         }
 
-        gl_FragColor = clamp(colour, 0.0, 1.0);
-        gl_FragColor.w = 1.0;
+        outputColour = vec4(clamp(colour.xyz, 0.0, 1.0), 1.0);
     }
     
     `;

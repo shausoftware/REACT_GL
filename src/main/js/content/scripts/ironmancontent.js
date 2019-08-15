@@ -25,8 +25,9 @@ export function getTitle() {
 }
 
 export function getDescription() {
-    var description = "This great Iron-Man OBJ model by Kimzauto has been passed through my pre-processor (source on GIT)" + 
-                      " to create a JSON representaion. This time I tried adding a glow effect some planar reflections in the floor. " +
+    var description = "Another model has that been passed through my pre-processor (source on GIT). " + 
+                      "This time the Iron-Man OBJ model by Kimzauto has nee renderered using a glow effect " +
+                      "and some planar reflections in the floor. " +
                       "The models are quite large and take a little while to load.";
     return description;
 }
@@ -35,12 +36,13 @@ export function getSnapshotImage() {
     return ironManImgSrc;
 }
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
 
-    //bugatti program
+    //iron man program
     const modelVsSource = ModelVertexShader.vertexSource();
     const ironManFsSource = IronManFragmentShader.fragmentSource();
     const ironManShaderProgram = ShauGL.initShaderProgram(gl, modelVsSource, ironManFsSource);
+
     const ironManProgramInfo = {
         program: ironManShaderProgram,
         attribLocations: {
@@ -71,7 +73,7 @@ export function initGLContent(gl, mBuffExt) {
         }
     }
 
-    //bugatti reflection program
+    //iron man reflection program
     const ironManReflectionFsSource = IronManReflectionFragmentShader.fragmentSource();
     const ironManReflectionShaderProgram = ShauGL.initShaderProgram(gl, modelVsSource, ironManReflectionFsSource);
     const ironManReflectionProgramInfo = {
@@ -166,7 +168,7 @@ export function initGLContent(gl, mBuffExt) {
             framebuffers: framebuffers};
 }
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
 
     return new Promise(resolve => {
         

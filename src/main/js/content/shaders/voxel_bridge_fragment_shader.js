@@ -2,7 +2,7 @@
 
 export function fragmentSource() {
 
-    const fsSource = `
+    const fsSource = `#version 300 es
 
         #ifdef GL_FRAGMENT_PRECISION_HIGH
 	        precision highp float;
@@ -12,6 +12,7 @@ export function fragmentSource() {
 
         uniform vec2 u_resolution;
         uniform float u_time;
+        uniform int u_frame;
 
         uniform sampler2D u_texture1;        
         
@@ -19,6 +20,8 @@ export function fragmentSource() {
         #define FAR 100.0 
         #define PI 3.14159265359
         #define T u_time
+
+        out vec4 outputColour;
 
         vec3 lp = vec3(4.0, 5.0, -2.0); //light position
 
@@ -182,9 +185,9 @@ export function fragmentSource() {
             }
 
             //glow light
-            pc += texture2D(u_texture1, gl_FragCoord.xy / u_resolution).xyz;
+            pc += texture(u_texture1, gl_FragCoord.xy / u_resolution).xyz;
             
-            gl_FragColor = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);
+            outputColour = vec4(sqrt(clamp(pc, 0.0, 1.0)), 1.0);
         }
     `;
 

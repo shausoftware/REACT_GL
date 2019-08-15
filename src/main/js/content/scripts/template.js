@@ -18,11 +18,11 @@ export function getSnapshotImage() {
 
 }
 
-export function initGLContent(gl, mBuffExt) {
+export function initGLContent(gl) {
 
 }
 
-export function loadGLContent(gl, mBuffExt, content) {
+export function loadGLContent(gl, content) {
     //do nothing
     return new Promise(resolve => {
         resolve(content);

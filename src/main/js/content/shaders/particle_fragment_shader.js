@@ -2,18 +2,21 @@
 
 export function fragmentSource() {
     
-    const fsSource = `
+    const fsSource = `#version 300 es
 
-        #ifdef GL_ES
+        //#ifdef GL_ES
             precision highp float;
-        #endif
+        //#endif
     
         uniform vec2 u_resolution;
         uniform sampler2D u_texture0;
         uniform sampler2D u_texture1;
         uniform sampler2D u_texture2;
 
-        varying vec4 v_colour;
+        //varying 
+        in vec4 v_colour;
+
+        out vec4 outputColour;
 
         void main() {
 
@@ -24,7 +27,7 @@ export function fragmentSource() {
                 pc = vec4(1.0);
             }
 
-            gl_FragColor = pc;
+            outputColour = pc;
         }
     `;
     
