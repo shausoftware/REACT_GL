@@ -24,8 +24,9 @@ export function getTitle() {
 
 export function getDescription() {
     var description = "This simple particle/compute shader uses multiple output buffers from a single fragment shader " +
-                      "to store and compute particle positions and velocities. Edan Kwan's curl noise is used " +
-                      "for the FBM type motion.";
+                      "to store and compute particle positions and velocities. It takes a few seconds to get going " +
+                      " but some invisible points are rotating through the particles affecting them with " +
+                      " negative gravity. Edan Kwan's curl noise is used for the FBM type motion.";
     return description;
 }
 
