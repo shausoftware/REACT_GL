@@ -15,7 +15,7 @@ finally open a web browser and navigate to:
 
 http://localhost:8080
 
-[Screenshot](src/main/js/static/images/react_gl.png)
+![Screenshot](src/main/js/static/images/react_gl.png)
 
 To run this as a development tool a few changes need to be made:
 change TEST_MODE from false to true in App.js. 
